@@ -82,7 +82,7 @@ public class NxtTeleOp extends OpMode {
     devMode = DcMotorController.DeviceMode.WRITE_ONLY;
 
     motorRight.setDirection(DcMotor.Direction.REVERSE);
-    //motorLeft.setDirection(DcMotor.Direction.REVERSE);
+    //frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
     // set the mode
     // Nxt devices start up in "write" mode by default, so no need to switch device modes here.

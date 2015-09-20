@@ -2,9 +2,6 @@ package com.qualcomm.ftcrobotcontroller;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import static com.qualcomm.ftcrobotcontroller.ServoInputs.FlapStates.FlapClosed;
-import static com.qualcomm.ftcrobotcontroller.ServoInputs.PinStates.PinDown;
-
 /**
  * Created by 4924_Users on 9/20/2015.
  */
@@ -13,9 +10,11 @@ public class ServoInputsReader {
         ServoInputs inputs = new ServoInputs();
 
         // TODO Calculate servo states from inputs
+        inputs.RaisePin = gamepad2.start;
+        inputs.LowerPin = gamepad2.back;
 
-        inputs.CurrentFlapState = FlapClosed;
-        inputs.CurrentPinState = PinDown;
+        inputs.OpenFlap = gamepad2.left_bumper;
+        inputs.CloseFlap = gamepad2.right_bumper;
 
         return inputs;
     }

@@ -35,6 +35,8 @@ public class SirHammerTeleop extends OpMode {
     Servo pinServo;
     Servo flapServo;
 
+    ServoAngles servoAngles = new ServoAngles();
+
     @Override
     public void init() {
 
@@ -57,9 +59,11 @@ public class SirHammerTeleop extends OpMode {
         SpinnerMotorPowerLevel spinnerMotorPowerLevel = SpinnerPowerCalculator.Calculate(spinnerInputs);
         SetSpinnerMotorPowerLevel(spinnerMotorPowerLevel);
 
-         // raise/lower the pin, the flaps, run the sweeper???
+        // raise/lower the pin, the flaps, run the sweeper???
+        // we have to keep a variable with current servo angles, since we want to keep the
+        // same angle if no inputs that cause us to change servos happen
         ServoInputs servoInputs = ServoInputsReader.GetServoInputs(gamepad1, gamepad2);
-        ServoAngles servoAngles = ServoAngleCalculator.Calculate(servoInputs);
+        ServoAngleCalculator.UpdateServoAngles(servoInputs, servoAngles);
         SetServoAngles(servoAngles);
 
     }
@@ -82,6 +86,6 @@ public class SirHammerTeleop extends OpMode {
 
     private void SetServoAngles(ServoAngles angles) {
         pinServo.setPosition(angles.PinAngle);
-        flapServo.setPosition(angles.FlagAngle);
+        flapServo.setPosition(angles.FlapAngle);
     }
 }

@@ -5,5 +5,10 @@ package com.qualcomm.ftcrobotcontroller;
  */
 public class ServoAngles {
     public float PinAngle;
-    public float FlagAngle;
+    public float FlapAngle;
+
+    public ServoAngles(float startPinAngle, float startFlapAngle) {
+        PinAngle = startPinAngle;
+        FlapAngle = startFlapAngle;
+    }
 }

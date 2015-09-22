@@ -10,7 +10,7 @@ public class SpinnerPowerCalculator {
     public static SpinnerMotorPowerLevel Calculate(SpinnerInputs inputs) {
         SpinnerMotorPowerLevel level = new SpinnerMotorPowerLevel();
 
-        // TODO Calculate spinner power levels from inputs
+        level.power = inputs.throttle;
 
         return level;
     }

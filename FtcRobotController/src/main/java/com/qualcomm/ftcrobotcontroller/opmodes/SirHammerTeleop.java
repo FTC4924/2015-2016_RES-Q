@@ -35,7 +35,7 @@ public class SirHammerTeleop extends OpMode {
     Servo pinServo;
     Servo flapServo;
 
-    ServoAngles servoAngles = new ServoAngles();
+    ServoAngles servoAngles = new ServoAngles(ServoAngleCalculator.PIN_UP_ANGLE, ServoAngleCalculator.FLAP_CLOSED_ANGLE);
 
     @Override
     public void init() {

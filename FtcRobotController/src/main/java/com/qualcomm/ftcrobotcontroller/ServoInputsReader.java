@@ -9,7 +9,6 @@ public class ServoInputsReader {
     public static ServoInputs GetServoInputs(Gamepad gamepad1, Gamepad gamepad2) {
         ServoInputs inputs = new ServoInputs();
 
-        // TODO Calculate servo states from inputs
         inputs.RaisePin = gamepad2.start;
         inputs.LowerPin = gamepad2.back;
 

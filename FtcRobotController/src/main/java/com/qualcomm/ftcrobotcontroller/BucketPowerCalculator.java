@@ -6,8 +6,9 @@ package com.qualcomm.ftcrobotcontroller;
 public class BucketPowerCalculator {
     public static BucketArmPowerLevel Calculate(BucketArmMotorInputs inputs) {
         BucketArmPowerLevel levels = new BucketArmPowerLevel();
-        float power = BucketArmReader.GetBucketArmInputs();
-        //TODO Ask about how to pass the gamepads
+        float power;
+        power = inputs.throttle;
+
         levels.power = power;
 
         return levels;

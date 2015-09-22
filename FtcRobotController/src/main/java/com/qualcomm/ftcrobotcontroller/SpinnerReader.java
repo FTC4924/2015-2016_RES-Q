@@ -8,8 +8,10 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class SpinnerReader {
     public static SpinnerInputs GetSpinnerInputs(Gamepad gamepad1, Gamepad gamepad2) {
         SpinnerInputs inputs = new SpinnerInputs();
+        float throttle;
 
-        // TODO Actually read spinner inputs
+        throttle = gamepad2.right_trigger - gamepad2.left_trigger;
+        inputs.throttle = throttle;
 
         return inputs;
     }

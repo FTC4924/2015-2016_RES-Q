@@ -8,8 +8,10 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class BucketArmReader {
     public static BucketArmMotorInputs GetBucketArmInputs(Gamepad gamepad1, Gamepad gamepad2) {
         BucketArmMotorInputs inputs = new BucketArmMotorInputs();
+        float bucketThrottle;
+        bucketThrottle = -gamepad2.left_stick_y;
 
-        // TODO Read Bucket Arm Inputs
+        inputs.throttle = bucketThrottle;
 
         return inputs;
     }

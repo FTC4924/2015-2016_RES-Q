@@ -40,6 +40,15 @@ public class SirHammerTeleop extends OpMode {
     @Override
     public void init() {
 
+        frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
+        frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
+        backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+        backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        pinServo = hardwareMap.servo.get("pinServo");
+        flapServo = hardwareMap.servo.get("flapServo");
     }
 
     @Override

@@ -54,11 +54,22 @@ public class SirHammerTeleop extends OpMode {
     @Override
     public void loop() {
 
-        ReadAndSetDriveMotors();
+        // drive the motors
+        DriverInputs inputs = DriverReader.GetDriverInputs(gamepad1, gamepad2);
+        FourWheelDrivePowerLevels levels = DriveMotorPowerCalculator.Calculate(inputs);
+        SetDriveMotorPowerLevels(levels);
+
         ReadAndSetBucketArmMotors();
         ReadAndSetSpinnerMotor();
         ReadAndSetServos();
 
+        // do some telemetry
+        telemetry.addData("Text", "*** Robot Data***");
+        if (servoAngles.PinAngle==ServoAngleCalculator.PIN_UP_ANGLE)
+            telemetry.addData("pin", "pin:  UP");
+        else
+            telemetry.addData("pin", "pin: DN");
+        //telemetry.addData("drivepower", String.format("pwr: %1|%2|%3|%4" + levels.frontLeft) );
     }
 
     private void ReadAndSetServos() {
@@ -78,10 +89,6 @@ public class SirHammerTeleop extends OpMode {
     }
 
     private void ReadAndSetDriveMotors() {
-        // drive the motors
-        DriverInputs inputs = DriverReader.GetDriverInputs(gamepad1, gamepad2);
-        FourWheelDrivePowerLevels levels = DriveMotorPowerCalculator.Calculate(inputs);
-        SetDriveMotorPowerLevels(levels);
     }
 
     private void ReadAndSetBucketArmMotors() {

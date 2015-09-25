@@ -6,9 +6,9 @@ import com.qualcomm.robotcore.util.Range;
  * Created by 4924_Users on 9/17/2015.
  */
 public class DriveMotorPowerCalculator {
-    public static DriveMotorPowerLevels Calculate(DriverInputs inputs) {
+    public static FourWheelDrivePowerLevels Calculate(DriverInputs inputs) {
 
-        DriveMotorPowerLevels levels = new DriveMotorPowerLevels();
+        FourWheelDrivePowerLevels levels = new FourWheelDrivePowerLevels();
         float right = inputs.throttle - inputs.direction;
         float left = inputs.throttle + inputs.direction;
 

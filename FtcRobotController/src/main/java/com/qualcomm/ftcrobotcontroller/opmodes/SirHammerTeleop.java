@@ -6,7 +6,7 @@ import com.qualcomm.ftcrobotcontroller.BucketArmReader;
 import com.qualcomm.ftcrobotcontroller.BucketPowerCalculator;
 import com.qualcomm.ftcrobotcontroller.DriverInputs;
 import com.qualcomm.ftcrobotcontroller.DriverReader;
-import com.qualcomm.ftcrobotcontroller.DriveMotorPowerLevels;
+import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.ftcrobotcontroller.DriveMotorPowerCalculator;
 import com.qualcomm.ftcrobotcontroller.ServoAngleCalculator;
 import com.qualcomm.ftcrobotcontroller.ServoAngles;
@@ -53,31 +53,45 @@ public class SirHammerTeleop extends OpMode {
 
     @Override
     public void loop() {
-        // drive the motors
-        DriverInputs inputs = DriverReader.GetDriverInputs(gamepad1, gamepad2);
-        DriveMotorPowerLevels levels = DriveMotorPowerCalculator.Calculate(inputs);
-        SetDriveMotorPowerLevels(levels);
 
-        // raise/lower the bucket arm
-        BucketArmMotorInputs bucketInputs = BucketArmReader.GetBucketArmInputs(gamepad1, gamepad2);
-        BucketArmPowerLevel bucketLevels = BucketPowerCalculator.Calculate(bucketInputs);
-        SetBucketArmPowerLevels(bucketLevels);
+        ReadAndSetDriveMotors();
+        ReadAndSetBucketArmMotors();
+        ReadAndSetSpinnerMotor();
+        ReadAndSetServos();
 
-        // turn the spinner
-        SpinnerInputs spinnerInputs = SpinnerReader.GetSpinnerInputs(gamepad1, gamepad2);
-        SpinnerMotorPowerLevel spinnerMotorPowerLevel = SpinnerPowerCalculator.Calculate(spinnerInputs);
-        SetSpinnerMotorPowerLevel(spinnerMotorPowerLevel);
+    }
 
+    private void ReadAndSetServos() {
         // raise/lower the pin, the flaps, run the sweeper???
         // we have to keep a variable with current servo angles, since we want to keep the
         // same angle if no inputs that cause us to change servos happen
         ServoInputs servoInputs = ServoInputsReader.GetServoInputs(gamepad1, gamepad2);
         ServoAngleCalculator.UpdateServoAngles(servoInputs, servoAngles);
         SetServoAngles(servoAngles);
-
     }
 
-    private void SetDriveMotorPowerLevels(DriveMotorPowerLevels levels) {
+    private void ReadAndSetSpinnerMotor() {
+        // turn the spinner
+        SpinnerInputs spinnerInputs = SpinnerReader.GetSpinnerInputs(gamepad1, gamepad2);
+        SpinnerMotorPowerLevel spinnerMotorPowerLevel = SpinnerPowerCalculator.Calculate(spinnerInputs);
+        SetSpinnerMotorPowerLevel(spinnerMotorPowerLevel);
+    }
+
+    private void ReadAndSetDriveMotors() {
+        // drive the motors
+        DriverInputs inputs = DriverReader.GetDriverInputs(gamepad1, gamepad2);
+        FourWheelDrivePowerLevels levels = DriveMotorPowerCalculator.Calculate(inputs);
+        SetDriveMotorPowerLevels(levels);
+    }
+
+    private void ReadAndSetBucketArmMotors() {
+        // raise/lower the bucket arm
+        BucketArmMotorInputs bucketInputs = BucketArmReader.GetBucketArmInputs(gamepad1, gamepad2);
+        BucketArmPowerLevel bucketLevels = BucketPowerCalculator.Calculate(bucketInputs);
+        SetBucketArmPowerLevels(bucketLevels);
+    }
+
+    private void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
         frontLeftMotor.setPower(levels.frontLeft);
         backLeftMotor.setPower(levels.backLeft);
         backRightMotor.setPower(levels.backRight);

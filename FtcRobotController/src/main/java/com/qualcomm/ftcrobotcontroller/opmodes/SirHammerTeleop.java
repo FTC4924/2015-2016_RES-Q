@@ -6,8 +6,8 @@ import com.qualcomm.ftcrobotcontroller.BucketArmReader;
 import com.qualcomm.ftcrobotcontroller.BucketPowerCalculator;
 import com.qualcomm.ftcrobotcontroller.DriverInputs;
 import com.qualcomm.ftcrobotcontroller.DriverReader;
-import com.qualcomm.ftcrobotcontroller.MotorPwerLvl;
-import com.qualcomm.ftcrobotcontroller.PowerCal;
+import com.qualcomm.ftcrobotcontroller.DriveMotorPowerLevels;
+import com.qualcomm.ftcrobotcontroller.DriveMotorPowerCalculator;
 import com.qualcomm.ftcrobotcontroller.ServoAngleCalculator;
 import com.qualcomm.ftcrobotcontroller.ServoAngles;
 import com.qualcomm.ftcrobotcontroller.ServoInputs;
@@ -55,8 +55,8 @@ public class SirHammerTeleop extends OpMode {
     public void loop() {
         // drive the motors
         DriverInputs inputs = DriverReader.GetDriverInputs(gamepad1, gamepad2);
-        MotorPwerLvl levels = PowerCal.CalcPwerLvls(inputs);
-        SetMotorPowerLevels(levels);
+        DriveMotorPowerLevels levels = DriveMotorPowerCalculator.Calculate(inputs);
+        SetDriveMotorPowerLevels(levels);
 
         // raise/lower the bucket arm
         BucketArmMotorInputs bucketInputs = BucketArmReader.GetBucketArmInputs(gamepad1, gamepad2);
@@ -77,7 +77,7 @@ public class SirHammerTeleop extends OpMode {
 
     }
 
-    private void SetMotorPowerLevels(MotorPwerLvl levels) {
+    private void SetDriveMotorPowerLevels(DriveMotorPowerLevels levels) {
         frontLeftMotor.setPower(levels.frontLeft);
         backLeftMotor.setPower(levels.backLeft);
         backRightMotor.setPower(levels.backRight);

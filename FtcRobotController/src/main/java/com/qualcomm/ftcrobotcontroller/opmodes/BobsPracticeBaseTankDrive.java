@@ -31,6 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
+import com.qualcomm.ftcrobotcontroller.DriveMotorPowerCalculator;
+import com.qualcomm.ftcrobotcontroller.DriverReader;
+import com.qualcomm.ftcrobotcontroller.DriverTankDriveInputs;
+import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
@@ -109,11 +113,15 @@ public class BobsPracticeBaseTankDrive extends OpMode {
 		 * wrist/claw via the a,b, x, y buttons
 		 */
 
+        DriverTankDriveInputs driveInputs = DriverReader.GetDriverTankInputs(gamepad1, gamepad2);
+        FourWheelDrivePowerLevels levels = DriveMotorPowerCalculator.CalculatePowerForTankInputs(driveInputs);
+        SetDriveMotorPowerLevels(levels);
+
         // throttle: left_stick_y ranges from -1 to 1, where -1 is full up, and
         // 1 is full down
         // direction: left_stick_x ranges from -1 to 1, where -1 is full left
         // and 1 is full right
-        float leftThrottle = -gamepad1.left_stick_y;
+/*        float leftThrottle = -gamepad1.left_stick_y;
         float rightThrottle = -gamepad1.right_stick_y;
         float right = rightThrottle;
         float left = leftThrottle;
@@ -132,6 +140,7 @@ public class BobsPracticeBaseTankDrive extends OpMode {
         backRightMotor.setPower(right);
         frontLeftMotor.setPower(left);
         backLeftMotor.setPower(left);
+*/
 
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using
@@ -140,8 +149,8 @@ public class BobsPracticeBaseTankDrive extends OpMode {
 		 * are currently write only.
 		 */
         telemetry.addData("Text", "*** Robot Data***");
-        telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", left));
-        telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
+        telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", levels.frontLeft));
+        telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", levels.frontRight));
 
     }
 
@@ -180,6 +189,13 @@ public class BobsPracticeBaseTankDrive extends OpMode {
         }
 
         return dScale;
+    }
+
+    private void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
+        frontLeftMotor.setPower(levels.frontLeft);
+        backLeftMotor.setPower(levels.backLeft);
+        backRightMotor.setPower(levels.backRight);
+        frontRightMotor.setPower(levels.frontRight);
     }
 
 }

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.Range;
  * Created by 4924_Users on 9/17/2015.
  */
 public class DriveMotorPowerCalculator {
-    public static FourWheelDrivePowerLevels Calculate(DriverInputs inputs) {
+    public static FourWheelDrivePowerLevels CalculatePowerForArcadeInputs(DriverArcadeInputs inputs) {
 
         FourWheelDrivePowerLevels levels = new FourWheelDrivePowerLevels();
         float right = inputs.throttle - inputs.direction;
@@ -27,6 +27,28 @@ public class DriveMotorPowerCalculator {
         return levels;
     }
 
+    public static FourWheelDrivePowerLevels CalculatePowerForTankInputs(DriverTankDriveInputs inputs) {
+        FourWheelDrivePowerLevels levels = new FourWheelDrivePowerLevels();
+
+        float left = inputs.left;
+        float right = inputs.right;
+        float accelerator = inputs.accelerator;
+
+        right = Range.clip(right, -1, 1);
+        left = Range.clip(left, -1, 1);
+        accelerator = Range.clip(accelerator, 0, 1);
+
+        // scale the joystick value to make it easier to control
+        // the robot more precisely at slower speeds.
+        right = right * accelerator;
+        left =  left * accelerator;
+
+        levels.backLeft = left;
+        levels.backRight = right;
+        levels.frontLeft = left;
+        levels.frontRight = right;
+        return levels;
+    }
     /*
 	 * This method scales the joystick input so for low joystick values, the
 	 * scaled value is less than linear.  This is to make it easier to drive

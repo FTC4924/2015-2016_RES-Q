@@ -4,7 +4,7 @@ import com.qualcomm.ftcrobotcontroller.BucketArmMotorInputs;
 import com.qualcomm.ftcrobotcontroller.BucketArmPowerLevel;
 import com.qualcomm.ftcrobotcontroller.BucketArmReader;
 import com.qualcomm.ftcrobotcontroller.BucketPowerCalculator;
-import com.qualcomm.ftcrobotcontroller.DriverInputs;
+import com.qualcomm.ftcrobotcontroller.DriverArcadeInputs;
 import com.qualcomm.ftcrobotcontroller.DriverReader;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.ftcrobotcontroller.DriveMotorPowerCalculator;
@@ -55,8 +55,8 @@ public class SirHammerTeleop extends OpMode {
     public void loop() {
 
         // drive the motors
-        DriverInputs inputs = DriverReader.GetDriverInputs(gamepad1, gamepad2);
-        FourWheelDrivePowerLevels levels = DriveMotorPowerCalculator.Calculate(inputs);
+        DriverArcadeInputs inputs = DriverReader.GetDriverArcadeInputs(gamepad1, gamepad2);
+        FourWheelDrivePowerLevels levels = DriveMotorPowerCalculator.CalculatePowerForArcadeInputs(inputs);
         SetDriveMotorPowerLevels(levels);
 
         ReadAndSetBucketArmMotors();

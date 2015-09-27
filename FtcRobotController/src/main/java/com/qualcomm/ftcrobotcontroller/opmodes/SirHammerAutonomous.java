@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import static com.qualcomm.ftcrobotcontroller.opmodes.SirHammerAutonomous.CenterColumnPosition.*;
 import static com.qualcomm.ftcrobotcontroller.opmodes.SirHammerAutonomous.RobotStates.*;
 
 /**
@@ -17,6 +18,9 @@ public class SirHammerAutonomous extends OpMode {
         READING_CENTER_POSITION, MOVING_TO_POSITION_1,
         MOVING_TO_POSITION_2, MOVING_TO_POSITION_3, RAISING_AUTONOMOUS_ARM,
         LOWERING_AUTONOMOUS_ARM, MOVING_TO_KICKSTAND }
+
+    public enum CenterColumnPosition { UNDETECTED, ONE, TWO, THREE }
+
     RobotStates state;
 
     DcMotor frontLeftMotor;
@@ -24,10 +28,12 @@ public class SirHammerAutonomous extends OpMode {
     DcMotor frontRightMotor;
     DcMotor backRightMotor;
     SirHammerAutonomousSensors sensors;
+    CenterColumnPosition goalPosition;
 
     @Override
     public void init() {
         state = MOVING_TO_READ_CENTER_POSITION;
+        goalPosition = UNDETECTED;
 
         frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");

@@ -93,8 +93,8 @@ public class BobsPracticeBaseTankDrive extends OpMode {
         frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
         backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
         backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
-        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
     }
 
@@ -117,31 +117,6 @@ public class BobsPracticeBaseTankDrive extends OpMode {
         FourWheelDrivePowerLevels levels = DriveMotorPowerCalculator.CalculatePowerForTankInputs(driveInputs);
         SetDriveMotorPowerLevels(levels);
 
-        // throttle: left_stick_y ranges from -1 to 1, where -1 is full up, and
-        // 1 is full down
-        // direction: left_stick_x ranges from -1 to 1, where -1 is full left
-        // and 1 is full right
-/*        float leftThrottle = -gamepad1.left_stick_y;
-        float rightThrottle = -gamepad1.right_stick_y;
-        float right = rightThrottle;
-        float left = leftThrottle;
-
-        // clip the right/left values so that the values never exceed +/- 1
-        right = Range.clip(right, -1, 1);
-        left = Range.clip(left, -1, 1);
-
-        // scale the joystick value to make it easier to control
-        // the robot more precisely at slower speeds.
-        right = (float)scaleInput(right);
-        left =  (float)scaleInput(left);
-
-        // write the values to the motors
-        frontRightMotor.setPower(right);
-        backRightMotor.setPower(right);
-        frontLeftMotor.setPower(left);
-        backLeftMotor.setPower(left);
-*/
-
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using
 		 * a legacy NXT-compatible motor controller, then the getPower() method
@@ -151,6 +126,9 @@ public class BobsPracticeBaseTankDrive extends OpMode {
         telemetry.addData("Text", "*** Robot Data***");
         telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", levels.frontLeft));
         telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", levels.frontRight));
+        telemetry.addData("Left stick y", String.format("%.2f", driveInputs.left));
+        telemetry.addData("Right stick y", String.format("%.2f", driveInputs.right));
+        telemetry.addData("Accelerator", String.format("%.2f", driveInputs.accelerator));
 
     }
 

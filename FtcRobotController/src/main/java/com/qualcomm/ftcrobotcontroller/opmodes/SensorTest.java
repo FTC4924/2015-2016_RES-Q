@@ -2,9 +2,12 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.robocol.Telemetry;
+
+import java.util.List;
 
 import static com.qualcomm.ftcrobotcontroller.opmodes.ColorSensorDriver.*;
 
@@ -16,6 +19,7 @@ public class SensorTest extends OpMode {
     ColorSensor colorReader;
     TouchSensor touchSensor;
     OpticalDistanceSensor distanceSensor;
+    DcMotor testMotor;
 
     @Override
     public void init() {
@@ -23,10 +27,19 @@ public class SensorTest extends OpMode {
         touchSensor = hardwareMap.touchSensor.get("TouchSensor");
         distanceSensor = hardwareMap.opticalDistanceSensor.get("DistanceSensor");
         distanceSensor.enableLed(true);
+        testMotor = hardwareMap.dcMotor.get("TestMotor");
     }
 
     @Override
     public void loop() {
+
+        Boolean advance1000 = false;
+        Boolean advance2000 = false;
+
+        advance1000 = gamepad1.a;
+        advance1000 = gamepad1.b;
+
+
 
         String touch;
 

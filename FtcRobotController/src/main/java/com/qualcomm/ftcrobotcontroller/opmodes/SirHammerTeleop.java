@@ -28,12 +28,12 @@ public class SirHammerTeleop extends OpMode {
     DcMotor backLeftMotor;
     DcMotor frontRightMotor;
     DcMotor backRightMotor;
-    DcMotor leftBucketMotor;
-    DcMotor rightBucketMotor;
-    DcMotor spinnerMotor;
+    //DcMotor leftBucketMotor;
+    //DcMotor rightBucketMotor;
+    //DcMotor spinnerMotor;
 
-    Servo pinServo;
-    Servo flapServo;
+    //Servo pinServo;
+    //Servo flapServo;
 
     ServoAngles servoAngles = new ServoAngles();
 
@@ -47,8 +47,8 @@ public class SirHammerTeleop extends OpMode {
         frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
         backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        pinServo = hardwareMap.servo.get("pinServo");
-        flapServo = hardwareMap.servo.get("flapServo");
+        //pinServo = hardwareMap.servo.get("pinServo");
+        //flapServo = hardwareMap.servo.get("flapServo");
     }
 
     @Override
@@ -59,20 +59,20 @@ public class SirHammerTeleop extends OpMode {
         FourWheelDrivePowerLevels levels = DriveMotorPowerCalculator.CalculatePowerForArcadeInputs(inputs);
         SetDriveMotorPowerLevels(levels);
 
-        ReadAndSetBucketArmMotors();
-        ReadAndSetSpinnerMotor();
-        ReadAndSetServos();
+        //ReadAndSetBucketArmMotors();
+        //ReadAndSetSpinnerMotor();
+        //ReadAndSetServos();
 
         // do some telemetry
-        telemetry.addData("Text", "*** Robot Data***");
-        if (servoAngles.PinAngle==ServoAngleCalculator.PIN_UP_ANGLE)
-            telemetry.addData("pin", "pin:  UP");
-        else
-            telemetry.addData("pin", "pin: DN");
+        //telemetry.addData("Text", "*** Robot Data***");
+        //if (servoAngles.PinAngle==ServoAngleCalculator.PIN_UP_ANGLE)
+            //telemetry.addData("pin", "pin:  UP");
+        //else
+            //telemetry.addData("pin", "pin: DN");
         //telemetry.addData("drivepower", String.format("pwr: %1|%2|%3|%4" + levels.frontLeft) );
     }
 
-    private void ReadAndSetServos() {
+    /*private void ReadAndSetServos() {
         // raise/lower the pin, the flaps, run the sweeper???
         // we have to keep a variable with current servo angles, since we want to keep the
         // same angle if no inputs that cause us to change servos happen
@@ -96,7 +96,7 @@ public class SirHammerTeleop extends OpMode {
         BucketArmMotorInputs bucketInputs = BucketArmReader.GetBucketArmInputs(gamepad1, gamepad2);
         BucketArmPowerLevel bucketLevels = BucketPowerCalculator.Calculate(bucketInputs);
         SetBucketArmPowerLevels(bucketLevels);
-    }
+    } */
 
     private void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
         frontLeftMotor.setPower(levels.frontLeft);
@@ -105,7 +105,7 @@ public class SirHammerTeleop extends OpMode {
         frontRightMotor.setPower(levels.frontRight);
     }
 
-    private void SetBucketArmPowerLevels(BucketArmPowerLevel levels) {
+    /*private void SetBucketArmPowerLevels(BucketArmPowerLevel levels) {
         leftBucketMotor.setPower(levels.power);
         rightBucketMotor.setPower(levels.power);
     }
@@ -117,5 +117,5 @@ public class SirHammerTeleop extends OpMode {
     private void SetServoAngles(ServoAngles angles) {
         pinServo.setPosition(angles.PinAngle);
         flapServo.setPosition(angles.FlapAngle);
-    }
+    } */
 }

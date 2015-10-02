@@ -65,6 +65,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register ("SensorTest", SensorTest.class);
     manager.register ("BobsPracticeBaseTankDrive", BobsPracticeBaseTankDrive.class);
     manager.register ("SirHammerTeleop", SirHammerTeleop.class);
+    manager.register ("SirHammerServoPositioner", SirHammerServoPositioner.class);
 
     /*
      * Uncomment any of the following lines if you want to register an op mode.

@@ -18,4 +18,10 @@ public class RobotCommandQueue {
             currentCommand = currentCommand.NextCommand;
         currentCommand.Execute();
     }
+
+    public String CurrentCommandDescription() {
+        if (currentCommand == null)
+            return "";
+        return currentCommand.Description;
+    }
 }

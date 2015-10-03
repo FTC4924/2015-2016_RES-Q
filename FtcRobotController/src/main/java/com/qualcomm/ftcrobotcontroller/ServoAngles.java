@@ -10,7 +10,7 @@ public class ServoAngles {
 
     public ServoAngles() {
         PinAngle = ServoAngleCalculator.PIN_UP_ANGLE;
-        FlapAngle = ServoAngleCalculator.FLAP_CLOSED_ANGLE;
+        FlapAngle = ServoAngleCalculator.FLAP_OPEN_ANGLE;
         KickStandAngle = ServoAngleCalculator.KICKSTAND_DOCKED_ANGLE;
     }
 }

@@ -5,8 +5,8 @@ package com.qualcomm.ftcrobotcontroller;
  */
 public class ServoAngleCalculator {
 
-    public static final float FLAP_CLOSED_ANGLE = 0.5f;
-    public static final float FLAP_OPEN_ANGLE = 1.0f;
+    public static final float FLAP_CLOSED_ANGLE = 0.0f;
+    public static final float FLAP_OPEN_ANGLE = 0.42f;
     public static final float PIN_UP_ANGLE = 0.075f;
     public static final float PIN_DOWN_ANGLE = 0.0f;
     public static final float KICKSTAND_DOCKED_ANGLE = 1.0f;

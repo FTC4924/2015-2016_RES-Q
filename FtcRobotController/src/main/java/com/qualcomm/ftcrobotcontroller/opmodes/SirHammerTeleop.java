@@ -34,6 +34,7 @@ public class SirHammerTeleop extends OpMode {
 
     Servo pinServo;
     Servo flapServo;
+    Servo kickStandServo;
 
     ServoAngles servoAngles = new ServoAngles();
 
@@ -51,7 +52,9 @@ public class SirHammerTeleop extends OpMode {
         rightMainArmMotor = hardwareMap.dcMotor.get("rightMainArmMotor");
         leftMainArmMotor.setDirection(DcMotor.Direction.REVERSE);
         pinServo = hardwareMap.servo.get("pinServo");
-        //flapServo = hardwareMap.servo.get("flapServo");
+        flapServo = hardwareMap.servo.get("flapServo");
+        kickStandServo = hardwareMap.servo.get("kickStandArmServo");
+        kickStandServo.setPosition(ServoAngleCalculator.KICKSTAND_DOCKED_ANGLE);
     }
 
     @Override
@@ -72,6 +75,10 @@ public class SirHammerTeleop extends OpMode {
             telemetry.addData("pin", "pin:  UP");
         else
             telemetry.addData("pin", "pin: DN");
+        if (servoAngles.KickStandAngle==ServoAngleCalculator.KICKSTAND_DOCKED_ANGLE)
+            telemetry.addData("kick", "kick:  DOCKED");
+        else
+            telemetry.addData("kick", "kick: EXTENDED");
         // telemetry.addData("drivepower", String.format("pwr: %1|%2|%3|%4" + levels.frontLeft) );
     }
 
@@ -116,6 +123,7 @@ public class SirHammerTeleop extends OpMode {
 */
     private void SetServoAngles(ServoAngles angles) {
         pinServo.setPosition(angles.PinAngle);
+        kickStandServo.setPosition(angles.KickStandAngle);
         //flapServo.setPosition(angles.FlapAngle);
     }
 }

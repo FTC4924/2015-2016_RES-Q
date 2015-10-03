@@ -2,6 +2,7 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 /**
@@ -9,26 +10,38 @@ import com.qualcomm.robotcore.util.Range;
  */
 public class SirHammerServoPositioner extends OpMode {
 
-    Servo pinServo;
-    float pinServoAngle;
+    Servo testedServo;
+    float servoAngle;
+    ElapsedTime time = new ElapsedTime();
+    boolean delayActive;
+    float delayInterval = 0.1f;
+    float angleIncrement = 0.01f;
 
     @Override
     public void init() {
-        pinServo = hardwareMap.servo.get("pinServo");
-        pinServoAngle = 0.0f;
+        testedServo = hardwareMap.servo.get("flapServo");
+        servoAngle = 0.0f;
+        time.reset();
+        delayActive=false;
     }
 
     @Override
     public void loop() {
 
-        if (gamepad1.left_bumper)
-            pinServoAngle -= 0.1;
-        if (gamepad1.right_bumper)
-            pinServoAngle += 0.1;
+        if (delayActive)
+            if (time.time() >= delayInterval)
+                delayActive = false;
 
-        pinServoAngle = Range.clip(pinServoAngle, 0.0f, 1.0f);
-        pinServo.setPosition(pinServoAngle);
-
-        telemetry.addData("angle", "angle" + String.format("%.2f", pinServoAngle));
+        if (!delayActive) {
+            if (gamepad1.left_bumper)
+                servoAngle -= angleIncrement;
+            if (gamepad1.right_bumper)
+                servoAngle += angleIncrement;
+            servoAngle = Range.clip(servoAngle, 0.0f, 1.0f);
+            testedServo.setPosition(servoAngle);
+            delayActive = true;
+            time.reset();
+        }
+        telemetry.addData("angle", "angle" + String.format("%.2f", servoAngle));
     }
 }

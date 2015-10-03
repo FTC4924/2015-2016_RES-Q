@@ -20,9 +20,22 @@ public class color_test extends OpMode {
         colorSensor.enableLed(false);
         red_team = colorSensor.red();
         blue_team = colorSensor.blue();
-        telemetry.addData("red", "team:  " + red_team );
-        telemetry.addData("blue", "team:  " + blue_team );
+
+        telemetry.addData("red", "red:  " + (isRed(red_team, blue_team) ? "Yes" : "No") );
+        telemetry.addData("blue", "blue:  " + (isBlue(blue_team, red_team) ? "Yes" : "No") );
         telemetry.addData("Text", "*** Robot Data***");
 
+    }
+    public boolean isRed(int red_team,int blue_team){
+        if(red_team>blue_team){
+            return true;
+        }
+        return false;
+    }
+    public boolean isBlue(int blue_team,int red_team){
+        if (blue_team>red_team){
+            return true;
+        }
+        return false;
     }
 }

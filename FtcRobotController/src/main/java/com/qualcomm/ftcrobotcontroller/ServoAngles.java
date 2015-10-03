@@ -6,9 +6,11 @@ package com.qualcomm.ftcrobotcontroller;
 public class ServoAngles {
     public float PinAngle;
     public float FlapAngle;
+    public float KickStandAngle;
 
     public ServoAngles() {
         PinAngle = ServoAngleCalculator.PIN_UP_ANGLE;
-        FlapAngle = ServoAngleCalculator.FLAP_CLOSED_ANGLE;
+        FlapAngle = ServoAngleCalculator.FLAP_OPEN_ANGLE;
+        KickStandAngle = ServoAngleCalculator.KICKSTAND_DOCKED_ANGLE;
     }
 }

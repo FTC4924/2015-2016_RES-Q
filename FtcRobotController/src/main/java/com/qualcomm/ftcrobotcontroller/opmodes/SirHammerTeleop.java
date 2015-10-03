@@ -30,7 +30,7 @@ public class SirHammerTeleop extends OpMode {
     DcMotor backRightMotor;
     DcMotor leftMainArmMotor;
     DcMotor rightMainArmMotor;
-    //DcMotor spinnerMotor;
+    DcMotor spinnerMotor;
 
     Servo pinServo;
     Servo flapServo;
@@ -51,6 +51,9 @@ public class SirHammerTeleop extends OpMode {
         leftMainArmMotor = hardwareMap.dcMotor.get("leftMainArmMotor");
         rightMainArmMotor = hardwareMap.dcMotor.get("rightMainArmMotor");
         leftMainArmMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        spinnerMotor = hardwareMap.dcMotor.get("spinnerMotor");
+
         pinServo = hardwareMap.servo.get("pinServo");
         flapServo = hardwareMap.servo.get("flapServo");
         kickStandServo = hardwareMap.servo.get("kickStandArmServo");
@@ -66,7 +69,7 @@ public class SirHammerTeleop extends OpMode {
         SetDriveMotorPowerLevels(levels);
 
         ReadAndSetBucketArmMotors();
-        //ReadAndSetSpinnerMotor();
+        ReadAndSetSpinnerMotor();
         ReadAndSetServos();
 
         // do some telemetry
@@ -79,7 +82,6 @@ public class SirHammerTeleop extends OpMode {
             telemetry.addData("kick", "kick:  DOCKED");
         else
             telemetry.addData("kick", "kick: EXTENDED");
-        // telemetry.addData("drivepower", String.format("pwr: %1|%2|%3|%4" + levels.frontLeft) );
     }
 
     private void ReadAndSetServos() {
@@ -90,14 +92,14 @@ public class SirHammerTeleop extends OpMode {
         ServoAngleCalculator.UpdateServoAngles(servoInputs, servoAngles);
         SetServoAngles(servoAngles);
     }
-/*
+
     private void ReadAndSetSpinnerMotor() {
         // turn the spinner
         SpinnerInputs spinnerInputs = SpinnerReader.GetSpinnerInputs(gamepad1, gamepad2);
         SpinnerMotorPowerLevel spinnerMotorPowerLevel = SpinnerPowerCalculator.Calculate(spinnerInputs);
         SetSpinnerMotorPowerLevel(spinnerMotorPowerLevel);
     }
-*/
+
     private void ReadAndSetBucketArmMotors() {
         // raise/lower the bucket arm
         BucketArmMotorInputs bucketInputs = BucketArmReader.GetBucketArmInputs(gamepad1, gamepad2);
@@ -116,11 +118,11 @@ public class SirHammerTeleop extends OpMode {
         leftMainArmMotor.setPower(levels.power);
         rightMainArmMotor.setPower(levels.power);
     }
-/*
+
     private void SetSpinnerMotorPowerLevel(SpinnerMotorPowerLevel level) {
         spinnerMotor.setPower(level.power);
     }
-*/
+
     private void SetServoAngles(ServoAngles angles) {
         pinServo.setPosition(angles.PinAngle);
         kickStandServo.setPosition(angles.KickStandAngle);

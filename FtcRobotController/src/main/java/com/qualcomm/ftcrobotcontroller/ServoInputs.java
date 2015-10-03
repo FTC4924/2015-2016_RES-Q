@@ -8,4 +8,6 @@ public class ServoInputs {
     public boolean LowerPin;
     public boolean OpenFlap;
     public boolean CloseFlap;
+    public boolean DockKickStand;
+    public boolean ExtendKickStand;
 }

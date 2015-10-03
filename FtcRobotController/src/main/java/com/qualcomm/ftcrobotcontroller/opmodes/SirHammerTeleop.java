@@ -28,14 +28,14 @@ public class SirHammerTeleop extends OpMode {
     DcMotor backLeftMotor;
     DcMotor frontRightMotor;
     DcMotor backRightMotor;
-    DcMotor leftBucketMotor;
-    DcMotor rightBucketMotor;
-    DcMotor spinnerMotor;
+    DcMotor leftMainArmMotor;
+    DcMotor rightMainArmMotor;
+    //DcMotor spinnerMotor;
 
     Servo pinServo;
     Servo flapServo;
 
-    ServoAngles servoAngles = new ServoAngles(ServoAngleCalculator.PIN_UP_ANGLE, ServoAngleCalculator.FLAP_CLOSED_ANGLE);
+    ServoAngles servoAngles = new ServoAngles();
 
     @Override
     public void init() {
@@ -47,8 +47,11 @@ public class SirHammerTeleop extends OpMode {
         frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
         backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
+        leftMainArmMotor = hardwareMap.dcMotor.get("leftMainArmMotor");
+        rightMainArmMotor = hardwareMap.dcMotor.get("rightMainArmMotor");
+        leftMainArmMotor.setDirection(DcMotor.Direction.REVERSE);
         pinServo = hardwareMap.servo.get("pinServo");
-        flapServo = hardwareMap.servo.get("flapServo");
+        //flapServo = hardwareMap.servo.get("flapServo");
     }
 
     @Override
@@ -60,7 +63,7 @@ public class SirHammerTeleop extends OpMode {
         SetDriveMotorPowerLevels(levels);
 
         ReadAndSetBucketArmMotors();
-        ReadAndSetSpinnerMotor();
+        //ReadAndSetSpinnerMotor();
         ReadAndSetServos();
 
         // do some telemetry
@@ -69,7 +72,7 @@ public class SirHammerTeleop extends OpMode {
             telemetry.addData("pin", "pin:  UP");
         else
             telemetry.addData("pin", "pin: DN");
-        //telemetry.addData("drivepower", String.format("pwr: %1|%2|%3|%4" + levels.frontLeft) );
+        // telemetry.addData("drivepower", String.format("pwr: %1|%2|%3|%4" + levels.frontLeft) );
     }
 
     private void ReadAndSetServos() {
@@ -80,17 +83,14 @@ public class SirHammerTeleop extends OpMode {
         ServoAngleCalculator.UpdateServoAngles(servoInputs, servoAngles);
         SetServoAngles(servoAngles);
     }
-
+/*
     private void ReadAndSetSpinnerMotor() {
         // turn the spinner
         SpinnerInputs spinnerInputs = SpinnerReader.GetSpinnerInputs(gamepad1, gamepad2);
         SpinnerMotorPowerLevel spinnerMotorPowerLevel = SpinnerPowerCalculator.Calculate(spinnerInputs);
         SetSpinnerMotorPowerLevel(spinnerMotorPowerLevel);
     }
-
-    private void ReadAndSetDriveMotors() {
-    }
-
+*/
     private void ReadAndSetBucketArmMotors() {
         // raise/lower the bucket arm
         BucketArmMotorInputs bucketInputs = BucketArmReader.GetBucketArmInputs(gamepad1, gamepad2);
@@ -106,16 +106,16 @@ public class SirHammerTeleop extends OpMode {
     }
 
     private void SetBucketArmPowerLevels(BucketArmPowerLevel levels) {
-        leftBucketMotor.setPower(levels.power);
-        rightBucketMotor.setPower(levels.power);
+        leftMainArmMotor.setPower(levels.power);
+        rightMainArmMotor.setPower(levels.power);
     }
-
+/*
     private void SetSpinnerMotorPowerLevel(SpinnerMotorPowerLevel level) {
         spinnerMotor.setPower(level.power);
     }
-
+*/
     private void SetServoAngles(ServoAngles angles) {
         pinServo.setPosition(angles.PinAngle);
-        flapServo.setPosition(angles.FlapAngle);
+        //flapServo.setPosition(angles.FlapAngle);
     }
 }

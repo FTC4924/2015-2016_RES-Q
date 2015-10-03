@@ -7,8 +7,8 @@ public class ServoAngles {
     public float PinAngle;
     public float FlapAngle;
 
-    public ServoAngles(float startPinAngle, float startFlapAngle) {
-        PinAngle = startPinAngle;
-        FlapAngle = startFlapAngle;
+    public ServoAngles() {
+        PinAngle = ServoAngleCalculator.PIN_UP_ANGLE;
+        FlapAngle = ServoAngleCalculator.FLAP_CLOSED_ANGLE;
     }
 }

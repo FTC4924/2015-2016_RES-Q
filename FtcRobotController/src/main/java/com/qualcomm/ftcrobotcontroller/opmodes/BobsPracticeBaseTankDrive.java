@@ -80,10 +80,10 @@ public class BobsPracticeBaseTankDrive extends OpMode {
     }
 
     private void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
-        frontLeftMotor.setPower(levels.frontLeft);
-        backLeftMotor.setPower(levels.backLeft);
-        backRightMotor.setPower(levels.backRight);
-        frontRightMotor.setPower(levels.frontRight);
+        frontLeftMotor.setPower(Range.clip(levels.frontLeft, -1.0, 1.0));
+        backLeftMotor.setPower(Range.clip(levels.backLeft, -1.0, 1.0));
+        backRightMotor.setPower(Range.clip(levels.backRight, -1.0, 1.0));
+        frontRightMotor.setPower(Range.clip(levels.frontRight, -1.0, 1.0));
     }
 
 }

@@ -1,6 +1,6 @@
 package com.qualcomm.ftcrobotcontroller;
 
-import com.qualcomm.robotcore.robocol.Command;
+import com.qualcomm.ftcrobotcontroller.RobotCommands.RobotCommand;
 
 import java.util.List;
 
@@ -17,5 +17,11 @@ public class RobotCommandQueue {
         if (currentCommand.IsFinished())
             currentCommand = currentCommand.NextCommand;
         currentCommand.Execute();
+    }
+
+    public String CurrentCommandDescription() {
+        if (currentCommand == null)
+            return "";
+        return currentCommand.Description;
     }
 }

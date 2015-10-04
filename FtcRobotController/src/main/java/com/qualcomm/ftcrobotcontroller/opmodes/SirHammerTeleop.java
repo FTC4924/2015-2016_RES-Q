@@ -19,6 +19,7 @@ import com.qualcomm.ftcrobotcontroller.SpinnerReader;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * Created by 4924_Users on 9/17/2015.
@@ -108,10 +109,10 @@ public class SirHammerTeleop extends OpMode {
     }
 
     private void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
-        frontLeftMotor.setPower(levels.frontLeft);
-        backLeftMotor.setPower(levels.backLeft);
-        backRightMotor.setPower(levels.backRight);
-        frontRightMotor.setPower(levels.frontRight);
+        frontLeftMotor.setPower(Range.clip(levels.frontLeft, -1.0, 1.0));
+        backLeftMotor.setPower(Range.clip(levels.backLeft, -1.0, 1.0));
+        backRightMotor.setPower(Range.clip(levels.backRight, -1.0, 1.0));
+        frontRightMotor.setPower(Range.clip(levels.frontRight, -1.0, 1.0));
     }
 
     private void SetBucketArmPowerLevels(BucketArmPowerLevel levels) {

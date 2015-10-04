@@ -1,6 +1,6 @@
 package com.qualcomm.ftcrobotcontroller;
 
-import com.qualcomm.robotcore.robocol.Command;
+import com.qualcomm.ftcrobotcontroller.RobotCommands.RobotCommand;
 
 import java.util.List;
 

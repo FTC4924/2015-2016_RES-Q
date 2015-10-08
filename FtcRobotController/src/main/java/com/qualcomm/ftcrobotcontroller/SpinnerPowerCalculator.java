@@ -10,7 +10,11 @@ public class SpinnerPowerCalculator {
     public static SpinnerMotorPowerLevel Calculate(SpinnerInputs inputs) {
         SpinnerMotorPowerLevel level = new SpinnerMotorPowerLevel();
 
-        level.power = inputs.throttle;
+        if (inputs.throttle > 0.5) {
+            level.power = 1.0f;
+        } else {
+            level.power = 0.25f;
+        }
 
         return level;
     }

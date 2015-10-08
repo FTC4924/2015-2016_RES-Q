@@ -76,13 +76,17 @@ public class SirHammerTeleop extends OpMode {
         // do some telemetry
         telemetry.addData("Text", "*** Robot Data***");
         if (servoAngles.PinAngle==ServoAngleCalculator.PIN_UP_ANGLE)
-            telemetry.addData("pin", "pin:  UP");
+            telemetry.addData("pin", ": UP");
         else
-            telemetry.addData("pin", "pin: DN");
+            telemetry.addData("pin", ": DN");
         if (servoAngles.KickStandAngle==ServoAngleCalculator.KICKSTAND_DOCKED_ANGLE)
-            telemetry.addData("kick", "kick:  DOCKED");
+            telemetry.addData("kick", ": DOCKED");
         else
-            telemetry.addData("kick", "kick: EXTENDED");
+            telemetry.addData("kick", ": EXTENDED");
+        if (servoAngles.FlapAngle == ServoAngleCalculator.FLAP_OPEN_ANGLE)
+            telemetry.addData("flap", ": OPEN");
+        else
+            telemetry.addData("flap", ": CLOSED");
     }
 
     private void ReadAndSetServos() {
@@ -127,6 +131,6 @@ public class SirHammerTeleop extends OpMode {
     private void SetServoAngles(ServoAngles angles) {
         pinServo.setPosition(angles.PinAngle);
         kickStandServo.setPosition(angles.KickStandAngle);
-        //flapServo.setPosition(angles.FlapAngle);
+        flapServo.setPosition(angles.FlapAngle);
     }
 }

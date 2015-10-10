@@ -1,5 +1,9 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
+import com.qualcomm.ftcrobotcontroller.AutonomousArmInputs;
+import com.qualcomm.ftcrobotcontroller.AutonomousArmPowerCalculate;
+import com.qualcomm.ftcrobotcontroller.AutonomousArmPowerLevel;
+import com.qualcomm.ftcrobotcontroller.AutonomousArmReader;
 import com.qualcomm.ftcrobotcontroller.BucketArmMotorInputs;
 import com.qualcomm.ftcrobotcontroller.BucketArmPowerLevel;
 import com.qualcomm.ftcrobotcontroller.BucketArmReader;
@@ -32,6 +36,7 @@ public class SirHammerTeleop extends OpMode {
     DcMotor leftMainArmMotor;
     DcMotor rightMainArmMotor;
     DcMotor spinnerMotor;
+    DcMotor autoArmMotor;
 
     Servo pinServo;
     Servo flapServo;
@@ -46,6 +51,7 @@ public class SirHammerTeleop extends OpMode {
         frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
         backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
         backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
+        autoArmMotor = hardwareMap.dcMotor.get("autoArmMotor");
         frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
         backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
@@ -72,10 +78,15 @@ public class SirHammerTeleop extends OpMode {
         ReadAndSetBucketArmMotors();
         ReadAndSetSpinnerMotor();
         ReadAndSetServos();
+        ReadAndSetAutonomousArm();
 
         // do some telemetry
+        DisplayTelemetry();
+    }
+
+    private void DisplayTelemetry() {
         telemetry.addData("Text", "*** Robot Data***");
-        if (servoAngles.PinAngle==ServoAngleCalculator.PIN_UP_ANGLE)
+        if (servoAngles.PinAngle== ServoAngleCalculator.PIN_UP_ANGLE)
             telemetry.addData("pin", ": UP");
         else
             telemetry.addData("pin", ": DN");
@@ -105,6 +116,12 @@ public class SirHammerTeleop extends OpMode {
         SetSpinnerMotorPowerLevel(spinnerMotorPowerLevel);
     }
 
+    private void ReadAndSetAutonomousArm() {
+        AutonomousArmInputs armInputs = AutonomousArmReader.GetAutoArmInputs(gamepad1, gamepad2);
+        AutonomousArmPowerLevel armPowerLevel = AutonomousArmPowerCalculate.Calculate(armInputs);
+        SetAutonomousArmPowerLevel(armPowerLevel);
+    }
+
     private void ReadAndSetBucketArmMotors() {
         // raise/lower the bucket arm
         BucketArmMotorInputs bucketInputs = BucketArmReader.GetBucketArmInputs(gamepad1, gamepad2);
@@ -126,6 +143,10 @@ public class SirHammerTeleop extends OpMode {
 
     private void SetSpinnerMotorPowerLevel(SpinnerMotorPowerLevel level) {
         spinnerMotor.setPower(level.power);
+    }
+
+    private void SetAutonomousArmPowerLevel(AutonomousArmPowerLevel level) {
+        autoArmMotor.setPower(level.power);
     }
 
     private void SetServoAngles(ServoAngles angles) {

@@ -67,6 +67,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register ("SirHammerTeleop", SirHammerTeleop.class);
     manager.register ("SirHammerServoPositioner", SirHammerServoPositioner.class);
     manager.register ("color_test", color_test.class);
+    manager.register ("SirHammerEncoderTest", SirHammerEncoderTest.class);
     /*
      * Uncomment any of the following lines if you want to register an op mode.
      */

@@ -66,6 +66,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register ("BobsPracticeBaseTankDrive", BobsPracticeBaseTankDrive.class);
     manager.register ("SirHammerTeleop", SirHammerTeleop.class);
     manager.register ("SirHammerServoPositioner", SirHammerServoPositioner.class);
+    manager.register ("SirHammerEncoderTest", SirHammerEncoderTest.class);
     manager.register ("color_test", color_test.class);
     manager.register ("battel_tank", battel_tank.class);
     /*

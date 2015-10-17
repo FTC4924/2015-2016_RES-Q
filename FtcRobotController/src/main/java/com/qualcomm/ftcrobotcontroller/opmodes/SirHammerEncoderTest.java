@@ -10,7 +10,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 public class SirHammerEncoderTest extends OpMode {
 
-    private DcMotor testMotor;
+    private DcMotor frontRightMotor;
+    private DcMotor frontLeftMotor;
+    private DcMotor backRightMotor;
+    private DcMotor backLeftMotor;
     int targetPosition = 0;
     ElapsedTime time;
 
@@ -20,10 +23,22 @@ public class SirHammerEncoderTest extends OpMode {
 
     @Override
     public void init() {
-        testMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        testMotor.setTargetPosition(0);
-        testMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-        testMotor.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
+        frontRightMotor.setTargetPosition(0);
+        frontRightMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+        frontRightMotor.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
+        frontLeftMotor.setTargetPosition(0);
+        frontLeftMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+        frontLeftMotor.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+        backRightMotor.setTargetPosition(0);
+        backRightMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+        backRightMotor.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
+        backLeftMotor.setTargetPosition(0);
+        backLeftMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+        backLeftMotor.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
         time = new ElapsedTime();
         time.reset();
     }
@@ -34,24 +49,43 @@ public class SirHammerEncoderTest extends OpMode {
 
         if (gamepad1.a && (time.time() > DELAY)) {
             targetPosition  += FIRST_POSITION;
-            testMotor.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            testMotor.setTargetPosition(targetPosition);
-            testMotor.setPower(0.5f);
-            time.reset();
+            setAllMotorPowers();
         }
         if (gamepad1.b && (time.time() > DELAY)) {
             targetPosition += SECOND_POSITION;
-            testMotor.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            testMotor.setTargetPosition(targetPosition);
-            testMotor.setPower(0.5f);
-            time.reset();
+            setAllMotorPowers();
         }
 
         if (gamepad1.x) {
-            testMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-            testMotor.setTargetPosition(0);
+            resetAllMotors();
         }
 
         telemetry.addData("target:", targetPosition);
+    }
+
+    private void setAllMotorPowers() {
+        setMotorPower(frontLeftMotor);
+        setMotorPower(frontRightMotor);
+        setMotorPower(backLeftMotor);
+        setMotorPower(backRightMotor);
+        time.reset();
+    }
+
+    private void setMotorPower(DcMotor motor) {
+        motor.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        motor.setTargetPosition(targetPosition);
+        motor.setPower(0.5f);
+    }
+
+    private void resetAllMotors() {
+        resetMotor(frontLeftMotor);
+        resetMotor(frontRightMotor);
+        resetMotor(backLeftMotor);
+        resetMotor(backRightMotor);
+    }
+
+    private void resetMotor(DcMotor motor) {
+        motor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+        motor.setTargetPosition(0);
     }
 }

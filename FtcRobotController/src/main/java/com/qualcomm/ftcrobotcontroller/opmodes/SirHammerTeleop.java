@@ -22,6 +22,7 @@ import com.qualcomm.ftcrobotcontroller.SpinnerPowerCalculator;
 import com.qualcomm.ftcrobotcontroller.SpinnerReader;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.IrSeekerSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -44,6 +45,8 @@ public class SirHammerTeleop extends OpMode {
 
     ServoAngles servoAngles = new ServoAngles();
 
+    IrSeekerSensor irSensor;
+
     @Override
     public void init() {
 
@@ -65,6 +68,8 @@ public class SirHammerTeleop extends OpMode {
         flapServo = hardwareMap.servo.get("flapServo");
         kickStandServo = hardwareMap.servo.get("kickStandArmServo");
         kickStandServo.setPosition(ServoAngleCalculator.KICKSTAND_DOCKED_ANGLE);
+
+        irSensor = hardwareMap.irSeekerSensor.get("irSensor");
     }
 
     @Override
@@ -79,6 +84,11 @@ public class SirHammerTeleop extends OpMode {
         ReadAndSetSpinnerMotor();
         ReadAndSetServos();
         ReadAndSetAutonomousArm();
+
+        if (irSensor.signalDetected()) {
+            telemetry.addData("angle", irSensor.getAngle());
+            telemetry.addData("strength", irSensor.getStrength());
+        }
 
         // do some telemetry
         DisplayTelemetry();

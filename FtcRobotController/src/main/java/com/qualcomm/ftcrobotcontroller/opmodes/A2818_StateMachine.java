@@ -289,8 +289,8 @@ public class A2818_StateMachine extends OpMode
             case STATE_DRIVE_TO_MOUNTAIN: // Follow path until last segment is completed
                 if (pathComplete())
                 {
-                    useConstantPower();                     // Action: Switch to constant Speed
-                    setDrivePower(0.5, 0.5);                // Action: Start Driving forward at 50 Speed
+                    useConstantPower();                     // Action: Switch to constant Power
+                    setDrivePower(0.5, 0.5);                // Action: Start Driving forward at 50 Power
                     newState(State.STATE_CLIMB_MOUNTAIN);   // Next State:
                 }
                 else
@@ -387,7 +387,7 @@ public class A2818_StateMachine extends OpMode
     }
 
     //--------------------------------------------------------------------------
-    // runToPosition ()
+    // UseRunToPosition ()
     // Set both drive motors to encoder servo mode (requires encoders)
     //--------------------------------------------------------------------------
     public void runToPosition()

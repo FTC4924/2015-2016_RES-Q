@@ -251,13 +251,13 @@ public class SirHammerAutonomous extends OpMode {
     public void setDriveMode(DcMotorController.RunMode mode)
     {
         // Ensure the motors are in the correct mode.
-        if (frontLeftMotor.getChannelMode() != mode)
+        //if (frontLeftMotor.getChannelMode() != mode)
             frontLeftMotor.setChannelMode(mode);
-        if (backLeftMotor.getChannelMode() != mode)
+        //if (backLeftMotor.getChannelMode() != mode)
             backLeftMotor.setChannelMode(mode);
-        if (frontRightMotor.getChannelMode() != mode)
+        //if (frontRightMotor.getChannelMode() != mode)
             frontRightMotor.setChannelMode(mode);
-        if (backRightMotor.getChannelMode() != mode)
+        //if (backRightMotor.getChannelMode() != mode)
             backRightMotor.setChannelMode(mode);
     }
 
@@ -336,20 +336,22 @@ public class SirHammerAutonomous extends OpMode {
     private void setEncoderTargetsToCurrentPosition()
     {
         //	get and set the encoder targets
-        currentEncoderTargets.LeftTarget = frontLeftMotor.getCurrentPosition();
-        currentEncoderTargets.RightTarget = frontRightMotor.getCurrentPosition();
+        currentEncoderTargets.LeftTarget = getLeftPosition();
+        currentEncoderTargets.RightTarget = getRightPosition();
     }
 
     // Return Left Encoder count
     private int getLeftPosition()
     {
-        return frontLeftMotor.getCurrentPosition();
+        return currentEncoderTargets.LeftTarget;
+        //return frontLeftMotor.getCurrentPosition();
     }
 
     // Return Right Encoder count
     private int getRightPosition()
     {
-        return frontRightMotor.getCurrentPosition();
+        return currentEncoderTargets.RightTarget;
+        //return frontRightMotor.getCurrentPosition();
     }
 
     // Return true if motors have both reached the desired encoder target

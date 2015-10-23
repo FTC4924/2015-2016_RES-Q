@@ -16,7 +16,6 @@ public class DriverReader {
         inputs.throttle = y;
         inputs.direction = x;
 
-
         return inputs;
     }
 

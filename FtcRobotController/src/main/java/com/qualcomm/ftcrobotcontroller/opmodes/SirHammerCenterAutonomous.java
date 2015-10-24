@@ -292,36 +292,34 @@ public class SirHammerCenterAutonomous extends OpMode {
     // addEncoderTarget( LeftEncoder, RightEncoder);
     // Sets relative Encoder Position.  Offset current targets with passed data
     //--------------------------------------------------------------------------
-    void addEncoderTarget(int leftEncoderAdder, int rightEncoderAdder)
-    {
+    void addEncoderTarget(int leftEncoderAdder, int rightEncoderAdder) {
+
         currentEncoderTargets.LeftTarget += leftEncoderAdder;
         currentEncoderTargets.RightTarget += rightEncoderAdder;
     }
 
-    private void setEncoderTargetsToCurrentPosition()
-    {
+    private void setEncoderTargetsToCurrentPosition() {
         //	get and set the encoder targets
         currentEncoderTargets.LeftTarget = getLeftPosition();
         currentEncoderTargets.RightTarget = getRightPosition();
     }
 
     // Return Left Encoder count
-    private int getLeftPosition()
-    {
+    private int getLeftPosition() {
+
         return currentEncoderTargets.LeftTarget;
         //return frontLeftMotor.getCurrentPosition();
     }
 
     // Return Right Encoder count
-    private int getRightPosition()
-    {
+    private int getRightPosition() {
+
         return currentEncoderTargets.RightTarget;
         //return frontRightMotor.getCurrentPosition();
     }
 
     // Return true if motors have both reached the desired encoder target
-    private boolean moveComplete()
-    {
+    private boolean moveComplete() {
         //  return (!mLeftMotor.isBusy() && !mRightMotor.isBusy());
         return (elapsedTimeForCurrentState.time() >= 2.0f);
         // return ((Math.abs(getLeftPosition() - currentEncoderTargets.LeftTarget) < 10) &&

@@ -31,8 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import android.hardware.Sensor;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 
@@ -67,7 +65,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register ("SirHammerTeleop", SirHammerTeleop.class);
     manager.register ("SirHammerServoPositioner", SirHammerServoPositioner.class);
     manager.register ("SirHammerEncoderTest", SirHammerEncoderTest.class);
-    manager.register ("SirHammerAutonomous", SirHammerAutonomous.class);
+    manager.register ("SirHammerCenterAutonomous", SirHammerCenterAutonomous.class);
     manager.register ("color_test", color_test.class);
     manager.register ("battel_tank", battel_tank.class);
     /*

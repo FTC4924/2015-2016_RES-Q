@@ -17,8 +17,8 @@ public class SirHammerEncoderTest extends OpMode {
     int targetPosition = 0;
     ElapsedTime time;
 
-    static final int FIRST_POSITION = 2500;
-    static final int SECOND_POSITION = 5000;
+    static final int FIRST_POSITION = 5000;
+    static final int SECOND_POSITION = -5000;
     static final float DELAY = 1.0f;
 
     @Override
@@ -45,14 +45,12 @@ public class SirHammerEncoderTest extends OpMode {
 
     @Override
     public void loop() {
-
-
         if (gamepad1.a && (time.time() > DELAY)) {
-            targetPosition  += FIRST_POSITION;
+            targetPosition = FIRST_POSITION;
             setAllMotorPowers();
         }
         if (gamepad1.b && (time.time() > DELAY)) {
-            targetPosition += SECOND_POSITION;
+            targetPosition = SECOND_POSITION;
             setAllMotorPowers();
         }
 
@@ -60,6 +58,7 @@ public class SirHammerEncoderTest extends OpMode {
             resetAllMotors();
         }
 
+        frontLeftMotor.getCurrentPosition();
         telemetry.addData("target:", targetPosition);
     }
 

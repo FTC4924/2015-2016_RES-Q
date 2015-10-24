@@ -40,22 +40,25 @@ public class SirHammerCenterAutonomous extends OpMode {
     // Define driving paths as pairs of relative wheel movements in inches (left,right) plus speed %
     // Note: this is a dummy path, and is NOT likely to actually work with YOUR robot.
     final DrivePathSegment[] centerReadingPath = {
-            new DrivePathSegment(  20.0f,  20.0f, 0.2f)
+            new DrivePathSegment(  10.0f,  10.0f, 0.8f)
     };
     final DrivePathSegment[] position1Path = {
-            new DrivePathSegment(  5.0f, 5.0f, 0.2f)
+            new DrivePathSegment(  5.0f, 5.0f, 0.8f)
     };
     final DrivePathSegment[] touchCenterPath = {
-            new DrivePathSegment(  5.0f, 5.0f, 0.2f)
+            new DrivePathSegment( -5.0f, -5.0f, 0.8f),      // backup
+            new DrivePathSegment(5.0f,-5.0f, 0.8f),         // turn
+            new DrivePathSegment(10.0f,  10.0f, 0.8f),      // forward
+            new DrivePathSegment(-5.0f, 5.0f, 0.8f)         // turn
     };
     final DrivePathSegment[] kickstandSetupPath = {
-            new DrivePathSegment( -5.0f, -5.0f, 0.2f),      // backup
-            new DrivePathSegment(5.0f,-5.0f, 0.4f),         // turn
-            new DrivePathSegment(10.0f,  10.0f, 0.7f),      // forward
-            new DrivePathSegment(-5.0f, 5.0f, 0.4f)         // turn
+            new DrivePathSegment( -5.0f, -5.0f, 0.8f),      // backup
+            new DrivePathSegment(5.0f,-5.0f, 0.8f),         // turn
+            new DrivePathSegment(10.0f,  10.0f, 0.8f),      // forward
+            new DrivePathSegment(-5.0f, 5.0f, 0.8f)         // turn
     };
     final DrivePathSegment[] kickstandTurnAndPullPath = {
-            new DrivePathSegment( 15.0f, 15.0f, 0.6f),
+            new DrivePathSegment( 15.0f, 15.0f, 0.8f),
             new DrivePathSegment(10.0f,-10.0f, 0.8f)
     };
     final double COUNTS_PER_INCH = 240 ;    // Number of encoder counts per inch of wheel travel.
@@ -192,6 +195,7 @@ public class SirHammerCenterAutonomous extends OpMode {
                 TurnOffAllDriveMotors();
                 break;
         }
+        SetEncoderTargets();
     }
 
     private void LowerKickstandArm() {
@@ -321,7 +325,7 @@ public class SirHammerCenterAutonomous extends OpMode {
     // Return true if motors have both reached the desired encoder target
     private boolean moveComplete() {
         //  return (!mLeftMotor.isBusy() && !mRightMotor.isBusy());
-        return (elapsedTimeForCurrentState.time() >= 2.0f);
+        return (elapsedTimeForCurrentState.time() >= 10.0f);
         // return ((Math.abs(getLeftPosition() - currentEncoderTargets.LeftTarget) < 10) &&
         //        (Math.abs(getRightPosition() - currentEncoderTargets.RightTarget) < 10));
     }

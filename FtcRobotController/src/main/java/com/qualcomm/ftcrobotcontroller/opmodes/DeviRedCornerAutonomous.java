@@ -48,9 +48,9 @@ public class DeviRedCornerAutonomous extends OpMode {
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     final DrivePathSegment[] mBeaconPath = {
-            new DrivePathSegment(  0.0f,  18.0f, 0.2f),  // Left
-            new DrivePathSegment( 60.0f, 60.0f, 0.9f),  // Forward
-            new DrivePathSegment(  0.0f,  18.0f, 0.2f),  // Left
+            //new DrivePathSegment(  0.0f,  18.0f, 0.2f),  // Left
+            new DrivePathSegment( 10.0f, 10.0f, 0.9f),  // Forward
+            //new DrivePathSegment(  0.0f,  18.0f, 0.2f),  // Left
     };
 
     final DrivePathSegment[] locateLinePath = {
@@ -76,14 +76,17 @@ public class DeviRedCornerAutonomous extends OpMode {
     public void init() {
 
         //lineDetector = hardwareMap.opticalDistanceSensor.get("lineDetector");
-        frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
-        frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
+        frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
+        backRightMotor = hardwareMap.dcMotor.get("backrightMotor");
+        frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
+        backLeftMotor = hardwareMap.dcMotor.get("backleftMotor");
         frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
         backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         countsPerInch = (COUNTS_PER_REVOLUTION / Math.PI * WHEEL_DIAMETER) * GEAR_RATIO;
+
+        TurnOffAllDriveMotors();
+        SetEncoderTargets();
     }
 
     @Override
@@ -105,7 +108,7 @@ public class DeviRedCornerAutonomous extends OpMode {
                 if (encodersAtZero()) {
 
                     startPath(mBeaconPath);
-                    SetCurrentState(State.STATE_DRIVE_TO_BEACON);
+                    SetCurrentState(State.STATE_STOP);
 
                 } else {
 
@@ -170,7 +173,11 @@ public class DeviRedCornerAutonomous extends OpMode {
 
                 break;
 
+            case STATE_STOP:
+
         }
+
+        SetEncoderTargets();
     }
 
     private boolean isOnWhiteLine() {
@@ -286,6 +293,13 @@ public class DeviRedCornerAutonomous extends OpMode {
 
     private void TurnOffAllDriveMotors() {
         SetDriveMotorPowerLevels(zeroPowerLevels);
+    }
+
+    private void SetEncoderTargets() {
+        frontLeftMotor.setTargetPosition(currentEncoderTargets.LeftTarget);
+        backLeftMotor.setTargetPosition(currentEncoderTargets.LeftTarget);
+        frontRightMotor.setTargetPosition(currentEncoderTargets.RightTarget);
+        backRightMotor.setTargetPosition(currentEncoderTargets.RightTarget);
     }
 
     public void UseConstantSpeed()

@@ -31,10 +31,10 @@ public class DeviRedCornerAutonomous extends OpMode {
     private OpticalDistanceSensor lineDetector;
     private ElapsedTime elapsedTimeForCurrentState = new ElapsedTime();
     private EncoderTargets zeroEncoderTargets = new EncoderTargets(0, 0);
-    final int COUNTS_PER_REVOLUTION = 1024;
-    final double WHEEL_DIAMETER = 5.0f;
-    final double GEAR_RATIO = 1.0f;
-    final double WHITE_THRESHOLD = 0.5;
+    final int COUNTS_PER_REVOLUTION = 1120;
+    final double WHEEL_DIAMETER = 4.5f;
+    final double GEAR_RATIO = 24.0f/16.0f;
+    final double WHITE_THRESHOLD = 0.5f;
     double countsPerInch;
 
     DcMotor frontLeftMotor;
@@ -83,10 +83,10 @@ public class DeviRedCornerAutonomous extends OpMode {
         frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
         backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        countsPerInch = (COUNTS_PER_REVOLUTION / Math.PI * WHEEL_DIAMETER) * GEAR_RATIO;
+        countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO;
 
-        TurnOffAllDriveMotors();
-        SetEncoderTargets();
+       // TurnOffAllDriveMotors();
+       // SetEncoderTargets();
     }
 
     @Override
@@ -94,7 +94,7 @@ public class DeviRedCornerAutonomous extends OpMode {
 
         elapsedGameTime.reset();
         SetCurrentState(State.STATE_INITIAL);
-        UseRunToPosition();
+       // UseRunToPosition();
     }
 
     @Override
@@ -176,11 +176,11 @@ public class DeviRedCornerAutonomous extends OpMode {
 
             case STATE_STOP:
 
-                if (pathComplete()) {
+                //if (pathComplete()) {
 
-                    TurnOffAllDriveMotors();
-                    telemetry.addData("StopComplete", "Stop Complete");
-                }
+                   // TurnOffAllDriveMotors();
+                   // telemetry.addData("StopComplete", "Stop Complete");
+                //}
         }
 
         SetEncoderTargets();

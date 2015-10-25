@@ -67,6 +67,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register ("SirHammerCenterAutonomous", SirHammerCenterAutonomous.class);
     manager.register ("battel_tank", battel_tank.class);
     manager.register ("DeviRedCornerAutonomous", DeviRedCornerAutonomous.class);
+    manager.register("OpticalDistanceSensorTest", OpticalDistanceSensorTest.class);
     /*
      * Uncomment any of the following lines if you want to register an op mode.
      */

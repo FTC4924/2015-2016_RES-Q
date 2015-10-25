@@ -94,6 +94,7 @@ public class DeviRedCornerAutonomous extends OpMode {
 
         elapsedGameTime.reset();
         SetCurrentState(State.STATE_INITIAL);
+        UseRunToPosition();
     }
 
     @Override
@@ -175,6 +176,11 @@ public class DeviRedCornerAutonomous extends OpMode {
 
             case STATE_STOP:
 
+                if (pathComplete()) {
+
+                    TurnOffAllDriveMotors();
+                    telemetry.addData("StopComplete", "Stop Complete");
+                }
         }
 
         SetEncoderTargets();

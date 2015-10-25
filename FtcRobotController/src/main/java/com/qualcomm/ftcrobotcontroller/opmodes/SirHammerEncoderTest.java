@@ -17,8 +17,8 @@ public class SirHammerEncoderTest extends OpMode {
     int targetPosition = 0;
     ElapsedTime time;
 
-    static final int FIRST_POSITION = 2500;
-    static final int SECOND_POSITION = 5000;
+    static final int FIRST_POSITION = 10000;
+    static final int SECOND_POSITION = -10000;
     static final float DELAY = 1.0f;
 
     @Override
@@ -39,20 +39,22 @@ public class SirHammerEncoderTest extends OpMode {
         backLeftMotor.setTargetPosition(0);
         backLeftMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
         backLeftMotor.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
+
         time = new ElapsedTime();
         time.reset();
     }
 
     @Override
     public void loop() {
-
-
         if (gamepad1.a && (time.time() > DELAY)) {
-            targetPosition  += FIRST_POSITION;
+            targetPosition = FIRST_POSITION;
             setAllMotorPowers();
         }
         if (gamepad1.b && (time.time() > DELAY)) {
-            targetPosition += SECOND_POSITION;
+            targetPosition = SECOND_POSITION;
             setAllMotorPowers();
         }
 
@@ -74,7 +76,7 @@ public class SirHammerEncoderTest extends OpMode {
     private void setMotorPower(DcMotor motor) {
         motor.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
         motor.setTargetPosition(targetPosition);
-        motor.setPower(0.5f);
+        motor.setPower(0.8f);
     }
 
     private void resetAllMotors() {

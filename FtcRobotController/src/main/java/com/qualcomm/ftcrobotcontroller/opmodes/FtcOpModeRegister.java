@@ -31,8 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import android.hardware.Sensor;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 
@@ -63,13 +61,12 @@ public class FtcOpModeRegister implements OpModeRegister {
     //manager.register ("PushBotAuto", PushBotAuto.class);
     //manager.register ("PushBotManual", PushBotManual.class);
     manager.register ("SensorTest", SensorTest.class);
-    manager.register ("BobsPracticeBaseTankDrive", BobsPracticeBaseTankDrive.class);
     manager.register ("SirHammerTeleop", SirHammerTeleop.class);
     manager.register ("SirHammerServoPositioner", SirHammerServoPositioner.class);
     manager.register ("SirHammerEncoderTest", SirHammerEncoderTest.class);
-    manager.register ("SirHammerAutonomous", SirHammerAutonomous.class);
-    manager.register ("color_test", color_test.class);
+    manager.register ("SirHammerCenterAutonomous", SirHammerCenterAutonomous.class);
     manager.register ("battel_tank", battel_tank.class);
+    manager.register ("DeviRedCornerAutonomous", DeviRedCornerAutonomous.class);
     /*
      * Uncomment any of the following lines if you want to register an op mode.
      */

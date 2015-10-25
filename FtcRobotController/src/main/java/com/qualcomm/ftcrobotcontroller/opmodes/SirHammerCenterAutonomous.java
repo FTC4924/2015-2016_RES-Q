@@ -9,27 +9,28 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import static com.qualcomm.ftcrobotcontroller.opmodes.SirHammerAutonomous.CenterColumnPosition.*;
-import static com.qualcomm.ftcrobotcontroller.opmodes.SirHammerAutonomous.State.*;
+import static com.qualcomm.ftcrobotcontroller.opmodes.SirHammerCenterAutonomous.CenterColumnPosition.*;
+import static com.qualcomm.ftcrobotcontroller.opmodes.SirHammerCenterAutonomous.State.*;
 
 /**
  * Created by 4924_Users on 9/27/2015.
  */
-public class SirHammerAutonomous extends OpMode {
+public class SirHammerCenterAutonomous extends OpMode {
 
     // A list of system States.
     public enum State
     {
         STATE_INITIAL,
-        STATE_DRIVE_TO_BEACON,
-        STATE_LOCATE_LINE,
-        STATE_FOLLOW_LINE,
-        STATE_SQUARE_TO_WALL,
-        STATE_DEPLOY_CLIMBERS,
-        STATE_DRIVE_TO_MOUNTAIN,
-        STATE_CLIMB_MOUNTAIN,
-        STATE_STOP,
+        STATE_DRIVE_TO_READ_IR,
+        STATE_READING_IR,
+        STATE_DRIVING_TO_POSITION,
+        STATE_DRIVING_TO_TOUCH_CENTER,
+        STATE_RAISING_LOWERING_ARM,
+        STATE_POSITIONING_FOR_KICKSTAND,
+        STATE_KICKSTAND_MOVE_AND_TURN,
+        STATE_STOP
     }
+
     public enum CenterColumnPosition { UNDETECTED, ONE, TWO, THREE }
     private FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
     private EncoderTargets zeroEncoderTargets = new EncoderTargets(0, 0);
@@ -38,19 +39,28 @@ public class SirHammerAutonomous extends OpMode {
 
     // Define driving paths as pairs of relative wheel movements in inches (left,right) plus speed %
     // Note: this is a dummy path, and is NOT likely to actually work with YOUR robot.
-    final DrivePathSegment[] mBeaconPath = {
-            new DrivePathSegment(  0.0f,  3.0f, 0.2f),  // Left
-            new DrivePathSegment( 60.0f, 60.0f, 0.9f),  // Forward
-            new DrivePathSegment(  1.0f,  0.0f, 0.2f),  // Left
+    final DrivePathSegment[] centerReadingPath = {
+            new DrivePathSegment(  10.0f,  10.0f, 0.8f)
     };
-
-    final DrivePathSegment[] mMountainPath = {
-            new DrivePathSegment(  0.0f, -3.0f, 0.2f),  // Left Rev
-            new DrivePathSegment(-30.0f,-30.0f, 0.9f),  // Backup
-            new DrivePathSegment(-16.0f,  0.0f, 0.7f),  // Right Rev
-            new DrivePathSegment( 10.0f, 10.0f, 0.3f),  // Forward
+    final DrivePathSegment[] position1Path = {
+            new DrivePathSegment(  5.0f, 5.0f, 0.8f)
     };
-
+    final DrivePathSegment[] touchCenterPath = {
+            new DrivePathSegment( -5.0f, -5.0f, 0.8f),      // backup
+            new DrivePathSegment(5.0f,-5.0f, 0.8f),         // turn
+            new DrivePathSegment(10.0f,  10.0f, 0.8f),      // forward
+            new DrivePathSegment(-5.0f, 5.0f, 0.8f)         // turn
+    };
+    final DrivePathSegment[] kickstandSetupPath = {
+            new DrivePathSegment( -5.0f, -5.0f, 0.8f),      // backup
+            new DrivePathSegment(5.0f,-5.0f, 0.8f),         // turn
+            new DrivePathSegment(10.0f,  10.0f, 0.8f),      // forward
+            new DrivePathSegment(-5.0f, 5.0f, 0.8f)         // turn
+    };
+    final DrivePathSegment[] kickstandTurnAndPullPath = {
+            new DrivePathSegment( 15.0f, 15.0f, 0.8f),
+            new DrivePathSegment(10.0f,-10.0f, 0.8f)
+    };
     final double COUNTS_PER_INCH = 240 ;    // Number of encoder counts per inch of wheel travel.
 
     DcMotor frontLeftMotor;
@@ -64,7 +74,7 @@ public class SirHammerAutonomous extends OpMode {
     private State currentState;
     private int currentPathSegmentIndex;
     private DrivePathSegment[] currentPath;
-
+    private CenterColumnPosition detectedCenterPosition = CenterColumnPosition.UNDETECTED;
     public State GetCurrentState() { return currentState; }
     public void SetCurrentState(State newState) {
         elapsedTimeForCurrentState.reset();
@@ -110,8 +120,8 @@ public class SirHammerAutonomous extends OpMode {
             case STATE_INITIAL:         // Stay in this state until encoders are both Zero.
                 if (encodersAtZero())
                 {
-                    startPath(mBeaconPath);                 // Action: Load path to beacon
-                    SetCurrentState(State.STATE_DRIVE_TO_BEACON);  // Next State:
+                    startPath(centerReadingPath);
+                    SetCurrentState(State.STATE_DRIVE_TO_READ_IR);
                 }
                 else
                 {
@@ -122,120 +132,79 @@ public class SirHammerAutonomous extends OpMode {
                 break;
 
 
-            case STATE_DRIVE_TO_BEACON: // Follow path until last segment is completed
+            case STATE_DRIVE_TO_READ_IR: // Follow path until last segment is completed
                 if (pathComplete())
                 {
-                    //mLight.enableLed(true);                 // Action: Enable Light Sensor
-                    //setDriveSpeed(-0.1, 0.1);               // Action: Start rotating left
-                    SetCurrentState(State.STATE_LOCATE_LINE);      // Next State:
-                }
-                else
-                {
-                    // Display Diagnostic data for this state.
-                    //telemetry.addData("1", String.format("%d of %d. L %5d:%5s - R %5d:%5d ",
-                    //        mCurrentSeg, mCurrentPath.length,
-                    //       mLeftEncoderTarget, getLeftPosition(),
-                    //        mRightEncoderTarget, getRightPosition()));
-                }
-                break;
- /*
-            case STATE_LOCATE_LINE:     // Rotate until white tape is detected
-                if (mLight.getLightDetected() > WHITE_THRESHOLD)
-                {
-                    setDriveSpeed(0.0, 0.0);                // Action: Stop rotation
-                    SetCurrentState(State.STATE_FOLLOW_LINE);      // Next State:
-                }
-                else
-                {
-                    // Display Diagnostic data for this state.
-                    telemetry.addData("1", String.format("%4.2f of %4.2f ",
-                            mLight.getLightDetected(),
-                            WHITE_THRESHOLD ));
+                    ReadCenterPosition();
+                    SetCurrentState(State.STATE_READING_IR);      // Next State:
                 }
                 break;
 
-            case STATE_FOLLOW_LINE:     // Track line until wall is reached
-                if (mDistance.getLightDetected() > RANGE_THRESHOLD)
-                {
-                    useConstantPower();                     // Apply constant power to motors
-                    setDriveSpeed(0.2, 0.2);                // Action: Drive Forward
-                    SetCurrentState(State.STATE_SQUARE_TO_WALL);   // Next State:
-                }
-                else
-                {
-                    // Steer left ot right
-                    if (mLight.getLightDetected() > WHITE_THRESHOLD)
-                    {
-                        setDriveSpeed(0.2, 0.0);            // Scan Right
-                        telemetry.addData("1", String.format("%4.2f --> %7d : %7d (%4.2f)" ,
-                                mLight.getLightDetected(),
-                                getLeftPosition(), getRightPosition(),
-                                mDistance.getLightDetected() ));
-                    }
-                    else
-                    {
-                        setDriveSpeed(0.0, 0.2);            // Scan Left
-                        telemetry.addData("1", String.format("%4.2f <-- %7d : %7d (%4.2f)",
-                                mLight.getLightDetected(),
-                                getLeftPosition(), getRightPosition(),
-                                mDistance.getLightDetected() ));
-                    }
+            case STATE_READING_IR:
+                switch (detectedCenterPosition) {
+                    case ONE:
+                        startPath(position1Path);
+                        SetCurrentState(State.STATE_DRIVING_TO_POSITION);
+                        break;
+                    case TWO:
+                        startPath(position1Path);
+                        SetCurrentState(State.STATE_DRIVING_TO_POSITION);
+                        break;
+                    case THREE:
+                        startPath(position1Path);
+                        SetCurrentState(State.STATE_DRIVING_TO_POSITION);
+                        break;
+                    default:
+                        ReadCenterPosition();
+                        break;
                 }
                 break;
 
-            case STATE_SQUARE_TO_WALL:     // Push up against wall for 1 second
-                if (mStateTime.time() > 1.0)
-                {
-                    setDriveSpeed(0.0, 0.0);                // Action: Stop pushing
-                    mServo.setPosition(CLIMBER_DEPLOY);     // Action:  Start deploying climbers.
-                    SetCurrentState(State.STATE_DEPLOY_CLIMBERS);  // Next State:
-                }
-                break;
-
-            case STATE_DEPLOY_CLIMBERS:     // wait 2 seconds while servos move and deposit climbers
-                if (mStateTime.time() > 2.0)
-                {
-                    mServo.setPosition(CLIMBER_RETRACT);    // Put servo into "starting position"
-                    startPath(mMountainPath);               // Action: Load path to Mountain
-                    SetCurrentState(State.STATE_DRIVE_TO_MOUNTAIN);// Next State:
-                }
-                break;
-
-            case STATE_DRIVE_TO_MOUNTAIN: // Follow path until last segment is completed
+            case STATE_DRIVING_TO_POSITION:
                 if (pathComplete())
                 {
-                    useConstantPower();                     // Action: Switch to constant Power
-                    setDrivePower(0.5, 0.5);                // Action: Start Driving forward at 50 Power
-                    newState(State.STATE_CLIMB_MOUNTAIN);   // Next State:
-                }
-                else
-                {
-                    // Display Diagnostic data for this state.
-                    telemetry.addData("1", String.format("%d of %d. L %5d:%5d - R %5d:%5d ",
-                            mCurrentSeg, mCurrentPath.length,
-                            mLeftEncoderTarget, getLeftPosition(),
-                            mRightEncoderTarget, getRightPosition()));
+                    startPath(touchCenterPath);
+                    SetCurrentState(State.STATE_DRIVING_TO_TOUCH_CENTER);      // Next State:
                 }
                 break;
-
-            case STATE_CLIMB_MOUNTAIN:   // Drive up mountain for 5 seconds
-                if (mStateTime.time() > 5.0)
+            case STATE_DRIVING_TO_TOUCH_CENTER:
+                if (pathComplete())
                 {
-                    useConstantPower();                     // Switch to constant Power
-                    setDrivePower(0, 0);                    // Set target speed to zero
-                    SetCurrentState(State.STATE_STOP);             // Next State:
-                }
-                else
-                {
-                    // Display Diagnostic data for this state.
-                    telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
-                            getRightPosition() ));
+                    TurnOffAllDriveMotors();
+                    SetCurrentState(State.STATE_STOP);      // Next State:
                 }
                 break;
-*/
+            case STATE_RAISING_LOWERING_ARM:
+                startPath(kickstandSetupPath);
+                SetCurrentState(STATE_POSITIONING_FOR_KICKSTAND);
+                break;
+            case STATE_POSITIONING_FOR_KICKSTAND:
+                if (pathComplete()) {
+                    LowerKickstandArm();
+                    startPath(kickstandTurnAndPullPath);
+                    SetCurrentState(STATE_KICKSTAND_MOVE_AND_TURN);
+                }
+                break;
+            case STATE_KICKSTAND_MOVE_AND_TURN:
+                if (pathComplete()) {
+                    TurnOffAllDriveMotors();
+                    SetCurrentState(STATE_STOP);
+                }
+                break;
             case STATE_STOP:
+                TurnOffAllDriveMotors();
                 break;
         }
+        SetEncoderTargets();
+    }
+
+    private void LowerKickstandArm() {
+        // TODO - make this talk to the servo
+    }
+    
+    private void ReadCenterPosition() {
+        // TODO - actually detect a position
+        detectedCenterPosition = CenterColumnPosition.ONE;
     }
 
     public void UseRunToPosition()
@@ -327,38 +296,36 @@ public class SirHammerAutonomous extends OpMode {
     // addEncoderTarget( LeftEncoder, RightEncoder);
     // Sets relative Encoder Position.  Offset current targets with passed data
     //--------------------------------------------------------------------------
-    void addEncoderTarget(int leftEncoderAdder, int rightEncoderAdder)
-    {
+    void addEncoderTarget(int leftEncoderAdder, int rightEncoderAdder) {
+
         currentEncoderTargets.LeftTarget += leftEncoderAdder;
         currentEncoderTargets.RightTarget += rightEncoderAdder;
     }
 
-    private void setEncoderTargetsToCurrentPosition()
-    {
+    private void setEncoderTargetsToCurrentPosition() {
         //	get and set the encoder targets
         currentEncoderTargets.LeftTarget = getLeftPosition();
         currentEncoderTargets.RightTarget = getRightPosition();
     }
 
     // Return Left Encoder count
-    private int getLeftPosition()
-    {
+    private int getLeftPosition() {
+
         return currentEncoderTargets.LeftTarget;
         //return frontLeftMotor.getCurrentPosition();
     }
 
     // Return Right Encoder count
-    private int getRightPosition()
-    {
+    private int getRightPosition() {
+
         return currentEncoderTargets.RightTarget;
         //return frontRightMotor.getCurrentPosition();
     }
 
     // Return true if motors have both reached the desired encoder target
-    private boolean moveComplete()
-    {
+    private boolean moveComplete() {
         //  return (!mLeftMotor.isBusy() && !mRightMotor.isBusy());
-        return (elapsedTimeForCurrentState.time() >= 2.0f);
+        return (elapsedTimeForCurrentState.time() >= 10.0f);
         // return ((Math.abs(getLeftPosition() - currentEncoderTargets.LeftTarget) < 10) &&
         //        (Math.abs(getRightPosition() - currentEncoderTargets.RightTarget) < 10));
     }

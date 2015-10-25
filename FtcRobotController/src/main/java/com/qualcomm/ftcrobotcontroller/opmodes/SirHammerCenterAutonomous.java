@@ -61,7 +61,7 @@ public class SirHammerCenterAutonomous extends OpMode {
             new DrivePathSegment( 15.0f, 15.0f, 0.8f),
             new DrivePathSegment(10.0f,-10.0f, 0.8f)
     };
-    final double COUNTS_PER_INCH = 240 ;    // Number of encoder counts per inch of wheel travel.
+    final double COUNTS_PER_INCH = 116.279f ;    // Number of encoder counts per inch of wheel travel.
 
     DcMotor frontLeftMotor;
     DcMotor backLeftMotor;

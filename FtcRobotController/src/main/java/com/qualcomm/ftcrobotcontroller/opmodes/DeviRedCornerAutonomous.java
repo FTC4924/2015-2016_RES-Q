@@ -50,8 +50,8 @@ public class DeviRedCornerAutonomous extends OpMode {
 
     final DrivePathSegment[] mBeaconPath = {
             new DrivePathSegment(  0.0f,  10.0f, 0.2f),  // Left
-            new DrivePathSegment( 60.0f, 60.0f, 0.9f),  // Forward
-            new DrivePathSegment(  0.0f,  10.0f, 0.2f)  // Left
+            new DrivePathSegment( 60.0f, 60.0f, 0.9f)  // Forward
+            //new DrivePathSegment(  0.0f,  10.0f, 0.2f)  // Left
     };
 
     final DrivePathSegment[] locateLinePath = {
@@ -125,6 +125,7 @@ public class DeviRedCornerAutonomous extends OpMode {
                     //lineDetector.enableLed(true);                 // Action: Enable Light Sensor
                     //setDriveSpeed(-0.1, 0.1);               // Action: Start rotating left
                     //startPath(locateLinePath);
+                    setEncoderTargetsToCurrentPosition();
                     SetCurrentState(State.STATE_STOP);      // Next State:
                 }
                 else
@@ -288,7 +289,7 @@ public class DeviRedCornerAutonomous extends OpMode {
                 currentPath = null;
                 currentPathSegmentIndex = 0;
                 TurnOffAllDriveMotors();
-                UseConstantSpeed();
+                //UseConstantSpeed();
                 return true;
             }
         }

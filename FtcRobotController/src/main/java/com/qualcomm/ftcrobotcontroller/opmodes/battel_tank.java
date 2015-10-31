@@ -16,7 +16,7 @@ public class battel_tank extends OpMode {
     DcMotor frontleftmotor;
     DcMotor backrightmotor;
     DcMotor backleftmotor;
-    //DcMotor armmotor;
+    DcMotor armmotor;
     //Servo firstservo;
     ElapsedTime time;
     static final float DELAY = 1.0f;
@@ -32,7 +32,7 @@ public class battel_tank extends OpMode {
         frontleftmotor = hardwareMap.dcMotor.get("frontleftMotor");
         backrightmotor = hardwareMap.dcMotor.get("backrightMotor");
         backleftmotor = hardwareMap.dcMotor.get("backleftMotor");
-        //armmotor = hardwareMap.dcMotor.get("arm");
+        armmotor = hardwareMap.dcMotor.get("arm");
         //firstservo = hardwareMap.servo.get("servo1");
         frontleftmotor.setDirection(DcMotor.Direction.REVERSE);
         backleftmotor.setDirection(DcMotor.Direction.REVERSE);
@@ -53,8 +53,7 @@ public class battel_tank extends OpMode {
         float backright = -gamepad1.right_stick_y;
         float backleft = -gamepad1.left_stick_y;
         float accelerator = gamepad1.right_trigger;
-        //float arm = gamepad2.right_stick_y;
-
+        float arm = gamepad2.right_stick_y;
 
         frontright = Range.clip(frontright, -1, 1);
         frontleft = Range.clip(frontleft, -1, 1);
@@ -76,13 +75,24 @@ public class battel_tank extends OpMode {
             frontleft = gamepad1.right_stick_y;
             backright = gamepad1.left_stick_y;
             backleft = gamepad1.right_stick_y;
+            accelerator = gamepad1.right_trigger;
+
+            frontright = Range.clip(frontright, -1, 1);
+            frontleft = Range.clip(frontleft, -1, 1);
+            backright = Range.clip(backright, -1, 1);
+            backleft = Range.clip(backleft, -1, 1);
+
+            frontright = frontright * accelerator;
+            frontleft = frontleft * accelerator;
+            backright = backright * accelerator;
+            backleft = backleft * accelerator;
         }
 
         frontrightmotor.setPower(frontright);
         frontleftmotor.setPower(frontleft);
         backrightmotor.setPower(backright);
         backleftmotor.setPower(backleft);
-        //armmotor.setPower(arm);
+        armmotor.setPower(arm);
 
         //firstservo.setPosition(firstservoangle);
 
@@ -90,7 +100,7 @@ public class battel_tank extends OpMode {
         telemetry.addData("frontleft", "frontleft");
         telemetry.addData("backright", "backright");
         telemetry.addData("backleft", "backleft");
-        //telemetry.addData("arm", "arm");
+        telemetry.addData("arm", "arm");
         telemetry.addData("time", time.time());
         if(reversed){
             telemetry.addData("reversed", "yes");

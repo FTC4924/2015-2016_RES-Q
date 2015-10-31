@@ -49,9 +49,10 @@ public class DeviRedCornerAutonomous extends OpMode {
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     final DrivePathSegment[] mBeaconPath = {
-            new DrivePathSegment(  0.0f,  10.0f, 0.2f),  // Left
+            new DrivePathSegment(  0.0f,  10.0f, 0.5f),  // Left
             new DrivePathSegment( 60.0f, 60.0f, 0.9f),  // Forward
-            new DrivePathSegment(  0.0f,  10.0f, 0.2f)  // Left
+            new DrivePathSegment(  0.0f,  10.0f, 0.5f),  // Left
+            new DrivePathSegment( 10.0f,  10.0f, 0.5f)  // Forward
     };
 
     final DrivePathSegment[] locateLinePath = {
@@ -125,6 +126,7 @@ public class DeviRedCornerAutonomous extends OpMode {
                     //lineDetector.enableLed(true);                 // Action: Enable Light Sensor
                     //setDriveSpeed(-0.1, 0.1);               // Action: Start rotating left
                     //startPath(locateLinePath);
+                    TurnOffAllDriveMotors();
                     SetCurrentState(State.STATE_STOP);      // Next State:
                 }
                 else
@@ -158,16 +160,16 @@ public class DeviRedCornerAutonomous extends OpMode {
                 if (beaconIsReached()) {
 
                     TurnOffAllDriveMotors();
-                    SetCurrentState(State.STATE_SQUARE_TO_WALL);
+                    SetCurrentState(State.STATE_STOP);
                 }
 
                 if (isOnWhiteLine()) {
 
-                    startPath(lineSearchLeftTurn);
+                    setPowerLevelsForLineFollowing(0.0f, 0.3f);
 
                 } else {
 
-                    startPath(lineSearchRightTurn);
+                    setPowerLevelsForLineFollowing(0.3f, 0.0f);
                     /*telemetry.addData("1", String.format("%4.2f of %4.2f ",
                             lineDetector.getLightDetected(),
                             WHITE_THRESHOLD ));*/
@@ -192,7 +194,7 @@ public class DeviRedCornerAutonomous extends OpMode {
     }
 
     private boolean isOnWhiteLine() {
-        return elapsedTimeForCurrentState.time() >= 10;
+        return lineDetector.getLightDetected() > WHITE_THRESHOLD;
     }
 
     private boolean encodersAtZero() {
@@ -288,7 +290,7 @@ public class DeviRedCornerAutonomous extends OpMode {
                 currentPath = null;
                 currentPathSegmentIndex = 0;
                 TurnOffAllDriveMotors();
-                UseConstantSpeed();
+                //UseConstantSpeed();
                 return true;
             }
         }
@@ -320,6 +322,14 @@ public class DeviRedCornerAutonomous extends OpMode {
 
     public boolean beaconIsReached() {
         //TODO Use an actual test for this
-        return elapsedTimeForCurrentState.time() >= 1.0f;
+        return elapsedTimeForCurrentState.time() >= 2.0f;
+    }
+
+    public void setPowerLevelsForLineFollowing(float leftPower, float rightPower) {
+
+        frontLeftMotor.setPower(leftPower);
+        backLeftMotor.setPower(leftPower);
+        frontRightMotor.setPower(rightPower);
+        backRightMotor.setPower(rightPower);
     }
 }

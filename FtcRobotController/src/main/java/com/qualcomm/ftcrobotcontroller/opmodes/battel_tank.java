@@ -55,7 +55,6 @@ public class battel_tank extends OpMode {
         float accelerator = gamepad1.right_trigger;
         //float arm = gamepad2.right_stick_y;
 
-
         frontright = Range.clip(frontright, -1, 1);
         frontleft = Range.clip(frontleft, -1, 1);
         backright = Range.clip(backright, -1, 1);
@@ -76,6 +75,17 @@ public class battel_tank extends OpMode {
             frontleft = gamepad1.right_stick_y;
             backright = gamepad1.left_stick_y;
             backleft = gamepad1.right_stick_y;
+            accelerator = gamepad1.right_trigger;
+
+            frontright = Range.clip(frontright, -1, 1);
+            frontleft = Range.clip(frontleft, -1, 1);
+            backright = Range.clip(backright, -1, 1);
+            backleft = Range.clip(backleft, -1, 1);
+
+            frontright = frontright * accelerator;
+            frontleft = frontleft * accelerator;
+            backright = backright * accelerator;
+            backleft = backleft * accelerator;
         }
 
         frontrightmotor.setPower(frontright);

@@ -160,7 +160,7 @@ public class DeviRedCornerAutonomous extends OpMode {
                 if (beaconIsReached()) {
 
                     TurnOffAllDriveMotors();
-                    SetCurrentState(State.STATE_SQUARE_TO_WALL);
+                    SetCurrentState(State.STATE_STOP);
                 }
 
                 if (isOnWhiteLine()) {

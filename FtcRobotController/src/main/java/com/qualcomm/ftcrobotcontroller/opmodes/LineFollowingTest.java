@@ -17,10 +17,10 @@ public class LineFollowingTest extends OpMode {
     }
 
     private FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
-    private OpticalDistanceSensor lineDetector;
     private ElapsedTime elapsedTimeForCurrentState = new ElapsedTime();
     final double WHITE_THRESHOLD = 0.5f;
 
+    OpticalDistanceSensor lineDetector;
     DcMotor frontLeftMotor;
     DcMotor backLeftMotor;
     DcMotor frontRightMotor;
@@ -31,6 +31,7 @@ public class LineFollowingTest extends OpMode {
     @Override
     public void init() {
 
+        lineDetector = hardwareMap.opticalDistanceSensor.get("lineDetector");
         frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
         backRightMotor = hardwareMap.dcMotor.get("backrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
@@ -40,7 +41,15 @@ public class LineFollowingTest extends OpMode {
     }
 
     @Override
+    public void start() {
+
+        SetCurrentState(State.STATE_FOLLOW_LINE);
+    }
+
+    @Override
     public void loop() {
+
+        telemetry.addData("0", String.format("%4.1f ", elapsedTimeForCurrentState.time()) + currentState.toString());
 
         switch (currentState) {
 
@@ -54,11 +63,11 @@ public class LineFollowingTest extends OpMode {
 
                 if (isOnWhiteLine()) {
 
-                    setPowerLevelsForLineFollowing(0.0f, 0.3f);
+                    setPowerLevelsForLineFollowing(0.0f, 0.3f); //Left
 
                 } else {
 
-                    setPowerLevelsForLineFollowing(0.3f, 0.0f);
+                    setPowerLevelsForLineFollowing(0.3f, 0.0f); //Right
                     /*telemetry.addData("1", String.format("%4.2f of %4.2f ",
                             lineDetector.getLightDetected(),
                             WHITE_THRESHOLD ));*/

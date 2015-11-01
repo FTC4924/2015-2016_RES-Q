@@ -1,9 +1,7 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import com.qualcomm.ftcrobotcontroller.ServoAngles;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -138,7 +136,7 @@ public class battel_tank extends OpMode {
 
         return dScale;
     }
-   // private void SetServoAngles(ServoAngles angles){
+   // private void SetServoAngles(SirHammerServoAngles angles){
    //   firstservo.setPosition(angles.f);
    // }
 }

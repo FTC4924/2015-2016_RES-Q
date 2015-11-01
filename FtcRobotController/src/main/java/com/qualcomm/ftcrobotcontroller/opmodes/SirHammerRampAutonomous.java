@@ -1,6 +1,5 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
 import com.qualcomm.ftcrobotcontroller.EncoderTargets;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.ftcrobotcontroller.LegacyDrivePathSegment;
@@ -10,30 +9,24 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import static com.qualcomm.ftcrobotcontroller.opmodes.SirHammerCenterAutonomous.CenterColumnPosition.*;
-import static com.qualcomm.ftcrobotcontroller.opmodes.SirHammerCenterAutonomous.State.*;
+import static com.qualcomm.ftcrobotcontroller.opmodes.SirHammerRampAutonomous.State.*;
 
 /**
- * Created by 4924_Users on 9/27/2015.
+ * Created by 4924_Users on 10/31/2015.
  */
-public class SirHammerCenterAutonomous extends OpMode {
+public class SirHammerRampAutonomous extends OpMode {
 
     // A list of system States.
     public enum State
     {
         STATE_INITIAL,
-        STATE_DRIVE_TO_READ_IR,
-        STATE_READING_IR,
-        STATE_DRIVING_TO_POSITION,
-        STATE_DRIVING_TO_TOUCH_CENTER,
-        STATE_RAISING_ARM,
-        STATE_LOWERING_ARM,
-        STATE_POSITIONING_FOR_KICKSTAND,
-        STATE_KICKSTAND_MOVE_AND_TURN,
+        STATE_DRIVE_DOWN_RAMP,
+        STATE_SQUARE_TO_GOAL,
+        STATE_DUMPING_AUTONOMOUS_BALL_AND_GRABBING_GOAL,
+        STATE_DRIVING_TO_PARKING,
         STATE_STOP
     }
 
-    public enum CenterColumnPosition { UNDETECTED, ONE, TWO, THREE }
     private FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
     private EncoderTargets zeroEncoderTargets = new EncoderTargets(0, 0);
     public ElapsedTime elapsedGameTime = new ElapsedTime();
@@ -42,28 +35,20 @@ public class SirHammerCenterAutonomous extends OpMode {
 
     // Define driving paths as pairs of relative wheel movements in inches (left,right) plus speed %
     // Note: this is a dummy path, and is NOT likely to actually work with YOUR robot.
-    final LegacyDrivePathSegment[] centerReadingPath = {
-            new LegacyDrivePathSegment(  20.0f, 20.0f, 0.8f, 2.0f)
+    final LegacyDrivePathSegment[] rampPath = {
+            new LegacyDrivePathSegment(  90.0f, 90.0f, 1.0f, 3.0f)
     };
-    final LegacyDrivePathSegment[] position1Path = {
-            new LegacyDrivePathSegment( -5.0f, -5.0f, 0.8f, 1.0f),      // backup
-            new LegacyDrivePathSegment(-14.1f,14.1f, 0.8f, 2.0f),         // should be left 90 degree turn
-            new LegacyDrivePathSegment(10.0f,  10.0f, 0.8f, 2.0f),      // forward
-            new LegacyDrivePathSegment(14.1f, -14.1f, 0.8f, 2.0f)         // should be right 90 degree turn
+    final LegacyDrivePathSegment[] squaringPath = {
+            new LegacyDrivePathSegment( -5.0f, 5.0f, 0.8f, 3.0f)
     };
-    final LegacyDrivePathSegment[] touchCenterPath = {
-            new LegacyDrivePathSegment( 5.0f, 5.0f, 0.4f, 1.0f),      // ease forward
+    final LegacyDrivePathSegment[] dumpingBallPath = {
+            new LegacyDrivePathSegment( 0.0f, 0.0f, 0.0f, 3.0f)
     };
-    final LegacyDrivePathSegment[] kickstandSetupPath = {
-            new LegacyDrivePathSegment( -5.0f, -5.0f, 0.8f, 1.0f),      // backup
-            new LegacyDrivePathSegment(5.0f,-5.0f, 0.8f, 1.0f),         // turn
-            new LegacyDrivePathSegment(10.0f,  10.0f, 0.8f, 2.0f),      // forward
-            new LegacyDrivePathSegment(-5.0f, 5.0f, 0.8f, 1.0f)         // turn
+    final LegacyDrivePathSegment[] drivingToParking = {
+            new LegacyDrivePathSegment( -2.0f, -10.0f, 0.5f, 3.0f),
+            new LegacyDrivePathSegment( -60.0f, -60.0f, 0.5f, 7.0f)
     };
-    final LegacyDrivePathSegment[] kickstandTurnAndPullPath = {
-            new LegacyDrivePathSegment( 15.0f, 15.0f, 0.8f, 2.0f),
-            new LegacyDrivePathSegment(10.0f,-10.0f, 0.8f, 2.0f)
-    };
+
     final double COUNTS_PER_INCH = 116.279f ;    // Number of encoder counts per inch of wheel travel.
 
     DcMotor frontLeftMotor;
@@ -74,33 +59,21 @@ public class SirHammerCenterAutonomous extends OpMode {
     DcMotorController rightController;
 
     SirHammerAutonomousSensors sensors;
-    CenterColumnPosition goalPosition;
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
     int loopCountSinceLastModeChange = 1;
 
     private State currentState;
     private int currentPathSegmentIndex;
     private LegacyDrivePathSegment[] currentPath;
-    private CenterColumnPosition detectedCenterPosition = CenterColumnPosition.UNDETECTED;
     public State GetCurrentState() { return currentState; }
     public void SetCurrentState(State newState) {
         elapsedTimeForCurrentState.reset();
         currentState = newState;
     }
-    private int lastLeftEncoderReading;
-    private int lastRightEncoderReading;
-    static final int ENCODERMARGIN = 10;
-    static final int LOOPSBEFOREWRITEMODE = 17;
-    static final int LOOPSFORMODECHANGETOCOMPLETE = 10;
-    private DcMotorController wheelController;
-    private int successfulReadCount = 0;
-    private String debugMode = "WRITE";
     private float segmentTime = 0.0f;
 
     @Override
     public void init() {
-        goalPosition = UNDETECTED;
-
         leftController = hardwareMap.dcMotorController.get("leftController");
         rightController = hardwareMap.dcMotorController.get("rightController");
 
@@ -109,13 +82,10 @@ public class SirHammerCenterAutonomous extends OpMode {
         backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
         backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
 
-        // this is reversed from normal, because in autonomous mode, the robot runs backwards
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
         sensors = new SirHammerAutonomousSensors();
 
-        lastLeftEncoderReading = 0;
-        lastRightEncoderReading = 0;
         loopCountSinceLastModeChange = 1;
 
         TurnOffAllDriveMotors();
@@ -142,137 +112,72 @@ public class SirHammerCenterAutonomous extends OpMode {
         switch (currentState)
         {
             case STATE_INITIAL:         // Stay in this state until encoders are both Zero.
-                    //if (encodersAtZero()) {
-                        startPath(centerReadingPath);
-                        SetCurrentState(State.STATE_DRIVE_TO_READ_IR);
-                   // } else {
-                        // Display Diagnostic data for this state.
-                    //    telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
-                     //           getRightPosition()));
-                    //}
+                startPath(rampPath);
+                SetCurrentState(State.STATE_DRIVE_DOWN_RAMP);
                 break;
 
-            case STATE_DRIVE_TO_READ_IR: // Follow path until last segment is completed
+            case STATE_DRIVE_DOWN_RAMP: // Follow path until last segment is completed
                 if (pathComplete())
                 {
-                    ReadCenterPosition();
-                    SetCurrentState(State.STATE_READING_IR);      // Next State:
+                    startPath(squaringPath);
+                    SetCurrentState(State.STATE_SQUARE_TO_GOAL);      // Next State:
                 }
                 break;
 
-            case STATE_READING_IR:
-                switch (detectedCenterPosition) {
-                    case ONE:
-                        startPath(position1Path);
-                        SetCurrentState(State.STATE_DRIVING_TO_POSITION);
-                        break;
-                    case TWO:
-                        startPath(position1Path);
-                        SetCurrentState(State.STATE_DRIVING_TO_POSITION);
-                        break;
-                    case THREE:
-                        startPath(position1Path);
-                        SetCurrentState(State.STATE_DRIVING_TO_POSITION);
-                        break;
-                    default:
-                        ReadCenterPosition();
-                        break;
+            case STATE_SQUARE_TO_GOAL:
+                if (pathComplete())
+                {
+                    startPath(dumpingBallPath);
+                    dumpAutonomousBall();
+                    grabScoringTube();
+                    SetCurrentState(STATE_DUMPING_AUTONOMOUS_BALL_AND_GRABBING_GOAL);      // Next State:
                 }
                 break;
 
-            case STATE_DRIVING_TO_POSITION:
-                if (pathComplete())
-                {
-                    startPath(touchCenterPath);
-                    SetCurrentState(State.STATE_DRIVING_TO_TOUCH_CENTER);      // Next State:
-                }
-                break;
-            case STATE_DRIVING_TO_TOUCH_CENTER:
-                if (pathComplete())
-                {
-                    TurnOffAllDriveMotors();
-                    SetCurrentState(State.STATE_STOP);      // Next State:
-                }
-                break;
-            case STATE_RAISING_ARM:
-                SetCurrentState(STATE_LOWERING_ARM);
-                break;
-            case STATE_LOWERING_ARM:
-                startPath(kickstandSetupPath);
-                SetCurrentState(STATE_POSITIONING_FOR_KICKSTAND);
-                break;
-            case STATE_POSITIONING_FOR_KICKSTAND:
+            case STATE_DUMPING_AUTONOMOUS_BALL_AND_GRABBING_GOAL:
                 if (pathComplete()) {
-                    LowerKickstandArm();
-                    startPath(kickstandTurnAndPullPath);
-                    SetCurrentState(STATE_KICKSTAND_MOVE_AND_TURN);
+                    startPath(drivingToParking);
+                    SetCurrentState(STATE_DRIVING_TO_PARKING);
                 }
                 break;
-            case STATE_KICKSTAND_MOVE_AND_TURN:
+
+            case STATE_DRIVING_TO_PARKING:
                 if (pathComplete()) {
                     TurnOffAllDriveMotors();
                     SetCurrentState(STATE_STOP);
                 }
                 break;
+
             case STATE_STOP:
                 TurnOffAllDriveMotors();
                 break;
         }
 
-        /*if (loopCountSinceLastModeChange % LOOPSBEFOREWRITEMODE  == 0){
-            if (leftController.getMotorControllerDeviceMode() == DcMotorController.DeviceMode.READ_ONLY) {
-                SwitchToWriteMode();
-            } else {
-                SwitchToReadMode();
-            }
-            loopCountSinceLastModeChange = 0;
-        } else {
-            // Every 17 loops, switch to read mode so we can read data from the NXT device.
-            // Only necessary on NXT devices.
-            if (loopCountSinceLastModeChange >= LOOPSFORMODECHANGETOCOMPLETE) {
-                if (leftController.getMotorControllerDeviceMode() == DcMotorController.DeviceMode.WRITE_ONLY) {
-                    SetEncoderTargets();
-                } else {
-                    if (leftController.getMotorControllerDeviceMode() == DcMotorController.DeviceMode.READ_ONLY) {
-                        lastLeftEncoderReading = frontLeftMotor.getCurrentPosition();
-                        successfulReadCount++;
-                        //leftController.setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
-                        //debugMode = "Write";
-                    }
-                    if (rightController.getMotorControllerDeviceMode()== DcMotorController.DeviceMode.READ_ONLY) {
-                        lastRightEncoderReading = frontRightMotor.getCurrentPosition();
-                        successfulReadCount++;
-                        //rightController.setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
-                        //debugMode = "Write";
-                    }
-                }
-            }
-        } */
         SetEncoderTargets();
 
-        // Update the current devModes
-        loopCountSinceLastModeChange++;
+        telemetry.addData("State: ", currentState);
+    }
+
+    private void dumpAutonomousBall() {
+
+    }
+
+    private void grabScoringTube() {
+
     }
 
     private void SwitchToReadMode() {
         leftController.setMotorControllerDeviceMode(DcMotorController.DeviceMode.READ_ONLY);
         rightController.setMotorControllerDeviceMode(DcMotorController.DeviceMode.READ_ONLY);
-        debugMode= "Read";
     }
 
     private void SwitchToWriteMode() {
         leftController.setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
         rightController.setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
-        debugMode = "Write";
     }
 
     private void LowerKickstandArm() {
         // TODO - make this talk to the servo
-    }
-    
-    private void ReadCenterPosition() {
-        // TODO - actually detect a position
-        detectedCenterPosition = CenterColumnPosition.ONE;
     }
 
     public void UseRunToPosition()
@@ -289,13 +194,13 @@ public class SirHammerCenterAutonomous extends OpMode {
     {
         // Ensure the motors are in the correct mode.
         //if (frontLeftMotor.getChannelMode() != mode)
-            frontLeftMotor.setChannelMode(mode);
+        frontLeftMotor.setChannelMode(mode);
         //if (backLeftMotor.getChannelMode() != mode)
-            backLeftMotor.setChannelMode(mode);
+        backLeftMotor.setChannelMode(mode);
         //if (frontRightMotor.getChannelMode() != mode)
-            frontRightMotor.setChannelMode(mode);
+        frontRightMotor.setChannelMode(mode);
         //if (backRightMotor.getChannelMode() != mode)
-            backRightMotor.setChannelMode(mode);
+        backRightMotor.setChannelMode(mode);
     }
 
     /*
@@ -382,14 +287,16 @@ public class SirHammerCenterAutonomous extends OpMode {
     private int getLeftPosition() {
         // return currentEncoderTargets.LeftTarget;
         // return frontLeftMotor.getCurrentPosition();
-        return lastLeftEncoderReading;
+        // return lastLeftEncoderReading;
+        return 0;
     }
 
     // Return Right Encoder count
     private int getRightPosition() {
         // return currentEncoderTargets.RightTarget;
         // return frontRightMotor.getCurrentPosition();
-        return lastRightEncoderReading;
+        // return lastRightEncoderReading;
+        return 0;
     }
 
     // Return true if motors have both reached the desired encoder target
@@ -402,9 +309,10 @@ public class SirHammerCenterAutonomous extends OpMode {
 
     // If the device is in either of these two modes, the op mode is allowed to write to the HW.
     private boolean allowedToWrite(int loopCountSinceLastModeChange){
-        return ((leftController.getMotorControllerDeviceMode() == DcMotorController.DeviceMode.WRITE_ONLY) &&
-                (rightController.getMotorControllerDeviceMode() == DcMotorController.DeviceMode.WRITE_ONLY) &&
-                (loopCountSinceLastModeChange > LOOPSFORMODECHANGETOCOMPLETE));
+//        return ((leftController.getMotorControllerDeviceMode() == DcMotorController.DeviceMode.WRITE_ONLY) &&
+//                (rightController.getMotorControllerDeviceMode() == DcMotorController.DeviceMode.WRITE_ONLY) &&
+//                (loopCountSinceLastModeChange > LOOPSFORMODECHANGETOCOMPLETE));
+        return true;
     }
 
     //--------------------------------------------------------------------------
@@ -433,4 +341,5 @@ public class SirHammerCenterAutonomous extends OpMode {
         backRightMotor.setPower(levels.backRight);
         frontRightMotor.setPower(levels.frontRight);
     }
+
 }

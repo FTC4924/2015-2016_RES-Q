@@ -5,9 +5,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 /**
  * Created by 4924_Users on 9/20/2015.
  */
-public class ServoInputsReader {
-    public static ServoInputs GetServoInputs(Gamepad gamepad1, Gamepad gamepad2) {
-        ServoInputs inputs = new ServoInputs();
+public class SirHammerServoInputsReader {
+    public static SirHammerServoInputs GetServoInputs(Gamepad gamepad1, Gamepad gamepad2) {
+        SirHammerServoInputs inputs = new SirHammerServoInputs();
 
         inputs.RaisePin = gamepad2.y;
         inputs.LowerPin = gamepad2.a;
@@ -17,6 +17,9 @@ public class ServoInputsReader {
 
         inputs.DockKickStand = gamepad2.x;
         inputs.ExtendKickStand = gamepad2.b;
+
+        inputs.LowerBackLeftArm = gamepad2.right_bumper;
+        inputs.RaiseBackLeftArm = gamepad2.left_bumper;
 
         return inputs;
     }

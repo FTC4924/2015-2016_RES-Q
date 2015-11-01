@@ -8,6 +8,8 @@ public class DrivePathSegment {
     public float RightSideDistance;
     public float Power;
 
+    public DrivePathSegment() {}
+
     public DrivePathSegment(float left, float right, float power) {
         LeftSideDistance = left;
         RightSideDistance = right;

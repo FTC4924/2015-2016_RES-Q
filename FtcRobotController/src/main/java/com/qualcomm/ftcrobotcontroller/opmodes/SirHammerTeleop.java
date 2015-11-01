@@ -12,10 +12,10 @@ import com.qualcomm.ftcrobotcontroller.DriverArcadeInputs;
 import com.qualcomm.ftcrobotcontroller.DriverReader;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.ftcrobotcontroller.DriveMotorPowerCalculator;
-import com.qualcomm.ftcrobotcontroller.ServoAngleCalculator;
-import com.qualcomm.ftcrobotcontroller.ServoAngles;
-import com.qualcomm.ftcrobotcontroller.ServoInputs;
-import com.qualcomm.ftcrobotcontroller.ServoInputsReader;
+import com.qualcomm.ftcrobotcontroller.SirHammerServoAngleCalculator;
+import com.qualcomm.ftcrobotcontroller.SirHammerServoAngles;
+import com.qualcomm.ftcrobotcontroller.SirHammerServoInputs;
+import com.qualcomm.ftcrobotcontroller.SirHammerServoInputsReader;
 import com.qualcomm.ftcrobotcontroller.SpinnerInputs;
 import com.qualcomm.ftcrobotcontroller.SpinnerMotorPowerLevel;
 import com.qualcomm.ftcrobotcontroller.SpinnerPowerCalculator;
@@ -42,8 +42,9 @@ public class SirHammerTeleop extends OpMode {
     Servo pinServo;
     Servo flapServo;
     Servo kickStandServo;
+    Servo backLeftArmServo;
 
-    ServoAngles servoAngles = new ServoAngles();
+    SirHammerServoAngles servoAngles = new SirHammerServoAngles();
 
     IrSeekerSensor irSensor;
 
@@ -67,7 +68,8 @@ public class SirHammerTeleop extends OpMode {
         pinServo = hardwareMap.servo.get("pinServo");
         flapServo = hardwareMap.servo.get("flapServo");
         kickStandServo = hardwareMap.servo.get("kickStandArmServo");
-        kickStandServo.setPosition(ServoAngleCalculator.KICKSTAND_DOCKED_ANGLE);
+        backLeftArmServo = hardwareMap.servo.get("backLeftArm");
+        kickStandServo.setPosition(SirHammerServoAngleCalculator.KICKSTAND_DOCKED_ANGLE);
 
         irSensor = hardwareMap.irSeekerSensor.get("irSensor");
     }
@@ -96,15 +98,15 @@ public class SirHammerTeleop extends OpMode {
 
     private void DisplayTelemetry() {
         telemetry.addData("Text", "*** Robot Data***");
-        if (servoAngles.PinAngle== ServoAngleCalculator.PIN_UP_ANGLE)
+        if (servoAngles.PinAngle== SirHammerServoAngleCalculator.PIN_UP_ANGLE)
             telemetry.addData("pin", ": UP");
         else
             telemetry.addData("pin", ": DN");
-        if (servoAngles.KickStandAngle==ServoAngleCalculator.KICKSTAND_DOCKED_ANGLE)
+        if (servoAngles.KickStandAngle== SirHammerServoAngleCalculator.KICKSTAND_DOCKED_ANGLE)
             telemetry.addData("kick", ": DOCKED");
         else
             telemetry.addData("kick", ": EXTENDED");
-        if (servoAngles.FlapAngle == ServoAngleCalculator.FLAP_OPEN_ANGLE)
+        if (servoAngles.FlapAngle == SirHammerServoAngleCalculator.FLAP_OPEN_ANGLE)
             telemetry.addData("flap", ": OPEN");
         else
             telemetry.addData("flap", ": CLOSED");
@@ -114,8 +116,8 @@ public class SirHammerTeleop extends OpMode {
         // raise/lower the pin, the flaps, run the sweeper???
         // we have to keep a variable with current servo angles, since we want to keep the
         // same angle if no inputs that cause us to change servos happen
-        ServoInputs servoInputs = ServoInputsReader.GetServoInputs(gamepad1, gamepad2);
-        ServoAngleCalculator.UpdateServoAngles(servoInputs, servoAngles);
+        SirHammerServoInputs servoInputs = SirHammerServoInputsReader.GetServoInputs(gamepad1, gamepad2);
+        SirHammerServoAngleCalculator.UpdateServoAngles(servoInputs, servoAngles);
         SetServoAngles(servoAngles);
     }
 
@@ -159,9 +161,10 @@ public class SirHammerTeleop extends OpMode {
         autoArmMotor.setPower(level.power);
     }
 
-    private void SetServoAngles(ServoAngles angles) {
+    private void SetServoAngles(SirHammerServoAngles angles) {
         pinServo.setPosition(angles.PinAngle);
         kickStandServo.setPosition(angles.KickStandAngle);
         flapServo.setPosition(angles.FlapAngle);
+        backLeftArmServo.setPosition(angles.BackLeftArmAngle);
     }
 }

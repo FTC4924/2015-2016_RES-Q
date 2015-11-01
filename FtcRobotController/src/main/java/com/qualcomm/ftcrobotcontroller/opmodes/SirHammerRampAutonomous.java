@@ -22,7 +22,7 @@ public class SirHammerRampAutonomous extends OpMode {
         STATE_INITIAL,
         STATE_DRIVE_DOWN_RAMP,
         STATE_SQUARE_TO_GOAL,
-        STATE_DUMPING_AUTONOMOUS_BALL,
+        STATE_DUMPING_AUTONOMOUS_BALL_AND_GRABBING_GOAL,
         STATE_DRIVING_TO_PARKING,
         STATE_STOP
     }
@@ -39,10 +39,14 @@ public class SirHammerRampAutonomous extends OpMode {
             new LegacyDrivePathSegment(  90.0f, 90.0f, 1.0f, 3.0f)
     };
     final LegacyDrivePathSegment[] squaringPath = {
-            new LegacyDrivePathSegment( -5.0f, 5.0f, 0.8f, 3.0f)      // backup
+            new LegacyDrivePathSegment( -5.0f, 5.0f, 0.8f, 3.0f)
     };
     final LegacyDrivePathSegment[] dumpingBallPath = {
-            new LegacyDrivePathSegment( 0.0f, 0.0f, 0.0f, 3.0f)      // backup
+            new LegacyDrivePathSegment( 0.0f, 0.0f, 0.0f, 3.0f)
+    };
+    final LegacyDrivePathSegment[] drivingToParking = {
+            new LegacyDrivePathSegment( -2.0f, -10.0f, 0.5f, 3.0f),
+            new LegacyDrivePathSegment( -60.0f, -60.0f, 0.5f, 7.0f)
     };
 
     final double COUNTS_PER_INCH = 116.279f ;    // Number of encoder counts per inch of wheel travel.
@@ -124,11 +128,20 @@ public class SirHammerRampAutonomous extends OpMode {
                 if (pathComplete())
                 {
                     startPath(dumpingBallPath);
-                    SetCurrentState(STATE_DUMPING_AUTONOMOUS_BALL);      // Next State:
+                    dumpAutonomousBall();
+                    grabScoringTube();
+                    SetCurrentState(STATE_DUMPING_AUTONOMOUS_BALL_AND_GRABBING_GOAL);      // Next State:
                 }
                 break;
 
-            case STATE_DUMPING_AUTONOMOUS_BALL:
+            case STATE_DUMPING_AUTONOMOUS_BALL_AND_GRABBING_GOAL:
+                if (pathComplete()) {
+                    startPath(drivingToParking);
+                    SetCurrentState(STATE_DRIVING_TO_PARKING);
+                }
+                break;
+
+            case STATE_DRIVING_TO_PARKING:
                 if (pathComplete()) {
                     TurnOffAllDriveMotors();
                     SetCurrentState(STATE_STOP);
@@ -143,6 +156,14 @@ public class SirHammerRampAutonomous extends OpMode {
         SetEncoderTargets();
 
         telemetry.addData("State: ", currentState);
+    }
+
+    private void dumpAutonomousBall() {
+
+    }
+
+    private void grabScoringTube() {
+
     }
 
     private void SwitchToReadMode() {

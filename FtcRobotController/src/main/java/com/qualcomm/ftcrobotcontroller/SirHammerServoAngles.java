@@ -8,11 +8,13 @@ public class SirHammerServoAngles {
     public float FlapAngle;
     public float KickStandAngle;
     public float BackLeftArmAngle;
+    public float DunkingArmAngle;
 
     public SirHammerServoAngles() {
         PinAngle = SirHammerServoAngleCalculator.PIN_UP_ANGLE;
         FlapAngle = SirHammerServoAngleCalculator.FLAP_OPEN_ANGLE;
         KickStandAngle = SirHammerServoAngleCalculator.KICKSTAND_DOCKED_ANGLE;
         BackLeftArmAngle = SirHammerServoAngleCalculator.BACK_LEFT_ARM_RAISED_ANGLE;
+        DunkingArmAngle = SirHammerServoAngleCalculator.DUNK_ARM_DOCKED_ANGLE;
     }
 }

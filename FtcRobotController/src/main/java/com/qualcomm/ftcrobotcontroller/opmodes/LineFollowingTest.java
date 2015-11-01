@@ -4,6 +4,7 @@ import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -25,6 +26,9 @@ public class LineFollowingTest extends OpMode {
     DcMotor backLeftMotor;
     DcMotor frontRightMotor;
     DcMotor backRightMotor;
+    DcMotor arm;
+    Servo servo1;
+    Servo servo2;
 
     private State currentState;
 
@@ -50,6 +54,7 @@ public class LineFollowingTest extends OpMode {
     public void loop() {
 
         telemetry.addData("0", String.format("%4.1f ", elapsedTimeForCurrentState.time()) + currentState.toString());
+        telemetry.addData("Has Beacon Been Reached: ", beaconIsReached());
 
         switch (currentState) {
 
@@ -63,31 +68,20 @@ public class LineFollowingTest extends OpMode {
 
                 if (isOnWhiteLine()) {
 
-                    setPowerLevelsForLineFollowing(0.0f, 0.3f); //Left
+                    setPowerLevelsForLineFollowing(0.0f, 0.4f); //Left
 
                 } else {
 
-                    setPowerLevelsForLineFollowing(0.3f, 0.0f); //Right
-                    /*telemetry.addData("1", String.format("%4.2f of %4.2f ",
-                            lineDetector.getLightDetected(),
-                            WHITE_THRESHOLD ));*/
+                    setPowerLevelsForLineFollowing(0.4f, 0.0f); //Right
                 }
 
                 break;
 
             case STATE_STOP:
 
-                //if (pathComplete()) {
-
-                // TurnOffAllDriveMotors();
-                // telemetry.addData("StopComplete", "Stop Complete");
-                //}
-
                 TurnOffAllDriveMotors();
         }
     }
-
-
 
     public void setPowerLevelsForLineFollowing(float leftPower, float rightPower) {
 

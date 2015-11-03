@@ -70,14 +70,14 @@ public class battel_tank extends OpMode {
             servo_angles.servo2 = servo_angles.servo2 - .10f;
         }
         else {
-            servo2.setPosition(0.50);
+            servo2.setPosition(0.50f);
         }
 
         if (gamepad2.a && (servo_time.time() > DELAY)){
             servo_angles.servo2 = servo_angles.servo2 + .10f;
         }
         else {
-            servo2.setPosition(0.50);
+            servo2.setPosition(0.50f);
         }
 
         servo_angles.servo1 = Range.clip(servo_angles.servo1, 0.00f, 1.00f);

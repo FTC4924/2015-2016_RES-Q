@@ -1,5 +1,7 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
+import android.media.SoundPool;
+
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.ftcrobotcontroller.LegacyDrivePathSegment;
 import com.qualcomm.ftcrobotcontroller.SirHammerEncoderTargets;
@@ -53,7 +55,7 @@ public class SirHammerRampAutonomous extends OpMode {
     final LegacyDrivePathSegment[] drivingToParking = {
             new LegacyDrivePathSegment( 20.0f, -20.0f, 20.0f, -20.0f, 0.8f, 3.0f),
             new LegacyDrivePathSegment( -10.0f, -10.0f, 0.8f, 3.0f),
-            new LegacyDrivePathSegment( 31.0f, -31.0f, 0.4f, 7.0f),
+            new LegacyDrivePathSegment( 32.0f, -32.0f, 0.4f, 7.0f),
             new LegacyDrivePathSegment( 80.0f, 80.0f, 0.8f, 7.0f)
     };
 

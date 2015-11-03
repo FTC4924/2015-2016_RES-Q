@@ -177,5 +177,6 @@ public class SirHammerTeleop extends OpMode {
         kickStandServo.setPosition(angles.KickStandAngle);
         flapServo.setPosition(angles.FlapAngle);
         backLeftArmServo.setPosition(angles.BackLeftArmAngle);
+        backDunkServo.setPosition(angles.DunkingArmAngle);
     }
 }

@@ -1,9 +1,8 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import com.qualcomm.ftcrobotcontroller.EncoderTargets;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.ftcrobotcontroller.LegacyDrivePathSegment;
-import com.qualcomm.ftcrobotcontroller.SirHammerAutonomousSensors;
+import com.qualcomm.ftcrobotcontroller.SirHammerEncoderTargets;
 import com.qualcomm.ftcrobotcontroller.SirHammerServoAngleCalculator;
 import com.qualcomm.ftcrobotcontroller.SirHammerServoAngles;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -25,13 +24,14 @@ public class SirHammerRampAutonomous extends OpMode {
         STATE_INITIAL,
         STATE_DRIVE_DOWN_RAMP,
         STATE_SQUARE_TO_GOAL,
-        STATE_DUMPING_AUTONOMOUS_BALL_AND_GRABBING_GOAL,
+        STATE_DUMPING_AUTONOMOUS_BALL,
+        STATE_GRABBING_GOAL,
         STATE_DRIVING_TO_PARKING,
         STATE_STOP
     }
 
     private FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
-    private EncoderTargets zeroEncoderTargets = new EncoderTargets(0, 0);
+    private SirHammerEncoderTargets zeroEncoderTargets = new SirHammerEncoderTargets(0, 0, 0, 0);
     public ElapsedTime elapsedGameTime = new ElapsedTime();
     private ElapsedTime elapsedTimeForCurrentState = new ElapsedTime();
     private ElapsedTime elapsedTimeForPathSegment = new ElapsedTime();
@@ -39,17 +39,22 @@ public class SirHammerRampAutonomous extends OpMode {
     // Define driving paths as pairs of relative wheel movements in inches (left,right) plus speed %
     // Note: this is a dummy path, and is NOT likely to actually work with YOUR robot.
     final LegacyDrivePathSegment[] rampPath = {
-            new LegacyDrivePathSegment(  90.0f, 90.0f, 1.0f, 4.0f)
+            new LegacyDrivePathSegment(  90.0f, 95.0f, 1.0f, 4.0f)
     };
     final LegacyDrivePathSegment[] squaringPath = {
             new LegacyDrivePathSegment( 0.0f, 0.0f, 0.8f, 3.0f)
     };
+    final LegacyDrivePathSegment[] grabGoalMove = {
+            new LegacyDrivePathSegment( -5.0f, -8.0f, 0.8f, 3.0f)
+    };
     final LegacyDrivePathSegment[] dumpingBallPath = {
-            new LegacyDrivePathSegment( 0.0f, 0.0f, 0.0f, 3.0f)
+            new LegacyDrivePathSegment( 0.0f, 0.0f, 0.0f, 5.0f)
     };
     final LegacyDrivePathSegment[] drivingToParking = {
-            new LegacyDrivePathSegment( 0.0f, 0.0f, 0.5f, 3.0f),
-            new LegacyDrivePathSegment( 0.0f, 0.0f, 0.5f, 7.0f)
+            new LegacyDrivePathSegment( 20.0f, -20.0f, 20.0f, -20.0f, 0.8f, 3.0f),
+            new LegacyDrivePathSegment( -10.0f, -10.0f, 0.8f, 3.0f),
+            new LegacyDrivePathSegment( 31.0f, -31.0f, 0.4f, 7.0f),
+            new LegacyDrivePathSegment( 80.0f, 80.0f, 0.8f, 7.0f)
     };
 
     final double COUNTS_PER_INCH = 116.279f ;    // Number of encoder counts per inch of wheel travel.
@@ -64,7 +69,7 @@ public class SirHammerRampAutonomous extends OpMode {
     Servo backLeftArmServo;
     Servo backDunkServo;
 
-    EncoderTargets currentEncoderTargets = zeroEncoderTargets;
+    SirHammerEncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     SirHammerServoAngles servoAngles = new SirHammerServoAngles();
 
@@ -84,6 +89,7 @@ public class SirHammerRampAutonomous extends OpMode {
         backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
         backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
 
+        // opposite from teleop since we go backwards down the ramp
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
@@ -95,6 +101,8 @@ public class SirHammerRampAutonomous extends OpMode {
         kickStandServo.setPosition(SirHammerServoAngleCalculator.KICKSTAND_DOCKED_ANGLE);
         backLeftArmServo.setPosition(SirHammerServoAngleCalculator.BACK_LEFT_ARM_RAISED_ANGLE);
         backDunkServo.setPosition(SirHammerServoAngleCalculator.DUNK_ARM_DOCKED_ANGLE);
+        pinServo.setPosition(SirHammerServoAngleCalculator.PIN_UP_ANGLE);
+        servoAngles.PinAngle = SirHammerServoAngleCalculator.PIN_UP_ANGLE;
 
         TurnOffAllDriveMotors();
 
@@ -109,6 +117,7 @@ public class SirHammerRampAutonomous extends OpMode {
         elapsedGameTime.reset();
         SetCurrentState(STATE_INITIAL);
         //SwitchToReadMode();
+        RaisePin();
     }
 
     @Override
@@ -138,15 +147,22 @@ public class SirHammerRampAutonomous extends OpMode {
                 {
                     startPath(dumpingBallPath);
                     dumpAutonomousBall();
-                    grabScoringTube();
-                    SetCurrentState(STATE_DUMPING_AUTONOMOUS_BALL_AND_GRABBING_GOAL);      // Next State:
+                    SetCurrentState(STATE_DUMPING_AUTONOMOUS_BALL);      // Next State:
                 }
                 break;
 
-            case STATE_DUMPING_AUTONOMOUS_BALL_AND_GRABBING_GOAL:
+            case STATE_DUMPING_AUTONOMOUS_BALL:
                 if (pathComplete()) {
                     dockAutonomousBallArm();
-                    releaseScoringTube();
+                    startPath(grabGoalMove);
+                    SetCurrentState(STATE_GRABBING_GOAL);
+                }
+                break;
+
+            case STATE_GRABBING_GOAL:
+                if (pathComplete()) {
+                    grabScoringTube();
+                    LowerPin();
                     startPath(drivingToParking);
                     SetCurrentState(STATE_DRIVING_TO_PARKING);
                 }
@@ -197,6 +213,14 @@ public class SirHammerRampAutonomous extends OpMode {
 
     private void RaiseKickstandArm() {
         servoAngles.KickStandAngle = SirHammerServoAngleCalculator.KICKSTAND_DOCKED_ANGLE;
+    }
+
+    private void RaisePin() {
+        servoAngles.PinAngle = SirHammerServoAngleCalculator.PIN_UP_ANGLE;
+    }
+
+    private void LowerPin() {
+        servoAngles.PinAngle = SirHammerServoAngleCalculator.PIN_DOWN_ANGLE;
     }
 
     public void UseRunToPosition()
@@ -266,17 +290,21 @@ public class SirHammerRampAutonomous extends OpMode {
      */
     private void startSeg()
     {
-        int Left;
-        int Right;
+        int leftFront;
+        int leftRear;
+        int rightFront;
+        int rightRear;
 
         if (currentPath != null)
         {
             elapsedTimeForPathSegment.reset();
             // Load up the next motion based on the current segemnt.
-            Left  = (int)(currentPath[currentPathSegmentIndex].LeftSideDistance * COUNTS_PER_INCH);
-            Right = (int)(currentPath[currentPathSegmentIndex].RightSideDistance * COUNTS_PER_INCH);
+            leftFront  = (int)(currentPath[currentPathSegmentIndex].LeftSideDistance * COUNTS_PER_INCH);
+            rightFront = (int)(currentPath[currentPathSegmentIndex].RightSideDistance * COUNTS_PER_INCH);
+            leftRear  = (int)(currentPath[currentPathSegmentIndex].LeftRearDistance * COUNTS_PER_INCH);
+            rightRear = (int)(currentPath[currentPathSegmentIndex].RightRearDistance * COUNTS_PER_INCH);
             segmentTime = currentPath[currentPathSegmentIndex].Time;
-            addEncoderTarget(Left, Right);
+            addEncoderTarget(leftFront, leftRear, rightFront, rightRear);
             FourWheelDrivePowerLevels powerLevels =
                     new FourWheelDrivePowerLevels(currentPath[currentPathSegmentIndex].Power,
                             currentPath[currentPathSegmentIndex].Power);
@@ -290,10 +318,13 @@ public class SirHammerRampAutonomous extends OpMode {
     // addEncoderTarget( LeftEncoder, RightEncoder);
     // Sets relative Encoder Position.  Offset current targets with passed data
     //--------------------------------------------------------------------------
-    void addEncoderTarget(int leftEncoderAdder, int rightEncoderAdder) {
+    void addEncoderTarget(int leftFrontEncoderAdder, int leftRearEncoderAdder,
+                          int rightFrontEncoderAdder, int rightRearEncoderAdder) {
 
-        currentEncoderTargets.LeftTarget += leftEncoderAdder;
-        currentEncoderTargets.RightTarget += rightEncoderAdder;
+        currentEncoderTargets.LeftFrontTarget += leftFrontEncoderAdder;
+        currentEncoderTargets.LeftRearTarget += leftRearEncoderAdder;
+        currentEncoderTargets.RightFrontTarget += rightFrontEncoderAdder;
+        currentEncoderTargets.RightRearTarget += rightRearEncoderAdder;
     }
 
     // Return true if motors have both reached the desired encoder target
@@ -309,10 +340,10 @@ public class SirHammerRampAutonomous extends OpMode {
     }
 
     private void SetEncoderTargets() {
-        frontLeftMotor.setTargetPosition(currentEncoderTargets.LeftTarget);
-        backLeftMotor.setTargetPosition(currentEncoderTargets.LeftTarget);
-        frontRightMotor.setTargetPosition(currentEncoderTargets.RightTarget);
-        backRightMotor.setTargetPosition(currentEncoderTargets.RightTarget);
+        frontLeftMotor.setTargetPosition(currentEncoderTargets.LeftFrontTarget);
+        backLeftMotor.setTargetPosition(currentEncoderTargets.LeftRearTarget);
+        frontRightMotor.setTargetPosition(currentEncoderTargets.RightFrontTarget);
+        backRightMotor.setTargetPosition(currentEncoderTargets.RightRearTarget);
     }
 
     private void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {

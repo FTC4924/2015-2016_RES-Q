@@ -13,8 +13,8 @@ public class SirHammerServoAngleCalculator {
     public static final float KICKSTAND_EXTENDED_ANGLE = 0.0f;
     public static final float BACK_LEFT_ARM_LOWERED_ANGLE = 0.6f;
     public static final float BACK_LEFT_ARM_RAISED_ANGLE = 0.0f;
-    public static final float DUNK_ARM_DOCKED_ANGLE = 0.0f;
-    public static final float DUNK_ARM_DUNKING_ANGLE = 0.5f;
+    public static final float DUNK_ARM_DOCKED_ANGLE = 0.7f;
+    public static final float DUNK_ARM_DUNKING_ANGLE = 0.0f;
 
     public static void UpdateServoAngles(SirHammerServoInputs inputs, SirHammerServoAngles servoAngles) {
 
@@ -35,8 +35,8 @@ public class SirHammerServoAngleCalculator {
         if (inputs.RaiseBackLeftArm)
             servoAngles.BackLeftArmAngle = BACK_LEFT_ARM_RAISED_ANGLE;
         if (inputs.RaiseDunkingArm)
-            servoAngles.DunkingArmAngle = DUNK_ARM_DOCKED_ANGLE;
-        if (inputs.LowerDunkingArm)
             servoAngles.DunkingArmAngle = DUNK_ARM_DUNKING_ANGLE;
+        if (inputs.LowerDunkingArm)
+            servoAngles.DunkingArmAngle = DUNK_ARM_DOCKED_ANGLE;
     }
 }

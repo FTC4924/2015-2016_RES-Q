@@ -19,7 +19,7 @@ public class LineFollowingTest extends OpMode {
 
     private FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
     private ElapsedTime elapsedTimeForCurrentState = new ElapsedTime();
-    final double WHITE_THRESHOLD = 0.5f;
+    final double WHITE_THRESHOLD = 0.05f;
 
     OpticalDistanceSensor lineDetector;
     DcMotor frontLeftMotor;
@@ -93,7 +93,7 @@ public class LineFollowingTest extends OpMode {
 
     public boolean beaconIsReached() {
         //TODO Use an actual test for this
-        return elapsedTimeForCurrentState.time() >= 2.0f;
+        return elapsedTimeForCurrentState.time() >= 6.0f;
     }
 
     private void TurnOffAllDriveMotors() {

@@ -34,7 +34,7 @@ public class DeviRedCornerAutonomous extends OpMode {
     final int COUNTS_PER_REVOLUTION = 1120;
     final double WHEEL_DIAMETER = 4.5f;
     final double GEAR_RATIO = 24.0f/16.0f;
-    final double WHITE_THRESHOLD = 0.5f;
+    final double WHITE_THRESHOLD = 0.05f;
     double countsPerInch;
     static final int ENCODER_TARGET_MARGIN = 20;
 
@@ -49,10 +49,8 @@ public class DeviRedCornerAutonomous extends OpMode {
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     final DrivePathSegment[] mBeaconPath = {
-            new DrivePathSegment(  0.0f,  10.0f, 0.5f),  // Left
-            new DrivePathSegment( 60.0f, 60.0f, 0.9f),  // Forward
-            new DrivePathSegment(  0.0f,  10.0f, 0.5f),  // Left
-            new DrivePathSegment( 10.0f,  10.0f, 0.5f)  // Forward
+            new DrivePathSegment(  0.0f,  15.0f, 0.5f),  // Left
+            new DrivePathSegment( 120.0f, 120.0f, 0.9f),  // Forward
     };
 
     final DrivePathSegment[] locateLinePath = {
@@ -82,6 +80,7 @@ public class DeviRedCornerAutonomous extends OpMode {
         backRightMotor = hardwareMap.dcMotor.get("backrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
         backLeftMotor = hardwareMap.dcMotor.get("backleftMotor");
+        lineDetector = hardwareMap.opticalDistanceSensor.get("lineDetector");
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
@@ -121,7 +120,7 @@ public class DeviRedCornerAutonomous extends OpMode {
                 break;
 
             case STATE_DRIVE_TO_BEACON: // Follow mBeaconPath until last segment is completed
-                if (pathComplete())
+                if (isOnWhiteLine())
                 {
                     //lineDetector.enableLed(true);                 // Action: Enable Light Sensor
                     //setDriveSpeed(-0.1, 0.1);               // Action: Start rotating left

@@ -17,7 +17,6 @@ public class DeviRedCornerAutonomous extends OpMode {
     public enum State {
         STATE_INITIAL,
         STATE_DRIVE_TO_BEACON,
-        STATE_LOCATE_LINE,
         STATE_FOLLOW_LINE,
         STATE_SQUARE_TO_WALL,
         STATE_DEPLOY_CLIMBERS,
@@ -49,22 +48,12 @@ public class DeviRedCornerAutonomous extends OpMode {
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     final DrivePathSegment[] mBeaconPath = {
-            new DrivePathSegment(  0.0f,  15.0f, 0.5f),  // Left
-            new DrivePathSegment( 120.0f, 120.0f, 0.9f),  // Forward
+            new DrivePathSegment(  0.0f,  17.0f, 0.5f),  // Left
+            new DrivePathSegment( 150.0f, 150.0f, 0.9f)  // Forward
     };
 
-    final DrivePathSegment[] locateLinePath = {
-            new DrivePathSegment(  3.0f,  0.0f, 0.2f),  // Right
-            new DrivePathSegment( -10.0f, -10.0f, 0.9f),  // Back
-            new DrivePathSegment(  0.0f,  1.0f, 0.2f)  // Right
-    };
-
-    final DrivePathSegment[] lineSearchRightTurn = {
-            new DrivePathSegment(  10.0f,  5.0f, 0.5f)  // Right
-    };
-
-    final DrivePathSegment[] lineSearchLeftTurn = {
-            new DrivePathSegment(  5.0f,  10.0f, 0.5f)  // Left
+    final DrivePathSegment[] startOnLinePath = {
+            new DrivePathSegment(  0.0f,  10.0f, 0.5f)  // Left
     };
 
     public void SetCurrentState(State newState) {
@@ -94,6 +83,7 @@ public class DeviRedCornerAutonomous extends OpMode {
     public void start() {
 
         elapsedGameTime.reset();
+
         SetCurrentState(State.STATE_INITIAL);
        // UseRunToPosition();
     }
@@ -107,26 +97,22 @@ public class DeviRedCornerAutonomous extends OpMode {
 
             case STATE_INITIAL:
 
-                if (encodersAtZero()) {
-
                     startPath(mBeaconPath);
                     SetCurrentState(State.STATE_DRIVE_TO_BEACON);
-
-                } else {
-
                     telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
                             getRightPosition() ));
-                }
+
                 break;
 
             case STATE_DRIVE_TO_BEACON: // Follow mBeaconPath until last segment is completed
-                if (isOnWhiteLine())
+                if (pathComplete() || isOnWhiteLine())
                 {
                     //lineDetector.enableLed(true);                 // Action: Enable Light Sensor
                     //setDriveSpeed(-0.1, 0.1);               // Action: Start rotating left
                     //startPath(locateLinePath);
                     TurnOffAllDriveMotors();
-                    SetCurrentState(State.STATE_STOP);      // Next State:
+                    startPath(startOnLinePath);
+                    SetCurrentState(State.STATE_FOLLOW_LINE);      // Next State:
                 }
                 else
                 {
@@ -136,22 +122,6 @@ public class DeviRedCornerAutonomous extends OpMode {
                     //       mLeftEncoderTarget, getLeftPosition(),
                     //        mRightEncoderTarget, getRightPosition()));
                 }
-                break;
-
-            case STATE_LOCATE_LINE:
-
-                if (isOnWhiteLine() || pathComplete()) {
-
-                    TurnOffAllDriveMotors();
-                    SetCurrentState(State.STATE_FOLLOW_LINE);
-
-                } else {
-
-                    /*telemetry.addData("1", String.format("%4.2f of %4.2f ",
-                            lineDetector.getLightDetected(),
-                            WHITE_THRESHOLD));*/
-                }
-
                 break;
 
             case STATE_FOLLOW_LINE:
@@ -164,11 +134,11 @@ public class DeviRedCornerAutonomous extends OpMode {
 
                 if (isOnWhiteLine()) {
 
-                    setPowerLevelsForLineFollowing(0.0f, 0.3f);
+                    setPowerLevelsForLineFollowing(0.0f, 0.5f);
 
                 } else {
 
-                    setPowerLevelsForLineFollowing(0.3f, 0.0f);
+                    setPowerLevelsForLineFollowing(0.5f, 0.0f);
                     /*telemetry.addData("1", String.format("%4.2f of %4.2f ",
                             lineDetector.getLightDetected(),
                             WHITE_THRESHOLD ));*/
@@ -321,7 +291,7 @@ public class DeviRedCornerAutonomous extends OpMode {
 
     public boolean beaconIsReached() {
         //TODO Use an actual test for this
-        return elapsedTimeForCurrentState.time() >= 2.0f;
+        return elapsedTimeForCurrentState.time() >= 4.0f;
     }
 
     public void setPowerLevelsForLineFollowing(float leftPower, float rightPower) {

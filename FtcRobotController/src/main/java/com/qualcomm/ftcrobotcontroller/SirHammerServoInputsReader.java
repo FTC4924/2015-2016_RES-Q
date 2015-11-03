@@ -21,6 +21,9 @@ public class SirHammerServoInputsReader {
         inputs.LowerBackLeftArm = gamepad2.right_bumper;
         inputs.RaiseBackLeftArm = gamepad2.left_bumper;
 
+        inputs.LowerDunkingArm = gamepad1.right_bumper;
+        inputs.RaiseDunkingArm = gamepad1.left_bumper;
+
         return inputs;
     }
 }

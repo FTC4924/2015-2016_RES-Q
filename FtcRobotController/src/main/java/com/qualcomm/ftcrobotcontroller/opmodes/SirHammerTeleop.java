@@ -24,6 +24,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IrSeekerSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 /**
@@ -43,8 +44,10 @@ public class SirHammerTeleop extends OpMode {
     Servo flapServo;
     Servo kickStandServo;
     Servo backLeftArmServo;
+    Servo backDunkServo;
 
     SirHammerServoAngles servoAngles = new SirHammerServoAngles();
+    public ElapsedTime elapsedGameTime = new ElapsedTime();
 
     IrSeekerSensor irSensor;
 
@@ -68,10 +71,18 @@ public class SirHammerTeleop extends OpMode {
         pinServo = hardwareMap.servo.get("pinServo");
         flapServo = hardwareMap.servo.get("flapServo");
         kickStandServo = hardwareMap.servo.get("kickStandArmServo");
-        backLeftArmServo = hardwareMap.servo.get("backLeftArm");
+        backLeftArmServo = hardwareMap.servo.get("backLeftArmServo");
+        backDunkServo = hardwareMap.servo.get("backDunkServo");
         kickStandServo.setPosition(SirHammerServoAngleCalculator.KICKSTAND_DOCKED_ANGLE);
+        backLeftArmServo.setPosition(SirHammerServoAngleCalculator.BACK_LEFT_ARM_RAISED_ANGLE);
+        backDunkServo.setPosition(SirHammerServoAngleCalculator.DUNK_ARM_DOCKED_ANGLE);
 
         irSensor = hardwareMap.irSeekerSensor.get("irSensor");
+    }
+
+    @Override
+    public void start() {
+        elapsedGameTime.reset();
     }
 
     @Override
@@ -166,5 +177,6 @@ public class SirHammerTeleop extends OpMode {
         kickStandServo.setPosition(angles.KickStandAngle);
         flapServo.setPosition(angles.FlapAngle);
         backLeftArmServo.setPosition(angles.BackLeftArmAngle);
+        backDunkServo.setPosition(angles.DunkingArmAngle);
     }
 }

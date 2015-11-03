@@ -12,4 +12,6 @@ public class SirHammerServoInputs {
     public boolean ExtendKickStand;
     public boolean LowerBackLeftArm;
     public boolean RaiseBackLeftArm;
+    public boolean RaiseDunkingArm;
+    public boolean LowerDunkingArm;
 }

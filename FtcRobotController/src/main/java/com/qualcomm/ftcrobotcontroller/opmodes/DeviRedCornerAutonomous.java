@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.net.UnknownServiceException;
+
 /**
  * Created by 4924_Users on 10/23/2015.
  */
@@ -17,11 +19,8 @@ public class DeviRedCornerAutonomous extends OpMode {
     public enum State {
         STATE_INITIAL,
         STATE_DRIVE_TO_BEACON,
+        STATE_GET_ON_LINE,
         STATE_FOLLOW_LINE,
-        STATE_SQUARE_TO_WALL,
-        STATE_DEPLOY_CLIMBERS,
-        STATE_DRIVE_TO_MOUNTAIN,
-        STATE_CLIMB_MOUNTAIN,
         STATE_STOP,
     }
 
@@ -38,9 +37,7 @@ public class DeviRedCornerAutonomous extends OpMode {
     static final int ENCODER_TARGET_MARGIN = 20;
 
     DcMotor frontLeftMotor;
-    DcMotor backLeftMotor;
     DcMotor frontRightMotor;
-    DcMotor backRightMotor;
 
     private State currentState;
     private int currentPathSegmentIndex;
@@ -48,11 +45,13 @@ public class DeviRedCornerAutonomous extends OpMode {
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     final DrivePathSegment[] mBeaconPath = {
-            new DrivePathSegment(  0.0f,  17.0f, 0.5f),  // Left
-            new DrivePathSegment( 150.0f, 150.0f, 0.9f)  // Forward
+            //new DrivePathSegment(  6.0f,   6.0f, 0.5f),
+            new DrivePathSegment(  0.0f,  14.0f, 0.5f),  // Left
+            new DrivePathSegment( 140.0f, 140.0f, 0.9f)  // Forward
     };
 
     final DrivePathSegment[] startOnLinePath = {
+            new DrivePathSegment(  5.0f,  5.0f, 0.5f),
             new DrivePathSegment(  0.0f,  10.0f, 0.5f)  // Left
     };
 
@@ -66,12 +65,9 @@ public class DeviRedCornerAutonomous extends OpMode {
 
         //lineDetector = hardwareMap.opticalDistanceSensor.get("lineDetector");
         frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
-        backRightMotor = hardwareMap.dcMotor.get("backrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
-        backLeftMotor = hardwareMap.dcMotor.get("backleftMotor");
         lineDetector = hardwareMap.opticalDistanceSensor.get("lineDetector");
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO;
 
@@ -97,21 +93,25 @@ public class DeviRedCornerAutonomous extends OpMode {
 
             case STATE_INITIAL:
 
+                if (encodersAtZero()) {
+
                     startPath(mBeaconPath);
                     SetCurrentState(State.STATE_DRIVE_TO_BEACON);
                     telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
-                            getRightPosition() ));
+                            getRightPosition()));
+                }
 
                 break;
 
             case STATE_DRIVE_TO_BEACON: // Follow mBeaconPath until last segment is completed
-                if (pathComplete() || isOnWhiteLine())
-                {
+
+                if (pathComplete()) {
                     //lineDetector.enableLed(true);                 // Action: Enable Light Sensor
                     //setDriveSpeed(-0.1, 0.1);               // Action: Start rotating left
                     //startPath(locateLinePath);
                     TurnOffAllDriveMotors();
-                    startPath(startOnLinePath);
+                    //startPath(startOnLinePath);
+                    runWithoutEncoders();
                     SetCurrentState(State.STATE_FOLLOW_LINE);      // Next State:
                 }
                 else
@@ -124,6 +124,17 @@ public class DeviRedCornerAutonomous extends OpMode {
                 }
                 break;
 
+            case STATE_GET_ON_LINE:
+
+                if (pathComplete()) {
+
+                    TurnOffAllDriveMotors();
+                    runWithoutEncoders();
+                    SetCurrentState(State.STATE_FOLLOW_LINE);
+                }
+
+                break;
+
             case STATE_FOLLOW_LINE:
 
                 if (beaconIsReached()) {
@@ -134,11 +145,11 @@ public class DeviRedCornerAutonomous extends OpMode {
 
                 if (isOnWhiteLine()) {
 
-                    setPowerLevelsForLineFollowing(0.0f, 0.5f);
+                    setPowerLevelsForLineFollowing(0.5f, 0.0f);
 
                 } else {
 
-                    setPowerLevelsForLineFollowing(0.5f, 0.0f);
+                    setPowerLevelsForLineFollowing(0.0f, 0.5f);
                     /*telemetry.addData("1", String.format("%4.2f of %4.2f ",
                             lineDetector.getLightDetected(),
                             WHITE_THRESHOLD ));*/
@@ -159,6 +170,8 @@ public class DeviRedCornerAutonomous extends OpMode {
 
         telemetry.addData("Left: ", currentEncoderTargets.LeftTarget);
         telemetry.addData("Right: ", currentEncoderTargets.RightTarget);
+        telemetry.addData("White Line: ", isOnWhiteLine());
+        telemetry.addData("ODS Reading: ",  lineDetector.getLightDetected());
         SetEncoderTargets();
     }
 
@@ -201,16 +214,17 @@ public class DeviRedCornerAutonomous extends OpMode {
         setDriveMode(DcMotorController.RunMode.RUN_TO_POSITION);
     }
 
+    public void runWithoutEncoders() {
+
+        setDriveMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
+    }
+
     public void setDriveMode(DcMotorController.RunMode mode) {
 
         if (frontLeftMotor.getChannelMode() != mode)
             frontRightMotor.setChannelMode(mode);
-        if (backLeftMotor.getChannelMode() != mode)
-            backRightMotor.setChannelMode(mode);
         if (frontRightMotor.getChannelMode() != mode)
             frontLeftMotor.setChannelMode(mode);
-        if (backRightMotor.getChannelMode() != mode)
-            backLeftMotor.setChannelMode(mode);
     }
 
     private void startSeg() {
@@ -241,9 +255,7 @@ public class DeviRedCornerAutonomous extends OpMode {
     private void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
 
         frontRightMotor.setPower(levels.frontLeft);
-        backRightMotor.setPower(levels.backLeft);
         frontLeftMotor.setPower(levels.backRight);
-        backLeftMotor.setPower(levels.frontRight);
     }
 
     private boolean pathComplete() {
@@ -279,9 +291,7 @@ public class DeviRedCornerAutonomous extends OpMode {
 
     private void SetEncoderTargets() {
         frontLeftMotor.setTargetPosition(currentEncoderTargets.LeftTarget);
-        backLeftMotor.setTargetPosition(currentEncoderTargets.LeftTarget);
         frontRightMotor.setTargetPosition(currentEncoderTargets.RightTarget);
-        backRightMotor.setTargetPosition(currentEncoderTargets.RightTarget);
     }
 
     public void UseConstantSpeed()
@@ -297,8 +307,6 @@ public class DeviRedCornerAutonomous extends OpMode {
     public void setPowerLevelsForLineFollowing(float leftPower, float rightPower) {
 
         frontLeftMotor.setPower(leftPower);
-        backLeftMotor.setPower(leftPower);
         frontRightMotor.setPower(rightPower);
-        backRightMotor.setPower(rightPower);
     }
 }

@@ -34,7 +34,7 @@ public class DeviRedCornerAutonomous extends OpMode {
     final double GEAR_RATIO = 24.0f/16.0f;
     final double WHITE_THRESHOLD = 0.05f;
     double countsPerInch;
-    static final int ENCODER_TARGET_MARGIN = 20;
+    static final int ENCODER_TARGET_MARGIN = 10;
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
@@ -44,10 +44,19 @@ public class DeviRedCornerAutonomous extends OpMode {
     private DrivePathSegment[] currentPath;
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
+    /*final DrivePathSegment[] mBeaconPath = {
+            //new DrivePathSegment(  6.0f,   6.0f, 0.5f),
+            new DrivePathSegment(  0.0f,  16.0f, 0.5f),  // Left
+            new DrivePathSegment( 150.0f, 150.0f, 0.9f)  // Forward
+    };*/
+
     final DrivePathSegment[] mBeaconPath = {
             //new DrivePathSegment(  6.0f,   6.0f, 0.5f),
-            new DrivePathSegment(  0.0f,  14.0f, 0.5f),  // Left
-            new DrivePathSegment( 140.0f, 140.0f, 0.9f)  // Forward
+            new DrivePathSegment(8.0f, 8.0f, 0.9f),
+            new DrivePathSegment(-8.0f, 8.0f, 0.5f),  // Left
+            new DrivePathSegment(140.0f, 140.0f, 0.9f),  // Forward
+            new DrivePathSegment(-5.0f, 5.0f, 0.5f),
+            new DrivePathSegment(22.0f, 22.0f, 0.9f)
     };
 
     final DrivePathSegment[] startOnLinePath = {
@@ -145,11 +154,11 @@ public class DeviRedCornerAutonomous extends OpMode {
 
                 if (isOnWhiteLine()) {
 
-                    setPowerLevelsForLineFollowing(0.5f, 0.0f);
+                    setPowerLevelsForLineFollowing(0.35f, 0.0f);
 
                 } else {
 
-                    setPowerLevelsForLineFollowing(0.0f, 0.5f);
+                    setPowerLevelsForLineFollowing(0.0f, 0.35f);
                     /*telemetry.addData("1", String.format("%4.2f of %4.2f ",
                             lineDetector.getLightDetected(),
                             WHITE_THRESHOLD ));*/

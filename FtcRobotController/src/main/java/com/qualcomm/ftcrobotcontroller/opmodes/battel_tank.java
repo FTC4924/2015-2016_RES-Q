@@ -57,12 +57,12 @@ public class battel_tank extends OpMode {
         }
 
         if (gamepad2.x && (servo_time.time() > DELAY)){
-            servo_angles.servo1 = servo_angles.servo1 + .25f;
+            servo_angles.servo1 = servo_angles.servo1 + 0.25f;
             servo_time.reset();
         }
 
         if (gamepad2.b && (servo_time.time() > DELAY)){
-            servo_angles.servo1 = servo_angles.servo1 - .25f;
+            servo_angles.servo1 = servo_angles.servo1 - 0.25f;
             servo_time.reset();
         }
 
@@ -73,12 +73,12 @@ public class battel_tank extends OpMode {
             if (gamepad2.a) {
                 servo_angles.servo2 = 0.3f;
             } else {
-                servo2.setPosition(0.50f);
+                servo_angles.servo2 = 0.50f;
             }
         }
 
-        servo_angles.servo1 = Range.clip(servo_angles.servo1, 0.00f, 1.00f);
-        servo_angles.servo2 = Range.clip(servo_angles.servo2, 0.00f, 1.00f);
+        servo_angles.servo1 = Range.clip(servo_angles.servo1, 0.0f, 1.0f);
+        servo_angles.servo2 = Range.clip(servo_angles.servo2, 0.0f, 1.0f);
 
         servo1.setPosition(servo_angles.servo1);
         servo2.setPosition(servo_angles.servo2);
@@ -90,8 +90,8 @@ public class battel_tank extends OpMode {
         float accelerator = gamepad1.right_trigger;
         float arm = gamepad2.right_stick_y;
 
-        frontright = Range.clip(frontright, -1, 1);
-        frontleft = Range.clip(frontleft, -1, 1);
+        frontright = Range.clip(frontright, -1.0f, 1.0f);
+        frontleft = Range.clip(frontleft, -1.0f, 1.0f);
         //backright = Range.clip(backright, -1, 1);
         //backleft = Range.clip(backleft, -1, 1);
 
@@ -113,15 +113,16 @@ public class battel_tank extends OpMode {
             //backleft = gamepad1.right_stick_y;
             accelerator = gamepad1.right_trigger;
 
-            frontright = Range.clip(frontright, -1, 1);
-            frontleft = Range.clip(frontleft, -1, 1);
-            //backright = Range.clip(backright, -1, 1);
-            //backleft = Range.clip(backleft, -1, 1);
-
             frontright = frontright * accelerator;
             frontleft = frontleft * accelerator;
             //backright = backright * accelerator;
             //backleft = backleft * accelerator;
+
+            frontright = Range.clip(frontright, -1.0f, 1.0f);
+            frontleft = Range.clip(frontleft, -1.0f, 1.0f);
+            //backright = Range.clip(backright, -1, 1);
+            //backleft = Range.clip(backleft, -1, 1);
+
         }
 
         frontrightmotor.setPower(frontright);
@@ -130,11 +131,11 @@ public class battel_tank extends OpMode {
         //backleftmotor.setPower(backleft);
         armmotor.setPower(arm);
 
-        telemetry.addData("frontright", "frontright");
-        telemetry.addData("frontleft", "frontleft");
+        telemetry.addData("frontright", frontright);
+        telemetry.addData("frontleft", frontleft);
         //telemetry.addData("backright", "backright");
         //telemetry.addData("backleft", "backleft");
-        telemetry.addData("arm", "arm");
+        telemetry.addData("arm", arm);
         telemetry.addData("servo1", servo_angles.servo1);
         telemetry.addData("servo2", servo_angles.servo2);
         telemetry.addData("time", time.time());

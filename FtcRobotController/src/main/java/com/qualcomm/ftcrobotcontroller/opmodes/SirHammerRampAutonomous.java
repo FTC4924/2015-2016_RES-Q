@@ -41,22 +41,25 @@ public class SirHammerRampAutonomous extends OpMode {
     // Define driving paths as pairs of relative wheel movements in inches (left,right) plus speed %
     // Note: this is a dummy path, and is NOT likely to actually work with YOUR robot.
     final LegacyDrivePathSegment[] rampPath = {
-            new LegacyDrivePathSegment(  90.0f, 95.0f, 1.0f, 4.0f)
+            new LegacyDrivePathSegment(  80.0f, 82.0f, 1.0f, 4.0f),
+            new LegacyDrivePathSegment(  5.0f, 5.0f, 0.20f, 1.5f)
     };
     final LegacyDrivePathSegment[] squaringPath = {
-            new LegacyDrivePathSegment( 0.0f, 0.0f, 0.8f, 3.0f)
+            new LegacyDrivePathSegment( 0.0f, 0.0f, 0.8f, 0.5f)
     };
     final LegacyDrivePathSegment[] grabGoalMove = {
-            new LegacyDrivePathSegment( -5.0f, -8.0f, 0.8f, 3.0f)
+            new LegacyDrivePathSegment( -5.0f, -5.0f, 0.8f, 2.5f)
     };
     final LegacyDrivePathSegment[] dumpingBallPath = {
-            new LegacyDrivePathSegment( 0.0f, 0.0f, 0.0f, 5.0f)
+            new LegacyDrivePathSegment( 0.0f, 0.0f, 0.0f, 1.0f)
     };
     final LegacyDrivePathSegment[] drivingToParking = {
-            new LegacyDrivePathSegment( 20.0f, -20.0f, 20.0f, -20.0f, 0.8f, 3.0f),
-            new LegacyDrivePathSegment( -10.0f, -10.0f, 0.8f, 3.0f),
-            new LegacyDrivePathSegment( 32.0f, -32.0f, 0.4f, 7.0f),
-            new LegacyDrivePathSegment( 80.0f, 80.0f, 0.8f, 7.0f)
+            new LegacyDrivePathSegment( 20.0f, -20.0f, 20.0f, -20.0f, 0.8f, 2.5f),
+            new LegacyDrivePathSegment( -10.0f, -10.0f, 0.8f, 2.5f),
+            new LegacyDrivePathSegment( 36.0f, -36.0f, 0.4f, 5.0f),
+            new LegacyDrivePathSegment( 20.0f, 20.0f, 0.8f, 3.5f),
+            new LegacyDrivePathSegment( 0.0f, 8.0f, 0.4f, 3.0f),
+            new LegacyDrivePathSegment( 55.0f, 55.0f, 0.8f, 5.0f)
     };
 
     final double COUNTS_PER_INCH = 116.279f ;    // Number of encoder counts per inch of wheel travel.
@@ -124,6 +127,12 @@ public class SirHammerRampAutonomous extends OpMode {
 
     @Override
     public void loop() {
+
+        if (elapsedGameTime.time() > 30.0f) {
+            TurnOffAllDriveMotors();
+            SetCurrentState(STATE_STOP);
+        }
+
         // Execute the current state.  Each STATE's case code does the following:
         // 1: Look for an EVENT that will cause a STATE change
         // 2: If an EVENT is found, take any required ACTION, and then set the next STATE
@@ -148,6 +157,7 @@ public class SirHammerRampAutonomous extends OpMode {
                 if (pathComplete())
                 {
                     startPath(dumpingBallPath);
+                    LowerPin();
                     dumpAutonomousBall();
                     SetCurrentState(STATE_DUMPING_AUTONOMOUS_BALL);      // Next State:
                 }
@@ -164,7 +174,6 @@ public class SirHammerRampAutonomous extends OpMode {
             case STATE_GRABBING_GOAL:
                 if (pathComplete()) {
                     grabScoringTube();
-                    LowerPin();
                     startPath(drivingToParking);
                     SetCurrentState(STATE_DRIVING_TO_PARKING);
                 }
@@ -186,6 +195,7 @@ public class SirHammerRampAutonomous extends OpMode {
         SetServoAngles();
 
         telemetry.addData("State: ", currentState);
+        telemetry.addData("time", elapsedGameTime.time());
     }
 
     private void SetServoAngles() {

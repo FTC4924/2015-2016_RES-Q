@@ -201,6 +201,7 @@ public class SirHammerRampAutonomous extends OpMode {
     private void SetServoAngles() {
         backDunkServo.setPosition(servoAngles.DunkingArmAngle);
         backLeftArmServo.setPosition(servoAngles.BackLeftArmAngle);
+        pinServo.setPosition(servoAngles.PinAngle);
     }
 
     private void dumpAutonomousBall() {
@@ -339,7 +340,8 @@ public class SirHammerRampAutonomous extends OpMode {
         currentEncoderTargets.RightRearTarget += rightRearEncoderAdder;
     }
 
-    // Return true if motors have both reached the desired encoder target
+    // For legacy motors, we have to use a time because we can't read from the encoder
+    // controller without changing mode, and it takes up to 80 loops for that to change
     private boolean moveComplete() {
         //  return (!mLeftMotor.isBusy() && !mRightMotor.isBusy());
         return (elapsedTimeForPathSegment.time() >= segmentTime);

@@ -5,9 +5,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 /**
  * Created by 4924_Users on 9/17/2015.
  */
-public class DriverReader {
-    public static DriverArcadeInputs GetDriverArcadeInputs(Gamepad gamepad1, Gamepad gamepad2){
-        DriverArcadeInputs inputs = new DriverArcadeInputs();
+public class SirHammerHolonomicDriverReader {
+    public static SirHammerDriverHolonomicInputs GetDriverArcadeInputs(Gamepad gamepad1, Gamepad gamepad2){
+        SirHammerDriverHolonomicInputs inputs = new SirHammerDriverHolonomicInputs();
         float x;
         float y;
         y = -gamepad1.left_stick_y;
@@ -15,6 +15,8 @@ public class DriverReader {
 
         inputs.throttle = y;
         inputs.direction = x;
+        inputs.leftHolonomic = gamepad1.dpad_left;
+        inputs.rightHolonomic = gamepad1.dpad_right;
 
         return inputs;
     }
@@ -35,4 +37,5 @@ public class DriverReader {
 
         return inputs;
     }
+
 }

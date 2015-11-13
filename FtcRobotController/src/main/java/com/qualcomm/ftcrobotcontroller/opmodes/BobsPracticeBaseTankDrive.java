@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import com.qualcomm.ftcrobotcontroller.DriveMotorPowerCalculator;
-import com.qualcomm.ftcrobotcontroller.DriverReader;
+import com.qualcomm.ftcrobotcontroller.SirHammerHolonomicDriveMotorPowerCalculator;
+import com.qualcomm.ftcrobotcontroller.SirHammerHolonomicDriverReader;
 import com.qualcomm.ftcrobotcontroller.DriverTankDriveInputs;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -62,8 +62,8 @@ public class BobsPracticeBaseTankDrive extends OpMode {
 
     @Override
     public void loop() {
-        DriverTankDriveInputs driveInputs = DriverReader.GetDriverTankInputs(gamepad1, gamepad2);
-        FourWheelDrivePowerLevels levels = DriveMotorPowerCalculator.CalculatePowerForTankInputs(driveInputs);
+        DriverTankDriveInputs driveInputs = SirHammerHolonomicDriverReader.GetDriverTankInputs(gamepad1, gamepad2);
+        FourWheelDrivePowerLevels levels = SirHammerHolonomicDriveMotorPowerCalculator.CalculatePowerForTankInputs(driveInputs);
         SetDriveMotorPowerLevels(levels);
 
         telemetry.addData("Text", "*** Robot Data***");

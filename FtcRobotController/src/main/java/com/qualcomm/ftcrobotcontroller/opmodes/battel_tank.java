@@ -17,8 +17,11 @@ public class battel_tank extends OpMode {
     //DcMotor backrightmotor;
     //DcMotor backleftmotor;
     DcMotor armmotor;
-    Servo servo1;
-    Servo servo2;
+    Servo servo1;     //servo1 is a 180
+    Servo servo2;     //servo2 is a continues
+    //Servo servo3;     //servo3 is a
+    //Servo servo4;     //servo4 is a
+    //Servo servo5;     //servo5 is a
     ElapsedTime time;
     ElapsedTime servo_time;
     battel_tank_servo_angles servo_angles;

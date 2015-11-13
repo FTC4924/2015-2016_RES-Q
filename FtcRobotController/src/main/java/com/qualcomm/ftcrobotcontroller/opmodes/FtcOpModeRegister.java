@@ -55,77 +55,18 @@ public class FtcOpModeRegister implements OpModeRegister {
      * If two or more op modes are registered with the same name, the app will display an error.
      */
 
-<<<<<<< HEAD
-    //manager.register("NullOp", NullOp.class);
-
-    //manager.register("K9TeleOp", K9TeleOp.class);
-    //manager.register ("PushBotAuto", PushBotAuto.class);
-    //manager.register ("PushBotManual", PushBotManual.class);
-    manager.register ("SensorTest", SensorTest.class);
     manager.register ("SirHammerTeleop", SirHammerTeleop.class);
-    manager.register ("SirHammerServoPositioner", SirHammerServoPositioner.class);
-    manager.register ("SirHammerEncoderTest", SirHammerEncoderTest.class);
     manager.register ("SirHammerCenterAutonomous", SirHammerCenterAutonomous.class);
     manager.register ("SirHammerRampAutonomous", SirHammerRampAutonomous.class);
     manager.register ("battel_tank", battel_tank.class);
     manager.register ("DeviRedCornerAutonomous", DeviRedCornerAutonomous.class);
     manager.register("OpticalDistanceSensorTest", OpticalDistanceSensorTest.class);
     manager.register("LineFollowingTest", LineFollowingTest.class);
-=======
-    manager.register("NullOp", NullOp.class);
 
-    //manager.register("MatrixK9TeleOp", MatrixK9TeleOp.class);
-    manager.register("K9TeleOp", K9TeleOp.class);
-    manager.register("K9Line", K9Line.class);
-    manager.register ("PushBotAuto", PushBotAuto.class);
-    manager.register ("PushBotManual", PushBotManual.class);
-
-
-
->>>>>>> refs/remotes/ftctechnh/master
     /*
      * Uncomment any of the following lines if you want to register an op mode.
      */
     manager.register("MR Gyro Test", MRGyroTest.class);
 
-    //manager.register("AdafruitRGBExample", AdafruitRGBExample.class);
-    //manager.register("MRRGBExample", MRRGBExample.class);
-    //manager.register("ColorSensorDriver", ColorSensorDriver.class);
-    //manager.register("HTRGBExample", HTRGBExample.class);
-
-    //manager.register("IrSeekerOp", IrSeekerOp.class);
-    //manager.register("CompassCalibration", CompassCalibration.class);
-    //manager.register("I2cAddressChangeExample", LinearI2cAddressChange.class);
-
-
-    //manager.register("NxtTeleOp", NxtTeleOp.class);
-
-    //manager.register("LinearK9TeleOp", LinearK9TeleOp.class);
-    //manager.register("LinearIrExample", LinearIrExample.class);
-
-
-    //manager.register ("PushBotManual1", PushBotManual1.class);
-    //manager.register ("PushBotAutoSensors", PushBotAutoSensors.class);
-    //manager.register ("PushBotIrEvent", PushBotIrEvent.class);
-
-    //manager.register ("PushBotManualSensors", PushBotManualSensors.class);
-    //manager.register ("PushBotOdsDetectEvent", PushBotOdsDetectEvent.class);
-    //manager.register ("PushBotOdsFollowEvent", PushBotOdsFollowEvent.class);
-<<<<<<< HEAD
-    //manager.register ("PushBotTouchEvent", PushBotTouchEvent.class);    
-    
-    //manager.register("PushBotDriveTouch", PushBotDriveTouch.class);
-    //manager.register("PushBotIrSeek", PushBotIrSeek.class);
-    //manager.register("PushBotSquare", PushBotSquare.class);
-
-    
-    
-=======
-    //manager.register ("PushBotTouchEvent", PushBotTouchEvent.class);
-
-    //manager.register("PushBotDriveTouch", PushBotDriveTouch.java);
-    //manager.register("PushBotIrSeek", PushBotIrSeek.java);
-    //manager.register("PushBotSquare", PushBotSquare.java);
->>>>>>> refs/remotes/ftctechnh/master
   }
 }

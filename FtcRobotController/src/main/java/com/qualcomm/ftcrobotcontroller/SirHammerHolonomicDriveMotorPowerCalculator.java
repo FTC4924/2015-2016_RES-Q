@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.util.Range;
 /**
  * Created by 4924_Users on 9/17/2015.
  */
-public class DriveMotorPowerCalculator {
-    public static FourWheelDrivePowerLevels CalculatePowerForArcadeInputs(DriverArcadeInputs inputs) {
+public class SirHammerHolonomicDriveMotorPowerCalculator {
+    public static FourWheelDrivePowerLevels CalculatePowerForArcadeInputs(SirHammerDriverHolonomicInputs inputs) {
 
         FourWheelDrivePowerLevels levels = new FourWheelDrivePowerLevels();
         float right = inputs.throttle - inputs.direction;
@@ -20,10 +20,23 @@ public class DriveMotorPowerCalculator {
         right = (float)scaleInput(right);
         left =  (float)scaleInput(left);
 
-        levels.backLeft = left;
-        levels.backRight = right;
-        levels.frontLeft = left;
-        levels.frontRight = right;
+        if (inputs.leftHolonomic || inputs.rightHolonomic) {
+            levels.backLeft = -0.8f;
+            levels.backRight = -0.8f;
+            levels.frontLeft = 0.8f;
+            levels.frontRight = 0.8f;
+            if (inputs.rightHolonomic) {
+                levels.backLeft *= -1.0f;
+                levels.backRight *= -1.0f;
+                levels.frontLeft *= -1.0f;
+                levels.frontRight *= -1.0f;
+            }
+        } else {
+            levels.backLeft = left;
+            levels.backRight = right;
+            levels.frontLeft = left;
+            levels.frontRight = right;
+        }
         return levels;
     }
 

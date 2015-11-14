@@ -8,10 +8,10 @@ import com.qualcomm.ftcrobotcontroller.BucketArmMotorInputs;
 import com.qualcomm.ftcrobotcontroller.BucketArmPowerLevel;
 import com.qualcomm.ftcrobotcontroller.BucketArmReader;
 import com.qualcomm.ftcrobotcontroller.BucketPowerCalculator;
-import com.qualcomm.ftcrobotcontroller.DriverArcadeInputs;
-import com.qualcomm.ftcrobotcontroller.DriverReader;
+import com.qualcomm.ftcrobotcontroller.SirHammerDriverHolonomicInputs;
+import com.qualcomm.ftcrobotcontroller.SirHammerHolonomicDriverReader;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
-import com.qualcomm.ftcrobotcontroller.DriveMotorPowerCalculator;
+import com.qualcomm.ftcrobotcontroller.SirHammerHolonomicDriveMotorPowerCalculator;
 import com.qualcomm.ftcrobotcontroller.SirHammerServoAngleCalculator;
 import com.qualcomm.ftcrobotcontroller.SirHammerServoAngles;
 import com.qualcomm.ftcrobotcontroller.SirHammerServoInputs;
@@ -89,8 +89,8 @@ public class SirHammerTeleop extends OpMode {
     public void loop() {
 
         // drive the motors
-        DriverArcadeInputs inputs = DriverReader.GetDriverArcadeInputs(gamepad1, gamepad2);
-        FourWheelDrivePowerLevels levels = DriveMotorPowerCalculator.CalculatePowerForArcadeInputs(inputs);
+        SirHammerDriverHolonomicInputs inputs = SirHammerHolonomicDriverReader.GetDriverArcadeInputs(gamepad1, gamepad2);
+        FourWheelDrivePowerLevels levels = SirHammerHolonomicDriveMotorPowerCalculator.CalculatePowerForArcadeInputs(inputs);
         SetDriveMotorPowerLevels(levels);
 
         ReadAndSetBucketArmMotors();

@@ -11,6 +11,14 @@ public class SpinnerReader {
         float throttle;
 
         throttle = gamepad2.right_trigger - gamepad2.left_trigger;
+
+        if (Math.abs(gamepad1.right_stick_y) >= 0.1f){
+            if (Math.abs(gamepad1.right_stick_y) >= 0.1f){
+                float stickValue = (float)gamepad1.right_stick_y;
+                throttle = -1.0f * Math.signum(stickValue) * 0.5f;
+            }
+        }
+
         inputs.throttle = throttle;
 
         return inputs;

@@ -15,10 +15,10 @@ public class DeviRedCornerAutonomousMountainOnly extends OpMode {
 
     final DrivePathSegment[] mountainPath = {
 
-            new DrivePathSegment(0.0f, 20.0f, 0.5f),  // Left
-            new DrivePathSegment(96.0f, 96.0f, 0.9f),  // Forward
-            new DrivePathSegment(47.0f, 0.0f, 0.5f),
-            new DrivePathSegment(-20.0f, -20.0f, 0.5f)
+            new DrivePathSegment(0.0f, 17.0f, 0.5f),  // Left
+            new DrivePathSegment(91.0f, 91.0f, 0.9f),  // Forward
+            new DrivePathSegment(50.0f, 0.0f, 0.5f),
+            //new DrivePathSegment(-20.0f, -20.0f, 0.5f)
     };
                                                                                     //(E) rules
     public enum State {
@@ -95,7 +95,7 @@ public class DeviRedCornerAutonomousMountainOnly extends OpMode {
 
             case STATE_CLIMB_MOUNTAIN:
 
-                if (elapsedTimeForCurrentState.time() >= 8.0f) {
+                if (elapsedTimeForCurrentState.time() >= 12.0f) {
 
                     TurnOffAllDriveMotors();
                     SetCurrentState(State.STATE_STOP);

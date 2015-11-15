@@ -17,7 +17,7 @@ public class SirHammerHolonomicDriverReader {
         inputs.direction = x;
         inputs.leftHolonomic = gamepad1.dpad_left;
         inputs.rightHolonomic = gamepad1.dpad_right;
-
+        inputs.slowMode = gamepad1.right_trigger > 0.5f;
         return inputs;
     }
 

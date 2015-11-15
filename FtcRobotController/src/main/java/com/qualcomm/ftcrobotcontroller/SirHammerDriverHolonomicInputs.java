@@ -8,4 +8,5 @@ public class SirHammerDriverHolonomicInputs {
     public float direction;
     public boolean leftHolonomic;
     public boolean rightHolonomic;
+    public boolean slowMode;
 }

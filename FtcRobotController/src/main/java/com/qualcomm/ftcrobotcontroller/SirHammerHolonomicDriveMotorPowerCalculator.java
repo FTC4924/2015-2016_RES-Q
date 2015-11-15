@@ -37,6 +37,12 @@ public class SirHammerHolonomicDriveMotorPowerCalculator {
             levels.frontLeft = left;
             levels.frontRight = right;
         }
+        if (inputs.slowMode) {
+            levels.backLeft = levels.backLeft / 2.0f;
+            levels.frontLeft = levels.frontLeft / 2.0f;
+            levels.backRight = levels.backRight / 2.0f;
+            levels.frontRight = levels.frontRight / 2.0f;
+        }
         return levels;
     }
 

@@ -67,16 +67,16 @@ public class battel_tank extends OpMode {
             servo_time.reset();
         }
 
-        if (gamepad2.b && (servo_time.time() > DELAY)){
+        if (gamepad2.y && (servo_time.time() > DELAY)){
             servo_angles.servo1 = servo_angles.servo1 - 0.25f;
             servo_time.reset();
         }
 
-        if (gamepad2.y){
+        if (gamepad2.right_bumper){
             servo_angles.servo2 = 0.6f;
         }
         else {
-            if (gamepad2.a) {
+            if (gamepad2.left_bumper) {
                 servo_angles.servo2 = 0.3f;
             }
                 else {
@@ -85,11 +85,11 @@ public class battel_tank extends OpMode {
         }
 
         if (gamepad2.dpad_down && (servo_time.time() > DELAY)){
-            servo_angles.servo3 = servo_angles.servo3 - 0.25f;
+            servo_angles.servo5 = servo_angles.servo5 - 0.25f;
         }
 
         if (gamepad2.dpad_up && (servo_time.time() > DELAY)){
-            servo_angles.servo3 = servo_angles.servo3 + 0.25f;
+            servo_angles.servo5 = servo_angles.servo5 + 0.25f;
         }
 
         if (gamepad2.dpad_left && (servo_time.time() > DELAY)){
@@ -100,12 +100,12 @@ public class battel_tank extends OpMode {
             servo_angles.servo4 = servo_angles.servo4 - 0.25f;
         }
 
-        if (gamepad2.right_bumper && (servo_time.time() > DELAY)){
-            servo_angles.servo5 = servo_angles.servo5 - 0.25f;
+        if (gamepad2.a && (servo_time.time() > DELAY)){
+            servo_angles.servo3 = servo_angles.servo3 - 0.25f;
         }
 
-        if (gamepad2.left_bumper  && (servo_time.time() > DELAY)){
-            servo_angles.servo5 = servo_angles.servo5 + 0.25f;
+        if (gamepad2.b  && (servo_time.time() > DELAY)){
+            servo_angles.servo3 = servo_angles.servo3 + 0.25f;
         }
 
         servo_angles.servo1 = Range.clip(servo_angles.servo1, 0.0f, 1.0f);

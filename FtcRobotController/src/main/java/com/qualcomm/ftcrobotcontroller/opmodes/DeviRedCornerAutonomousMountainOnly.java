@@ -15,10 +15,10 @@ public class DeviRedCornerAutonomousMountainOnly extends OpMode {
 
     final DrivePathSegment[] mountainPath = {
 
-            new DrivePathSegment(0.0f, 12.0f, 0.5f),  // Left
+            new DrivePathSegment(0.0f, 20.0f, 0.5f),  // Left
             new DrivePathSegment(96.0f, 96.0f, 0.9f),  // Forward
-            new DrivePathSegment(40.0f, 0.0f, 0.5f),
-            new DrivePathSegment(-40.0f, -40.0f, 0.5f)
+            new DrivePathSegment(47.0f, 0.0f, 0.5f),
+            new DrivePathSegment(-20.0f, -20.0f, 0.5f)
     };
                                                                                     //(E) rules
     public enum State {

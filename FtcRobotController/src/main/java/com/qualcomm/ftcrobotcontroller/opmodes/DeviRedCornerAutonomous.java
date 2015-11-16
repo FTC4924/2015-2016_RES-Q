@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -20,6 +21,7 @@ public class DeviRedCornerAutonomous extends OpMode {
         STATE_DRIVE_TO_BEACON,
         STATE_FOLLOW_LINE,
         STATE_DEPLOY_CLIMBERS,
+        STATE_DETERMINE_BEACON_COLOR,
         STATE_STOP
     }
 
@@ -36,6 +38,7 @@ public class DeviRedCornerAutonomous extends OpMode {
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
+    Servo climberDeployer;
     OpticalDistanceSensor lineDetector;
     TouchSensor bumper;
 
@@ -64,8 +67,9 @@ public class DeviRedCornerAutonomous extends OpMode {
 
         frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
+        climberDeployer = hardwareMap.servo.get("servo5");
         lineDetector = hardwareMap.opticalDistanceSensor.get("lineDetector");
-        //bumper = hardwareMap.touchSensor.get("bumper");
+        bumper = hardwareMap.touchSensor.get("bumper");
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO;
@@ -124,6 +128,20 @@ public class DeviRedCornerAutonomous extends OpMode {
                 } else {
 
                     setPowerLevelsForLineFollowing(0.0f, 0.35f);
+                }
+
+                break;
+
+            case STATE_DEPLOY_CLIMBERS:
+
+                if (climbersHaveBeenDeployed()) {
+
+                    climberDeployer.setPosition(0.0d);
+                    SetCurrentState(State.STATE_STOP);
+
+                } else {
+
+                    climberDeployer.setPosition(1.0d);
                 }
 
                 break;
@@ -260,6 +278,11 @@ public class DeviRedCornerAutonomous extends OpMode {
     public boolean beaconIsReached() {
 
         return bumper.isPressed();
+    }
+
+    public boolean climbersHaveBeenDeployed() {
+
+        return elapsedTimeForCurrentState.time() >= 4;
     }
 
     public void setPowerLevelsForLineFollowing(float leftPower, float rightPower) {

@@ -48,6 +48,7 @@ public class SirHammerTeleop extends OpMode {
 
     SirHammerServoAngles servoAngles = new SirHammerServoAngles();
     public ElapsedTime elapsedGameTime = new ElapsedTime();
+    public ElapsedTime bumperTime = new ElapsedTime();
 
     IrSeekerSensor irSensor;
 
@@ -82,6 +83,7 @@ public class SirHammerTeleop extends OpMode {
 
     @Override
     public void start() {
+        bumperTime.reset();
         elapsedGameTime.reset();
     }
 
@@ -108,7 +110,7 @@ public class SirHammerTeleop extends OpMode {
     }
 
     private void DisplayTelemetry() {
-        telemetry.addData("Text", "*** Robot Data***");
+        telemetry.addData("arm_angle: ", servoAngles.BackLeftArmAngle);
         if (servoAngles.PinAngle== SirHammerServoAngleCalculator.PIN_UP_ANGLE)
             telemetry.addData("pin", ": UP");
         else
@@ -128,7 +130,7 @@ public class SirHammerTeleop extends OpMode {
         // we have to keep a variable with current servo angles, since we want to keep the
         // same angle if no inputs that cause us to change servos happen
         SirHammerServoInputs servoInputs = SirHammerServoInputsReader.GetServoInputs(gamepad1, gamepad2);
-        SirHammerServoAngleCalculator.UpdateServoAngles(servoInputs, servoAngles);
+        SirHammerServoAngleCalculator.UpdateServoAngles(servoInputs, servoAngles, bumperTime);
         SetServoAngles(servoAngles);
     }
 

@@ -6,6 +6,7 @@ import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -41,10 +42,12 @@ public class DeviRedCornerAutonomous extends OpMode {
     Servo climberDeployer;
     OpticalDistanceSensor lineDetector;
     TouchSensor bumper;
+    GyroSensor turningGyro;
 
     private State currentState;
     private int currentPathSegmentIndex;
     private DrivePathSegment[] currentPath;
+    DrivePathSegment segment = currentPath[currentPathSegmentIndex];
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     final DrivePathSegment[] beaconPath = {
@@ -154,7 +157,7 @@ public class DeviRedCornerAutonomous extends OpMode {
         telemetry.addData("Left: ", currentEncoderTargets.LeftTarget);
         telemetry.addData("Right: ", currentEncoderTargets.RightTarget);
         telemetry.addData("White Line: ", isOnWhiteLine());
-        telemetry.addData("ODS Reading: ",  lineDetector.getLightDetected());
+        telemetry.addData("ODS Reading: ", lineDetector.getLightDetected());
         SetEncoderTargets();
     }
 
@@ -217,13 +220,30 @@ public class DeviRedCornerAutonomous extends OpMode {
 
         if (currentPath != null) {
 
-            Left  = (int)(currentPath[currentPathSegmentIndex].LeftSideDistance * countsPerInch);
-            Right = (int)(currentPath[currentPathSegmentIndex].RightSideDistance * countsPerInch);
-            addEncoderTarget(Left, Right);
-            FourWheelDrivePowerLevels powerLevels =
-                    new FourWheelDrivePowerLevels(currentPath[currentPathSegmentIndex].Power,
-                            currentPath[currentPathSegmentIndex].Power);
-            SetDriveMotorPowerLevels(powerLevels);
+
+
+            if (segment.isTurn) {
+
+                runWithoutEncoders();
+
+                if (segment.Angle > 0) {
+
+                    frontLeftMotor.setPower(segment.Power);
+
+                } else {
+
+                    frontRightMotor.setPower(segment.Power);
+                }
+
+            } else {
+
+                Left  = (int)(segment.LeftSideDistance * countsPerInch);
+                Right = (int)(segment.RightSideDistance * countsPerInch);
+                addEncoderTarget(Left, Right);
+                FourWheelDrivePowerLevels powerLevels =
+                        new FourWheelDrivePowerLevels(segment.Power, segment.Power);
+                SetDriveMotorPowerLevels(powerLevels);
+            }
 
             currentPathSegmentIndex++;
         }
@@ -260,7 +280,7 @@ public class DeviRedCornerAutonomous extends OpMode {
         return false;
     }
 
-    private boolean moveComplete() {
+    private boolean linearMoveComplete() {
 
         return ((Math.abs(getLeftPosition() - currentEncoderTargets.LeftTarget) < ENCODER_TARGET_MARGIN) &&
                (Math.abs(getRightPosition() - currentEncoderTargets.RightTarget) < ENCODER_TARGET_MARGIN));
@@ -289,5 +309,27 @@ public class DeviRedCornerAutonomous extends OpMode {
 
         frontLeftMotor.setPower(leftPower);
         frontRightMotor.setPower(rightPower);
+    }
+
+    public boolean turnComplete() {
+
+        if (segment.Angle >= turningGyro.getRotation()) {
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean moveComplete() {
+
+        if (segment.isTurn) {
+
+            return turnComplete();
+
+        } else {
+
+            return linearMoveComplete();
+        }
     }
 }

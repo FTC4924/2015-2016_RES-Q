@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * Created by 4924_Users on 11/16/2015.
  */
-public class lineFollowingDumpingClimbersAndBeaconTest extends OpMode {
+public class LineFollowingDumpTest extends OpMode {
 
     public enum State {
         STATE_INITIAL,
@@ -26,7 +26,7 @@ public class lineFollowingDumpingClimbersAndBeaconTest extends OpMode {
     OpticalDistanceSensor lineDetector;
     TouchSensor bumper;
 
-    final double WHITE_THRESHOLD = 0.05f;
+    final double WHITE_THRESHOLD = 0.1f;
 
     private State currentState;
     private ElapsedTime elapsedTimeForCurrentState = new ElapsedTime();
@@ -41,6 +41,7 @@ public class lineFollowingDumpingClimbersAndBeaconTest extends OpMode {
         lineDetector = hardwareMap.opticalDistanceSensor.get("lineDetector");
         bumper = hardwareMap.touchSensor.get("bumper");
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        climberDeployer.setPosition(0.0d);
 
         SetCurrentState(State.STATE_INITIAL);
     }
@@ -102,7 +103,6 @@ public class lineFollowingDumpingClimbersAndBeaconTest extends OpMode {
     }
 
     public boolean beaconIsReached() {
-
         return bumper.isPressed();
     }
 
@@ -123,8 +123,8 @@ public class lineFollowingDumpingClimbersAndBeaconTest extends OpMode {
 
     private void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
 
-        frontRightMotor.setPower(levels.frontLeft);
-        frontLeftMotor.setPower(levels.backRight);
+        frontRightMotor.setPower(levels.frontRight);
+        frontLeftMotor.setPower(levels.frontLeft);
     }
 
     public boolean climbersHaveBeenDeployed() {

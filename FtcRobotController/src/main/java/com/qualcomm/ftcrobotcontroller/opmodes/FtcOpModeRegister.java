@@ -64,6 +64,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register("LineFollowingTest", LineFollowingTest.class);
     manager.register("MountainClimbingTest", MountainClimbingTest.class);
     manager.register("DeviRedCornerAutonomousMountainOnly", DeviRedCornerAutonomousMountainOnly.class);
+    manager.register("LineFollowingDumpTest", LineFollowingDumpTest.class);
     manager.register("ServoTest", ServoTest.class);
 
     /*

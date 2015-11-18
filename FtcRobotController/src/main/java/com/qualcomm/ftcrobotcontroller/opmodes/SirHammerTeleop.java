@@ -100,29 +100,42 @@ public class SirHammerTeleop extends OpMode {
         ReadAndSetServos();
         ReadAndSetAutonomousArm();
 
-        if (irSensor.signalDetected()) {
-            telemetry.addData("angle", irSensor.getAngle());
-            telemetry.addData("strength", irSensor.getStrength());
-        }
-
         // do some telemetry
         DisplayTelemetry();
     }
 
     private void DisplayTelemetry() {
-        telemetry.addData("arm_angle: ", servoAngles.BackLeftArmAngle);
-        if (servoAngles.PinAngle== SirHammerServoAngleCalculator.PIN_UP_ANGLE)
+        telemetry.clearData();
+        if (irSensor.signalDetected()) {
+            telemetry.addData("IRAngle: ", irSensor.getAngle());
+            telemetry.addData("IRStrength: ", irSensor.getStrength());
+        } else {
+            telemetry.addData("NO IR", "NO IR");
+        }
+        if (pinIsUp())
             telemetry.addData("pin", ": UP");
         else
             telemetry.addData("pin", ": DN");
-        if (servoAngles.KickStandAngle== SirHammerServoAngleCalculator.KICKSTAND_DOCKED_ANGLE)
+        if (kickstandIsDocked())
             telemetry.addData("kick", ": DOCKED");
         else
             telemetry.addData("kick", ": EXTENDED");
-        if (servoAngles.FlapAngle == SirHammerServoAngleCalculator.FLAP_OPEN_ANGLE)
+        if (flapIsOpen())
             telemetry.addData("flap", ": OPEN");
         else
             telemetry.addData("flap", ": CLOSED");
+    }
+
+    private boolean flapIsOpen() {
+        return servoAngles.FlapAngle == SirHammerServoAngleCalculator.FLAP_OPEN_ANGLE;
+    }
+
+    private boolean kickstandIsDocked() {
+        return servoAngles.KickStandAngle == SirHammerServoAngleCalculator.KICKSTAND_DOCKED_ANGLE;
+    }
+
+    private boolean pinIsUp() {
+        return servoAngles.PinAngle == SirHammerServoAngleCalculator.PIN_UP_ANGLE;
     }
 
     private void ReadAndSetServos() {

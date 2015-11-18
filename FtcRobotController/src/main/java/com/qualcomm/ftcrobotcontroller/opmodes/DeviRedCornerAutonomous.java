@@ -6,7 +6,9 @@ import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -20,6 +22,7 @@ public class DeviRedCornerAutonomous extends OpMode {
         STATE_DRIVE_TO_BEACON,
         STATE_FOLLOW_LINE,
         STATE_DEPLOY_CLIMBERS,
+        STATE_DETERMINE_BEACON_COLOR,
         STATE_STOP
     }
 
@@ -36,12 +39,15 @@ public class DeviRedCornerAutonomous extends OpMode {
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
+    Servo climberDeployer;
     OpticalDistanceSensor lineDetector;
     TouchSensor bumper;
+    GyroSensor turningGyro;
 
     private State currentState;
     private int currentPathSegmentIndex;
     private DrivePathSegment[] currentPath;
+    DrivePathSegment segment = currentPath[currentPathSegmentIndex];
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     final DrivePathSegment[] beaconPath = {
@@ -64,8 +70,9 @@ public class DeviRedCornerAutonomous extends OpMode {
 
         frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
+        climberDeployer = hardwareMap.servo.get("servo5");
         lineDetector = hardwareMap.opticalDistanceSensor.get("lineDetector");
-        //bumper = hardwareMap.touchSensor.get("bumper");
+        bumper = hardwareMap.touchSensor.get("bumper");
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO;
@@ -128,6 +135,20 @@ public class DeviRedCornerAutonomous extends OpMode {
 
                 break;
 
+            case STATE_DEPLOY_CLIMBERS:
+
+                if (climbersHaveBeenDeployed()) {
+
+                    climberDeployer.setPosition(0.0d);
+                    SetCurrentState(State.STATE_STOP);
+
+                } else {
+
+                    climberDeployer.setPosition(1.0d);
+                }
+
+                break;
+
             case STATE_STOP:
 
                 TurnOffAllDriveMotors();
@@ -136,7 +157,7 @@ public class DeviRedCornerAutonomous extends OpMode {
         telemetry.addData("Left: ", currentEncoderTargets.LeftTarget);
         telemetry.addData("Right: ", currentEncoderTargets.RightTarget);
         telemetry.addData("White Line: ", isOnWhiteLine());
-        telemetry.addData("ODS Reading: ",  lineDetector.getLightDetected());
+        telemetry.addData("ODS Reading: ", lineDetector.getLightDetected());
         SetEncoderTargets();
     }
 
@@ -199,13 +220,30 @@ public class DeviRedCornerAutonomous extends OpMode {
 
         if (currentPath != null) {
 
-            Left  = (int)(currentPath[currentPathSegmentIndex].LeftSideDistance * countsPerInch);
-            Right = (int)(currentPath[currentPathSegmentIndex].RightSideDistance * countsPerInch);
-            addEncoderTarget(Left, Right);
-            FourWheelDrivePowerLevels powerLevels =
-                    new FourWheelDrivePowerLevels(currentPath[currentPathSegmentIndex].Power,
-                            currentPath[currentPathSegmentIndex].Power);
-            SetDriveMotorPowerLevels(powerLevels);
+
+
+            if (segment.isTurn) {
+
+                runWithoutEncoders();
+
+                if (segment.Angle > 0) {
+
+                    frontLeftMotor.setPower(segment.Power);
+
+                } else {
+
+                    frontRightMotor.setPower(segment.Power);
+                }
+
+            } else {
+
+                Left  = (int)(segment.LeftSideDistance * countsPerInch);
+                Right = (int)(segment.RightSideDistance * countsPerInch);
+                addEncoderTarget(Left, Right);
+                FourWheelDrivePowerLevels powerLevels =
+                        new FourWheelDrivePowerLevels(segment.Power, segment.Power);
+                SetDriveMotorPowerLevels(powerLevels);
+            }
 
             currentPathSegmentIndex++;
         }
@@ -242,7 +280,7 @@ public class DeviRedCornerAutonomous extends OpMode {
         return false;
     }
 
-    private boolean moveComplete() {
+    private boolean linearMoveComplete() {
 
         return ((Math.abs(getLeftPosition() - currentEncoderTargets.LeftTarget) < ENCODER_TARGET_MARGIN) &&
                (Math.abs(getRightPosition() - currentEncoderTargets.RightTarget) < ENCODER_TARGET_MARGIN));
@@ -262,9 +300,36 @@ public class DeviRedCornerAutonomous extends OpMode {
         return bumper.isPressed();
     }
 
+    public boolean climbersHaveBeenDeployed() {
+
+        return elapsedTimeForCurrentState.time() >= 4;
+    }
+
     public void setPowerLevelsForLineFollowing(float leftPower, float rightPower) {
 
         frontLeftMotor.setPower(leftPower);
         frontRightMotor.setPower(rightPower);
+    }
+
+    public boolean turnComplete() {
+
+        if (segment.Angle >= turningGyro.getRotation()) {
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean moveComplete() {
+
+        if (segment.isTurn) {
+
+            return turnComplete();
+
+        } else {
+
+            return linearMoveComplete();
+        }
     }
 }

@@ -59,11 +59,11 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register ("SirHammerCenterAutonomous", SirHammerCenterAutonomous.class);
     manager.register ("SirHammerRampAutonomous", SirHammerRampAutonomous.class);
     manager.register ("battel_tank", battel_tank.class);
-    manager.register ("DeviRedCornerAutonomous", DeviRedCornerAutonomous.class);
+    manager.register ("DeviRedWallAutonomous", DeviRedWallAutonomous.class);
     manager.register("OpticalDistanceSensorTest", OpticalDistanceSensorTest.class);
     manager.register("LineFollowingTest", LineFollowingTest.class);
     manager.register("MountainClimbingTest", MountainClimbingTest.class);
-    //manager.register("DeviRedCornerAutonomousMountainOnly", DeviRedCornerAutonomousMountainOnly.class);
+    manager.register("DeviRedWallAutoMTN", DeviRedWallAutoMTN.class);
     manager.register("LineFollowingDumpTest", LineFollowingDumpTest.class);
     manager.register("ServoTest", ServoTest.class);
     manager.register("GyroSensorTest", GyroSensorTest.class);

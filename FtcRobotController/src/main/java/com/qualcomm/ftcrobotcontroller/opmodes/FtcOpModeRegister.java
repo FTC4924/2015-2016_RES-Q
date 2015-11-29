@@ -63,8 +63,10 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register("OpticalDistanceSensorTest", OpticalDistanceSensorTest.class);
     manager.register("LineFollowingTest", LineFollowingTest.class);
     manager.register("MountainClimbingTest", MountainClimbingTest.class);
-    manager.register("DeviRedCornerAutonomousMountainOnly", DeviRedCornerAutonomousMountainOnly.class);
-
+    //manager.register("DeviRedCornerAutonomousMountainOnly", DeviRedCornerAutonomousMountainOnly.class);
+    manager.register("LineFollowingDumpTest", LineFollowingDumpTest.class);
+    manager.register("ServoTest", ServoTest.class);
+    manager.register("GyroSensorTest", GyroSensorTest.class);
     /*
      * Uncomment any of the following lines if you want to register an op mode.
      */

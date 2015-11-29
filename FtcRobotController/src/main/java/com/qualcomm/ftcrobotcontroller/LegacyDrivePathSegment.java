@@ -9,6 +9,8 @@ public class LegacyDrivePathSegment extends DrivePathSegment {
     public float LeftRearDistance;
     public float RightRearDistance;
 
+    public LegacyDrivePathSegment() {}
+
     public LegacyDrivePathSegment(float left, float right, float power, float time) {
         LeftSideDistance = left;
         LeftRearDistance = left;

@@ -19,11 +19,11 @@ public class battel_tank extends OpMode {
     //DcMotor backrightmotor;
     //DcMotor backleftmotor;
 
-    Servo leftsidesevo; //leftsideservo is a 180
+    Servo leftsideservo; //leftsideservo is a 180
     Servo rightsideservo; //rightsideservo is a
-    Servo servo3;     //servo3 is a 180
-    Servo servo4;     //servo4 is a 180
-    Servo servo5;     //servo5 is a 180
+    Servo mustachmotor; //mustachmotor is a 180
+    //Servo servo4;     //servo4 is a 180
+    //Servo servo5;     //servo5 is a 180
     ElapsedTime time;
     ElapsedTime servo_time;
     battel_tank_servo_angles servo_angles;
@@ -41,11 +41,11 @@ public class battel_tank extends OpMode {
         //backleftmotor = hardwareMap.dcMotor.get("backleftMotor");
         winchmotor = hardwareMap.dcMotor.get("winch");
         armmotor = hardwareMap.dcMotor.get("arm");
-        leftsidesevo = hardwareMap.servo.get("servo1");
+        leftsideservo = hardwareMap.servo.get("servo1");
         rightsideservo = hardwareMap.servo.get("servo2");
-        servo3 = hardwareMap.servo.get("servo3");
-        servo4 = hardwareMap.servo.get("servo4");
-        servo5 = hardwareMap.servo.get("servo5");
+        mustachmotor = hardwareMap.servo.get("servo3");
+        //servo4 = hardwareMap.servo.get("servo4");
+        //servo5 = hardwareMap.servo.get("servo5");
         servo_angles = new battel_tank_servo_angles();
         frontleftmotor.setDirection(DcMotor.Direction.REVERSE);
         //backleftmotor.setDirection(DcMotor.Direction.REVERSE);
@@ -54,6 +54,8 @@ public class battel_tank extends OpMode {
         time.reset();
         servo_time = new ElapsedTime();
         servo_time.reset();
+        servo_angles.rightsideservo = 0.70f;
+        servo_angles.mustachmotor = 0.00f;
     }
 
     @Override
@@ -63,70 +65,62 @@ public class battel_tank extends OpMode {
             time.reset();
         }
 
-        if (gamepad2.x && (servo_time.time() > DELAY)){
-            servo_angles.leftsideservo = 0.50f;
-            servo_time.reset();
-        }else {
-            servo_angles.leftsideservo = 0.00f;
-        }
-
         if (gamepad2.y && (servo_time.time() > DELAY)){
-            servo_angles.leftsideservo = servo_angles.leftsideservo + 0.15f;
+            servo_angles.rightsideservo = -0.50f;
             servo_time.reset();
         }
 
-        if (gamepad2.right_bumper && (servo_time.time() > DELAY)){
-            servo_angles.rightsideservo = 0.50f;
-            servo_time.reset();
-        }else {
-            servo_angles.rightsideservo = 0.00f;
-        }
-
-        if (gamepad2.left_bumper && (servo_time.time() > DELAY)){
-            servo_angles.rightsideservo = servo_angles.rightsideservo - 0.15f;
-            servo_time.reset();
-        }
-
-        if (gamepad2.dpad_down && (servo_time.time() > DELAY)){
-            servo_angles.servo5 = servo_angles.servo5 - 0.10f;
-            servo_time.reset();
-        }
-
-        if (gamepad2.dpad_up && (servo_time.time() > DELAY)){
-            servo_angles.servo5 = servo_angles.servo5 + 0.10f;
-            servo_time.reset();
-        }
-
-        if (gamepad2.dpad_left && (servo_time.time() > DELAY)){
-            servo_angles.servo4 = servo_angles.servo4 + 0.10f;
-            servo_time.reset();
-        }
-
-        if (gamepad2.dpad_right && (servo_time.time() > DELAY)){
-            servo_angles.servo4 = servo_angles.servo4 - 0.10f;
+        if (gamepad2.x && (servo_time.time() > DELAY)){
+            servo_angles.rightsideservo = 0.70f;
             servo_time.reset();
         }
 
         if (gamepad2.a && (servo_time.time() > DELAY)){
-            servo_angles.servo3 = servo_angles.servo3 - 0.10f;
+            servo_angles.leftsideservo = 0.00f;
             servo_time.reset();
         }
 
         if (gamepad2.b  && (servo_time.time() > DELAY)){
-            servo_angles.servo3 = servo_angles.servo3 + 0.10f;
+            servo_angles.leftsideservo = 0.50f;
+            servo_time.reset();
+        }
+
+        if (gamepad2.dpad_up && (servo_time.time() > DELAY)){
+            servo_angles.leftsideservo = servo_angles.leftsideservo + 0.10f;
+            servo_time.reset();
+        }
+
+        if (gamepad2.dpad_down && (servo_time.time() > DELAY)){
+            servo_angles.leftsideservo = servo_angles.leftsideservo - 0.10f;
+            servo_time.reset();
+        }
+
+        if (gamepad2.dpad_right && (servo_time.time() > DELAY)){
+            servo_angles.rightsideservo = servo_angles.rightsideservo + 0.10f;
+            servo_time.reset();
+        }
+
+        if (gamepad2.dpad_left && (servo_time.time() > DELAY)){
+            servo_angles.rightsideservo = servo_angles.rightsideservo - 0.10f;
+            servo_time.reset();
+        }
+
+        if (gamepad2.back && (servo_time.time() > DELAY)){
+            servo_angles.mustachmotor = 0.50f;
             servo_time.reset();
         }
 
         servo_angles.leftsideservo = Range.clip(servo_angles.leftsideservo, 0.0f, 1.0f);
         servo_angles.rightsideservo = Range.clip(servo_angles.rightsideservo, 0.0f, 1.0f);
-        servo_angles.servo3 = Range.clip(servo_angles.servo3, 0.0f, 1.0f);
-        servo_angles.servo4 = Range.clip(servo_angles.servo4, 0.0f, 1.0f);
-        servo_angles.servo5 = Range.clip(servo_angles.servo5, 0.0f, 1.0f);
+        servo_angles.mustachmotor = Range.clip(servo_angles.mustachmotor, 0.0f, 1.0f);
+        //servo_angles.servo4 = Range.clip(servo_angles.servo4, 0.0f, 1.0f);
+        //servo_angles.servo5 = Range.clip(servo_angles.servo5, 0.0f, 1.0f);
 
-        leftsidesevo.setPosition(servo_angles.leftsideservo);
-        servo3.setPosition(servo_angles.servo3);
-        servo4.setPosition(servo_angles.servo4);
-        servo5.setPosition(servo_angles.servo5);
+        leftsideservo.setPosition(servo_angles.leftsideservo);
+        rightsideservo.setPosition(servo_angles.rightsideservo);
+        mustachmotor.setPosition(servo_angles.mustachmotor);
+        //servo4.setPosition(servo_angles.servo4);
+        //servo5.setPosition(servo_angles.servo5);
 
         float frontright = -gamepad1.right_stick_y;
         float frontleft = -gamepad1.left_stick_y;
@@ -139,7 +133,7 @@ public class battel_tank extends OpMode {
 
         frontright = Range.clip(frontright, -1.0f, 1.0f);
         frontleft = Range.clip(frontleft, -1.0f, 1.0f);
-        arm = Range.clip(arm, -1.0f, 1.0f);
+        arm = Range.clip(arm, -0.30f, 0.30f);
         //backright = Range.clip(backright, -1, 1);
         //backleft = Range.clip(backleft, -1, 1);
 
@@ -147,6 +141,7 @@ public class battel_tank extends OpMode {
         frontright = frontright * accelerator;
         frontleft = frontleft * accelerator;
         arm = arm * accelerator2;
+        winch = winch * accelerator2;
         //backright = backright * accelerator;
         //backleft = backleft * accelerator;
 
@@ -161,7 +156,6 @@ public class battel_tank extends OpMode {
             //backright = gamepad1.left_stick_y;
             //backleft = gamepad1.right_stick_y;
             accelerator = gamepad1.right_trigger;
-            accelerator2 = gamepad2.right_trigger;
 
             frontright = frontright * accelerator;
             frontleft = frontleft * accelerator;
@@ -190,9 +184,9 @@ public class battel_tank extends OpMode {
         telemetry.addData("winch", winch);
         telemetry.addData("servo1", servo_angles.leftsideservo);
         telemetry.addData("servo2", servo_angles.rightsideservo);
-        telemetry.addData("servo3", servo_angles.servo3);
-        telemetry.addData("servo4", servo_angles.servo4);
-        telemetry.addData("servo5", servo_angles.servo5);
+        telemetry.addData("servo3", servo_angles.mustachmotor);
+        //telemetry.addData("servo4", servo_angles.servo4);
+        //telemetry.addData("servo5", servo_angles.servo5);
         telemetry.addData("time", time.time());
         telemetry.addData("servo_time", servo_time.time());
         if(reversed){

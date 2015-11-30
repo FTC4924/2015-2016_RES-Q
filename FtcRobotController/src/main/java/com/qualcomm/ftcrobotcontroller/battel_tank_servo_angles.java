@@ -6,7 +6,7 @@ package com.qualcomm.ftcrobotcontroller;
 public class battel_tank_servo_angles {
     public float leftsideservo;
     public float rightsideservo;
-    public float servo3;
+    public float mustachmotor;
     public float servo4;
     public float servo5;
 

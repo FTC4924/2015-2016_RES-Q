@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * Created by 4924_Users on 11/14/2015.
  */
-public class DeviRedCornerAutonomousMountainOnly extends OpMode {
+public class DeviRedWallAutoMTN extends OpMode {
 
     final DrivePathSegment[] mountainPath = {
 

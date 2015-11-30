@@ -38,10 +38,20 @@ public class DeviRedWallAutonomous extends OpMode {
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
-    Servo climberDeployer;
     OpticalDistanceSensor lineDetector;
     TouchSensor bumper;
     GyroSensor turningGyro;
+
+    Servo climberDeployer;
+    Servo rightTriggerArmServo;
+    Servo continuousServo;
+    Servo ballRotatorServo;
+    Servo leftTriggerArmServo;
+
+    double climberDeployerServoAngle = 0.0d;
+    double ballRotatorServoAngle = 0.0d;
+    double leftTriggerArmServoAngle = 0.0d;
+    double rightTriggerArmServoAngle = 0.0d;
 
     private State currentState;
     private int currentPathSegmentIndex;
@@ -74,6 +84,14 @@ public class DeviRedWallAutonomous extends OpMode {
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO;
+
+        leftTriggerArmServo = hardwareMap.servo.get("servo1");
+        continuousServo = hardwareMap.servo.get("servo2");
+        rightTriggerArmServo = hardwareMap.servo.get("servo3");
+        ballRotatorServo = hardwareMap.servo.get("servo4");
+        climberDeployer= hardwareMap.servo.get("servo5");
+        climberDeployer.setPosition(0.0d);
+        continuousServo.setPosition(0.5f);
     }
 
     @Override
@@ -93,13 +111,13 @@ public class DeviRedWallAutonomous extends OpMode {
 
             case STATE_INITIAL:
 
-                if (encodersAtZero() && !turningGyro.isCalibrating()) {
+                /*if (encodersAtZero() && !turningGyro.isCalibrating()) {
 
                     startPath(mountainPath);
                     SetCurrentState(State.STATE_DRIVE_TO_MOUNTAIN);
                     telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
                             getRightPosition()));
-                }
+                }*/
 
                 break;
 
@@ -288,17 +306,18 @@ public class DeviRedWallAutonomous extends OpMode {
         frontRightMotor.setPower(rightPower);
     }
 
-    public boolean turnComplete() {
+    /*public boolean turnComplete() {
 
         return segment.Angle <= turningGyro.getHeading() + TURNING_ANGLE_MARGINE &&
                 segment.Angle >= turningGyro.getHeading() - TURNING_ANGLE_MARGINE;
-    }
+    }*/
 
     public boolean moveComplete() {
 
         if (segment.isTurn) {
 
-            return turnComplete();
+            //return turnComplete();
+            return true;
 
         } else {
 

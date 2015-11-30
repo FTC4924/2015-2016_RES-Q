@@ -6,7 +6,9 @@ package com.qualcomm.ftcrobotcontroller;
 public class DrivePathSegment {
     public float LeftSideDistance;
     public float RightSideDistance;
+    public float Angle;
     public float Power;
+    public boolean isTurn;
 
     public DrivePathSegment() {}
 
@@ -14,5 +16,12 @@ public class DrivePathSegment {
         LeftSideDistance = left;
         RightSideDistance = right;
         Power = power;
+        isTurn = false;
+    }
+
+    public DrivePathSegment(float angle, float power) {
+        Angle = angle;
+        Power = power;
+        isTurn = true;
     }
 }

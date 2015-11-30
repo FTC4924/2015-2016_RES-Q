@@ -18,8 +18,11 @@ public class SirHammerServoInputsReader {
         inputs.DockKickStand = gamepad2.x;
         inputs.ExtendKickStand = gamepad2.b;
 
-        inputs.LowerBackLeftArm = gamepad2.right_bumper;
-        inputs.RaiseBackLeftArm = gamepad2.left_bumper;
+        inputs.LowerBackLeftArm = gamepad1.right_bumper;
+        inputs.RaiseBackLeftArm = gamepad1.left_bumper;
+
+        inputs.LowerDunkingArm = gamepad1.b;
+        inputs.RaiseDunkingArm = gamepad1.x;
 
         return inputs;
     }

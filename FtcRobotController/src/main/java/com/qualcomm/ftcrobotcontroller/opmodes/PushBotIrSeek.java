@@ -46,7 +46,7 @@ public class PushBotIrSeek extends LinearOpMode {
                 rightMotor.setPower(0);
             }
             telemetry.addData("Seeker", irSeeker.toString());
-            telemetry.addData("Power", " Left=" + leftMotor.getPower() + " Right=" + rightMotor.getPower());
+            telemetry.addData("Speed", " Left=" + leftMotor.getPower() + " Right=" + rightMotor.getPower());
 
             //Wait one hardware cycle to avoid taxing the processor
             waitOneFullHardwareCycle();

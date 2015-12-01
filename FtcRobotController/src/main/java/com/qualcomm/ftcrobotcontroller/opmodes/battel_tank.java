@@ -22,7 +22,7 @@ public class battel_tank extends OpMode {
     Servo leftsideservo; //leftsideservo is a 180
     Servo rightsideservo; //rightsideservo is a
     Servo mustachmotor; //mustachmotor is a 180
-    //Servo servo4;     //servo4 is a 180
+    Servo frontrightservo; //frontrightservo is a 180
     //Servo servo5;     //servo5 is a 180
     ElapsedTime time;
     ElapsedTime servo_time;
@@ -128,12 +128,13 @@ public class battel_tank extends OpMode {
         //float backleft = -gamepad1.left_stick_y;
         float accelerator = gamepad1.right_trigger;
         float accelerator2 = gamepad2.right_trigger;
+        float accelerator3 = gamepad1.left_trigger;
         float winch = gamepad2.right_stick_y;
         float arm = gamepad2.left_stick_y;
 
         frontright = Range.clip(frontright, -1.0f, 1.0f);
         frontleft = Range.clip(frontleft, -1.0f, 1.0f);
-        arm = Range.clip(arm, -0.30f, 0.30f);
+        arm = Range.clip(arm, -0.15f, 0.15f);
         //backright = Range.clip(backright, -1, 1);
         //backleft = Range.clip(backleft, -1, 1);
 
@@ -141,7 +142,7 @@ public class battel_tank extends OpMode {
         frontright = frontright * accelerator;
         frontleft = frontleft * accelerator;
         arm = arm * accelerator2;
-        winch = winch * accelerator2;
+        winch = winch * accelerator3;
         //backright = backright * accelerator;
         //backleft = backleft * accelerator;
 

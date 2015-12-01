@@ -7,9 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -31,41 +28,27 @@ public class DeviRedWallAutonomous extends OpMode {
     final int COUNTS_PER_REVOLUTION = 1120;
     final double WHEEL_DIAMETER = 4.5f;
     final double GEAR_RATIO = 24.0f/16.0f;
-    final double WHITE_THRESHOLD = 0.05f;
     double countsPerInch;
     static final int ENCODER_TARGET_MARGIN = 10;
     final float TURNING_ANGLE_MARGINE = 2.0f;
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
-    OpticalDistanceSensor lineDetector;
-    TouchSensor bumper;
     GyroSensor turningGyro;
-
-    Servo climberDeployer;
-    Servo rightTriggerArmServo;
-    Servo continuousServo;
-    Servo ballRotatorServo;
-    Servo leftTriggerArmServo;
-
-    double climberDeployerServoAngle = 0.0d;
-    double ballRotatorServoAngle = 0.0d;
-    double leftTriggerArmServoAngle = 0.0d;
-    double rightTriggerArmServoAngle = 0.0d;
-
-    private State currentState;
-    private int currentPathSegmentIndex;
-    private DrivePathSegment[] currentPath;
-    DrivePathSegment segment = currentPath[currentPathSegmentIndex];
-    EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     final DrivePathSegment[] mountainPath = {
 
-            new DrivePathSegment(8.0f, 8.0f, 0.9f),
-            new DrivePathSegment(45.0f, 0.5f),  // Left
-            new DrivePathSegment(110.0f, 110.0f, 0.9f),  // Forward
+            new DrivePathSegment(12.0f, 12.0f, 0.9f),
+            new DrivePathSegment(45.0f, 0.5f),
+            new DrivePathSegment(110.0f, 110.0f, 0.9f),
             new DrivePathSegment(90.0f, 0.5f)
     };
+
+    private State currentState;
+    private int currentPathSegmentIndex;
+    private DrivePathSegment[] currentPath = mountainPath;
+    DrivePathSegment segment = currentPath[currentPathSegmentIndex];
+    EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     public void SetCurrentState(State newState) {
 
@@ -78,27 +61,19 @@ public class DeviRedWallAutonomous extends OpMode {
 
         frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
-        lineDetector = hardwareMap.opticalDistanceSensor.get("lineDetector");
-        bumper = hardwareMap.touchSensor.get("bumper");
-        //turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
+        turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
+
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO;
 
-        leftTriggerArmServo = hardwareMap.servo.get("servo1");
-        continuousServo = hardwareMap.servo.get("servo2");
-        rightTriggerArmServo = hardwareMap.servo.get("servo3");
-        ballRotatorServo = hardwareMap.servo.get("servo4");
-        climberDeployer= hardwareMap.servo.get("servo5");
-        climberDeployer.setPosition(0.0d);
-        continuousServo.setPosition(0.5f);
+        turningGyro.calibrate();
     }
 
     @Override
     public void start() {
 
         elapsedGameTime.reset();
-        //turningGyro.calibrate();
         SetCurrentState(State.STATE_INITIAL);
     }
 
@@ -111,13 +86,13 @@ public class DeviRedWallAutonomous extends OpMode {
 
             case STATE_INITIAL:
 
-                /*if (encodersAtZero() && !turningGyro.isCalibrating()) {
+                if (encodersAtZero() && !turningGyro.isCalibrating()) {
 
                     startPath(mountainPath);
                     SetCurrentState(State.STATE_DRIVE_TO_MOUNTAIN);
                     telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
                             getRightPosition()));
-                }*/
+                }
 
                 break;
 
@@ -134,7 +109,7 @@ public class DeviRedWallAutonomous extends OpMode {
 
             case STATE_CLIMB_MOUNTAIN:
 
-                if (elapsedTimeForCurrentState.time() >= 12.0f) {
+                if (elapsedTimeForCurrentState.time() >= 3.0f) {
 
                     TurnOffAllDriveMotors();
                     SetCurrentState(State.STATE_STOP);
@@ -149,17 +124,13 @@ public class DeviRedWallAutonomous extends OpMode {
             case STATE_STOP:
 
                 TurnOffAllDriveMotors();
+
+                break;
         }
 
         telemetry.addData("Left: ", currentEncoderTargets.LeftTarget);
         telemetry.addData("Right: ", currentEncoderTargets.RightTarget);
-        telemetry.addData("White Line: ", isOnWhiteLine());
-        telemetry.addData("ODS Reading: ", lineDetector.getLightDetected());
         SetEncoderTargets();
-    }
-
-    private boolean isOnWhiteLine() {
-        return lineDetector.getLightDetected() > WHITE_THRESHOLD;
     }
 
     private boolean encodersAtZero() {
@@ -290,34 +261,17 @@ public class DeviRedWallAutonomous extends OpMode {
         frontRightMotor.setTargetPosition(currentEncoderTargets.RightTarget);
     }
 
-    public boolean beaconIsReached() {
-
-        return bumper.isPressed();
-    }
-
-    public boolean climbersHaveBeenDeployed() {
-
-        return elapsedTimeForCurrentState.time() >= 4;
-    }
-
-    public void setPowerLevelsForLineFollowing(float leftPower, float rightPower) {
-
-        frontLeftMotor.setPower(leftPower);
-        frontRightMotor.setPower(rightPower);
-    }
-
-    /*public boolean turnComplete() {
+    public boolean turnComplete() {
 
         return segment.Angle <= turningGyro.getHeading() + TURNING_ANGLE_MARGINE &&
                 segment.Angle >= turningGyro.getHeading() - TURNING_ANGLE_MARGINE;
-    }*/
+    }
 
     public boolean moveComplete() {
 
         if (segment.isTurn) {
 
-            //return turnComplete();
-            return true;
+            return turnComplete();
 
         } else {
 

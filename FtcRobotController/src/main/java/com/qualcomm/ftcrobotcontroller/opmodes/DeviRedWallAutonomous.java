@@ -39,13 +39,13 @@ public class DeviRedWallAutonomous extends OpMode {
     final DrivePathSegment[] mountainPath = {
 
             new DrivePathSegment(12.0f, 12.0f, 0.9f),
-            new DrivePathSegment(45.0f, 0.5f),
+            new DrivePathSegment(315.0f, 0.7f),
             new DrivePathSegment(110.0f, 110.0f, 0.9f),
-            new DrivePathSegment(90.0f, 0.5f)
+            new DrivePathSegment(225.0f, 0.7f)
     };
 
     private State currentState;
-    private int currentPathSegmentIndex;
+    private int currentPathSegmentIndex = 0;
     private DrivePathSegment[] currentPath = mountainPath;
     DrivePathSegment segment = currentPath[currentPathSegmentIndex];
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
@@ -130,6 +130,7 @@ public class DeviRedWallAutonomous extends OpMode {
 
         telemetry.addData("Left: ", currentEncoderTargets.LeftTarget);
         telemetry.addData("Right: ", currentEncoderTargets.RightTarget);
+        telemetry.addData("Heading: ", turningGyro.getHeading());
         SetEncoderTargets();
     }
 
@@ -183,6 +184,8 @@ public class DeviRedWallAutonomous extends OpMode {
 
     private void startSeg() {
 
+        segment = currentPath[currentPathSegmentIndex];
+
         int Left;
         int Right;
 
@@ -194,11 +197,15 @@ public class DeviRedWallAutonomous extends OpMode {
 
                 if (segment.Angle > 0) {
 
-                    frontLeftMotor.setPower(segment.Power);
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(segment.Power, 0.0f);
+                    SetDriveMotorPowerLevels(powerLevels);
 
                 } else {
 
-                    frontRightMotor.setPower(segment.Power);
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(0.0f, segment.Power);
+                    SetDriveMotorPowerLevels(powerLevels);
                 }
 
             } else {
@@ -231,18 +238,20 @@ public class DeviRedWallAutonomous extends OpMode {
         // Wait for this Segement to end and then see what's next.
         if (moveComplete()) {
             // Start next Segement if there is one.
-            if (currentPathSegmentIndex < currentPath.length)
-            {
+            if (currentPathSegmentIndex < currentPath.length) {
+
+                TurnOffAllDriveMotors();
                 startSeg();
-            }
-            else  // Otherwise, stop and return done
-            {
+
+            } else {
+
                 currentPath = null;
                 currentPathSegmentIndex = 0;
                 TurnOffAllDriveMotors();
                 return true;
             }
         }
+
         return false;
     }
 

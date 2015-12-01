@@ -67,6 +67,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register("LineFollowingDumpTest", LineFollowingDumpTest.class);
     manager.register("ServoTest", ServoTest.class);
     manager.register("GyroSensorTest", GyroSensorTest.class);
+    manager.register("DistanceTest", DistanceTest.class);
     /*
      * Uncomment any of the following lines if you want to register an op mode.
      */

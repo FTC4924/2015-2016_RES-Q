@@ -55,23 +55,10 @@ public class FtcOpModeRegister implements OpModeRegister {
      * If two or more op modes are registered with the same name, the app will display an error.
      */
 
-    manager.register ("SirHammerTeleop", SirHammerTeleop.class);
-    manager.register ("SirHammerCenterAutonomous", SirHammerCenterAutonomous.class);
-    manager.register ("SirHammerRampAutonomous", SirHammerRampAutonomous.class);
     manager.register ("battel_tank", battel_tank.class);
-    manager.register ("DeviRedWallAutonomous", DeviRedWallAutonomous.class);
-    manager.register("OpticalDistanceSensorTest", OpticalDistanceSensorTest.class);
-    //manager.register("LineFollowingTest", LineFollowingTest.class);
-    //manager.register("MountainClimbingTest", MountainClimbingTest.class);
-    manager.register("DeviRedWallAutoMTN", DeviRedWallAutoMTN.class);
-    manager.register("LineFollowingDumpTest", LineFollowingDumpTest.class);
-    manager.register("ServoTest", ServoTest.class);
-    manager.register("GyroSensorTest", GyroSensorTest.class);
-    manager.register("DistanceTest", DistanceTest.class);
-    /*
-     * Uncomment any of the following lines if you want to register an op mode.
-     */
-    manager.register("MR Gyro Test", MRGyroTest.class);
-
+    manager.register("RedWallClimb", RedWallClimb.class);
+    manager.register("BlueWallClimb", BlueWallClimb.class);
+    manager.register("RedCornerClimb", RedCornerClimb.class);
+    manager.register("BlueCornerClimb", BlueCornerClimb.class);
   }
 }

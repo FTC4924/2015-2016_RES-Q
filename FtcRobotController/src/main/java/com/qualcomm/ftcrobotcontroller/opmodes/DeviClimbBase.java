@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * Created by 4924_Users on 10/23/2015.
  */
-public class DeviRedWallAutonomous extends OpMode {
+public class DeviClimbBase extends OpMode {
 
     public enum State {
         STATE_INITIAL,
@@ -39,12 +39,12 @@ public class DeviRedWallAutonomous extends OpMode {
     DcMotor frontRightMotor;
     GyroSensor turningGyro;
 
-    final DrivePathSegment[] mountainPath = {
+    public DrivePathSegment[] mountainPath = {
 
             new DrivePathSegment(20.0f, 20.0f, 0.9f),
             new DrivePathSegment(315.0f, 0.7f),
             new DrivePathSegment(35.0f, 35.0f, 0.9f),
-            new DrivePathSegment(-45.0f, 0.7f)
+            new DrivePathSegment(-50.0f, 0.7f)
     };
 
     private State currentState;
@@ -83,8 +83,6 @@ public class DeviRedWallAutonomous extends OpMode {
     @Override
     public void loop() {
 
-        telemetry.addData("0", String.format("%4.1f ", elapsedTimeForCurrentState.time()) + currentState.toString());
-
         switch (currentState) {
 
             case STATE_INITIAL:
@@ -112,7 +110,7 @@ public class DeviRedWallAutonomous extends OpMode {
 
             case STATE_CLIMB_MOUNTAIN:
 
-                if (elapsedTimeForCurrentState.time() >= 3.0f) {
+                if (elapsedTimeForCurrentState.time() >= 10.0f) {
 
                     TurnOffAllDriveMotors();
                     SetCurrentState(State.STATE_STOP);
@@ -131,10 +129,17 @@ public class DeviRedWallAutonomous extends OpMode {
                 break;
         }
 
-        telemetry.addData("Left: ", currentEncoderTargets.LeftTarget);
-        telemetry.addData("Right: ", currentEncoderTargets.RightTarget);
-        telemetry.addData("Heading: ", turningGyro.getHeading());
         SetEncoderTargets();
+
+        addTelemetry();
+    }
+
+    private void addTelemetry() {
+        telemetry.addData("State Time: ", String.format("%4.1f ", elapsedTimeForCurrentState.time()) + currentState.toString());
+        telemetry.addData("Elapsed Time: ", String.format("%4.1f ", elapsedGameTime.time()));
+        /*telemetry.addData("Left: ", currentEncoderTargets.LeftTarget);
+        telemetry.addData("Right: ", currentEncoderTargets.RightTarget);
+        telemetry.addData("Heading: ", turningGyro.getHeading());*/
     }
 
     private boolean encodersAtZero() {
@@ -297,7 +302,7 @@ public class DeviRedWallAutonomous extends OpMode {
 
     public void setClimbingPowerLevels() {
 
-        frontLeftMotor.setPower(-0.4d);
-        frontRightMotor.setPower(-0.4d);
+        frontLeftMotor.setPower(-0.6d);
+        frontRightMotor.setPower(-0.6d);
     }
 }

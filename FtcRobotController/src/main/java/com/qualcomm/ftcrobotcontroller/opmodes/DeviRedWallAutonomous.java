@@ -30,7 +30,10 @@ public class DeviRedWallAutonomous extends OpMode {
     final double GEAR_RATIO = 24.0f/16.0f;
     double countsPerInch;
     static final int ENCODER_TARGET_MARGIN = 10;
-    final float TURNING_ANGLE_MARGINE = 2.0f;
+    static final float TURNING_ANGLE_MARGIN = 2.0f;
+    static final float CALIBRATION_FACTOR = 1.414f;
+    int turnStartValueLeft;
+    int turnStartValueRight;
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
@@ -38,10 +41,10 @@ public class DeviRedWallAutonomous extends OpMode {
 
     final DrivePathSegment[] mountainPath = {
 
-            new DrivePathSegment(12.0f, 12.0f, 0.9f),
+            new DrivePathSegment(20.0f, 20.0f, 0.9f),
             new DrivePathSegment(315.0f, 0.7f),
-            new DrivePathSegment(110.0f, 110.0f, 0.9f),
-            new DrivePathSegment(225.0f, 0.7f)
+            new DrivePathSegment(35.0f, 35.0f, 0.9f),
+            new DrivePathSegment(-45.0f, 0.7f)
     };
 
     private State currentState;
@@ -65,7 +68,7 @@ public class DeviRedWallAutonomous extends OpMode {
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO;
+        countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
         turningGyro.calibrate();
     }
@@ -193,6 +196,9 @@ public class DeviRedWallAutonomous extends OpMode {
 
             if (segment.isTurn) {
 
+                turnStartValueLeft = getLeftPosition();
+                turnStartValueRight = getRightPosition();
+
                 runWithoutEncoders();
 
                 if (segment.Angle > 0) {
@@ -210,6 +216,7 @@ public class DeviRedWallAutonomous extends OpMode {
 
             } else {
 
+                UseRunToPosition();
                 Left  = (int)(segment.LeftSideDistance * countsPerInch);
                 Right = (int)(segment.RightSideDistance * countsPerInch);
                 addEncoderTarget(Left, Right);
@@ -272,8 +279,8 @@ public class DeviRedWallAutonomous extends OpMode {
 
     public boolean turnComplete() {
 
-        return segment.Angle <= turningGyro.getHeading() + TURNING_ANGLE_MARGINE &&
-                segment.Angle >= turningGyro.getHeading() - TURNING_ANGLE_MARGINE;
+        return Math.abs(segment.Angle) <= turningGyro.getHeading() + TURNING_ANGLE_MARGIN &&
+                Math.abs(segment.Angle) >= turningGyro.getHeading() - TURNING_ANGLE_MARGIN;
     }
 
     public boolean moveComplete() {

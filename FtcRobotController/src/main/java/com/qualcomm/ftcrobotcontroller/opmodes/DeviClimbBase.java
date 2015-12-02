@@ -24,6 +24,7 @@ public class DeviClimbBase extends OpMode {
     public ElapsedTime elapsedGameTime = new ElapsedTime();
     private FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
     private ElapsedTime elapsedTimeForCurrentState = new ElapsedTime();
+    private ElapsedTime elapsedTimeForCurrentSegment = new ElapsedTime();
     private EncoderTargets zeroEncoderTargets = new EncoderTargets(0, 0);
     final int COUNTS_PER_REVOLUTION = 1120;
     final double WHEEL_DIAMETER = 4.5f;
@@ -193,6 +194,7 @@ public class DeviClimbBase extends OpMode {
     private void startSeg() {
 
         segment = currentPath[currentPathSegmentIndex];
+        elapsedTimeForCurrentSegment.reset();
 
         int Left;
         int Right;
@@ -221,13 +223,22 @@ public class DeviClimbBase extends OpMode {
 
             } else {
 
-                UseRunToPosition();
-                Left  = (int)(segment.LeftSideDistance * countsPerInch);
-                Right = (int)(segment.RightSideDistance * countsPerInch);
-                addEncoderTarget(Left, Right);
-                FourWheelDrivePowerLevels powerLevels =
-                        new FourWheelDrivePowerLevels(segment.Power, segment.Power);
-                SetDriveMotorPowerLevels(powerLevels);
+                if (segment.isDelay) {
+
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(0.0f, 0.0f);
+                    SetDriveMotorPowerLevels(powerLevels);
+
+                } else {
+
+                    UseRunToPosition();
+                    Left  = (int)(segment.LeftSideDistance * countsPerInch);
+                    Right = (int)(segment.RightSideDistance * countsPerInch);
+                    addEncoderTarget(Left, Right);
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(segment.Power, segment.Power);
+                    SetDriveMotorPowerLevels(powerLevels);
+                }
             }
 
             currentPathSegmentIndex++;
@@ -296,8 +307,20 @@ public class DeviClimbBase extends OpMode {
 
         } else {
 
-            return linearMoveComplete();
+            if (segment.isDelay) {
+
+                return delayComplete();
+
+            } else {
+
+                return linearMoveComplete();
+            }
         }
+    }
+
+    public boolean delayComplete() {
+
+        return elapsedTimeForCurrentSegment.time() >= segment.delayTime;
     }
 
     public void setClimbingPowerLevels() {

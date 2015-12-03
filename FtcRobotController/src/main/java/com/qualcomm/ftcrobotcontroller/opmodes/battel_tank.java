@@ -56,7 +56,8 @@ public class battel_tank extends OpMode {
         servo_time.reset();
         servo_angles.rightsideservo = 0.70f;
         servo_angles.mustachmotor = 0.00f;
-        servo_angles.frotrightservo = 0.80f;
+        servo_angles.frotrightservo = 1.00f;
+        servo_angles.leftsideservo = 1.00f;
     }
 
     @Override
@@ -77,7 +78,7 @@ public class battel_tank extends OpMode {
         }
 
         if (gamepad1.b && (servo_time.time() > DELAY)){
-            servo_angles.frotrightservo = 0.50f;
+            servo_angles.frotrightservo = 1.00f;
             servo_time.reset();
         }
 

@@ -7,7 +7,7 @@ public class battel_tank_servo_angles {
     public float leftsideservo;
     public float rightsideservo;
     public float mustachmotor;
-    public float servo4;
+    public float frotrightservo;
     public float servo5;
 
     public battel_tank_servo_angles() {

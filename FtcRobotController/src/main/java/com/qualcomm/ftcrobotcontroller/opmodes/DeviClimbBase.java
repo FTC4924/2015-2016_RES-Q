@@ -12,6 +12,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * Created by 4924_Users on 10/23/2015.
  */
+
+//Thanks to team #2818 for the base template of this autonomous program.
+//We created the turning and delay DrivePathSegment variants.
+
 public class DeviClimbBase extends OpMode {
 
     public enum State {

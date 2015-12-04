@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * Created by 4924_Users on 10/23/2015.
  */
-public class DeviRedWallAutonomous extends OpMode {
+public class DeviClimbBase extends OpMode {
 
     public enum State {
         STATE_INITIAL,
@@ -24,24 +24,28 @@ public class DeviRedWallAutonomous extends OpMode {
     public ElapsedTime elapsedGameTime = new ElapsedTime();
     private FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
     private ElapsedTime elapsedTimeForCurrentState = new ElapsedTime();
+    private ElapsedTime elapsedTimeForCurrentSegment = new ElapsedTime();
     private EncoderTargets zeroEncoderTargets = new EncoderTargets(0, 0);
     final int COUNTS_PER_REVOLUTION = 1120;
     final double WHEEL_DIAMETER = 4.5f;
     final double GEAR_RATIO = 24.0f/16.0f;
     double countsPerInch;
     static final int ENCODER_TARGET_MARGIN = 10;
-    final float TURNING_ANGLE_MARGINE = 2.0f;
+    static final float TURNING_ANGLE_MARGIN = 2.0f;
+    static final float CALIBRATION_FACTOR = 1.414f;
+    int turnStartValueLeft;
+    int turnStartValueRight;
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
     GyroSensor turningGyro;
 
-    final DrivePathSegment[] mountainPath = {
+    public DrivePathSegment[] mountainPath = {
 
-            new DrivePathSegment(12.0f, 12.0f, 0.9f),
+            new DrivePathSegment(20.0f, 20.0f, 0.9f),
             new DrivePathSegment(315.0f, 0.7f),
-            new DrivePathSegment(110.0f, 110.0f, 0.9f),
-            new DrivePathSegment(225.0f, 0.7f)
+            new DrivePathSegment(35.0f, 35.0f, 0.9f),
+            new DrivePathSegment(-50.0f, 0.7f)
     };
 
     private State currentState;
@@ -65,7 +69,7 @@ public class DeviRedWallAutonomous extends OpMode {
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO;
+        countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
         turningGyro.calibrate();
     }
@@ -79,8 +83,6 @@ public class DeviRedWallAutonomous extends OpMode {
 
     @Override
     public void loop() {
-
-        telemetry.addData("0", String.format("%4.1f ", elapsedTimeForCurrentState.time()) + currentState.toString());
 
         switch (currentState) {
 
@@ -109,7 +111,7 @@ public class DeviRedWallAutonomous extends OpMode {
 
             case STATE_CLIMB_MOUNTAIN:
 
-                if (elapsedTimeForCurrentState.time() >= 3.0f) {
+                if (elapsedTimeForCurrentState.time() >= 10.0f) {
 
                     TurnOffAllDriveMotors();
                     SetCurrentState(State.STATE_STOP);
@@ -128,10 +130,17 @@ public class DeviRedWallAutonomous extends OpMode {
                 break;
         }
 
-        telemetry.addData("Left: ", currentEncoderTargets.LeftTarget);
-        telemetry.addData("Right: ", currentEncoderTargets.RightTarget);
-        telemetry.addData("Heading: ", turningGyro.getHeading());
         SetEncoderTargets();
+
+        addTelemetry();
+    }
+
+    private void addTelemetry() {
+        telemetry.addData("State Time: ", String.format("%4.1f ", elapsedTimeForCurrentState.time()) + currentState.toString());
+        telemetry.addData("Elapsed Time: ", String.format("%4.1f ", elapsedGameTime.time()));
+        /*telemetry.addData("Left: ", currentEncoderTargets.LeftTarget);
+        telemetry.addData("Right: ", currentEncoderTargets.RightTarget);
+        telemetry.addData("Heading: ", turningGyro.getHeading());*/
     }
 
     private boolean encodersAtZero() {
@@ -185,6 +194,7 @@ public class DeviRedWallAutonomous extends OpMode {
     private void startSeg() {
 
         segment = currentPath[currentPathSegmentIndex];
+        elapsedTimeForCurrentSegment.reset();
 
         int Left;
         int Right;
@@ -192,6 +202,9 @@ public class DeviRedWallAutonomous extends OpMode {
         if (currentPath != null) {
 
             if (segment.isTurn) {
+
+                turnStartValueLeft = getLeftPosition();
+                turnStartValueRight = getRightPosition();
 
                 runWithoutEncoders();
 
@@ -210,12 +223,22 @@ public class DeviRedWallAutonomous extends OpMode {
 
             } else {
 
-                Left  = (int)(segment.LeftSideDistance * countsPerInch);
-                Right = (int)(segment.RightSideDistance * countsPerInch);
-                addEncoderTarget(Left, Right);
-                FourWheelDrivePowerLevels powerLevels =
-                        new FourWheelDrivePowerLevels(segment.Power, segment.Power);
-                SetDriveMotorPowerLevels(powerLevels);
+                if (segment.isDelay) {
+
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(0.0f, 0.0f);
+                    SetDriveMotorPowerLevels(powerLevels);
+
+                } else {
+
+                    UseRunToPosition();
+                    Left  = (int)(segment.LeftSideDistance * countsPerInch);
+                    Right = (int)(segment.RightSideDistance * countsPerInch);
+                    addEncoderTarget(Left, Right);
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(segment.Power, segment.Power);
+                    SetDriveMotorPowerLevels(powerLevels);
+                }
             }
 
             currentPathSegmentIndex++;
@@ -272,8 +295,8 @@ public class DeviRedWallAutonomous extends OpMode {
 
     public boolean turnComplete() {
 
-        return segment.Angle <= turningGyro.getHeading() + TURNING_ANGLE_MARGINE &&
-                segment.Angle >= turningGyro.getHeading() - TURNING_ANGLE_MARGINE;
+        return Math.abs(segment.Angle) <= turningGyro.getHeading() + TURNING_ANGLE_MARGIN &&
+                Math.abs(segment.Angle) >= turningGyro.getHeading() - TURNING_ANGLE_MARGIN;
     }
 
     public boolean moveComplete() {
@@ -284,13 +307,25 @@ public class DeviRedWallAutonomous extends OpMode {
 
         } else {
 
-            return linearMoveComplete();
+            if (segment.isDelay) {
+
+                return delayComplete();
+
+            } else {
+
+                return linearMoveComplete();
+            }
         }
+    }
+
+    public boolean delayComplete() {
+
+        return elapsedTimeForCurrentSegment.time() >= segment.delayTime;
     }
 
     public void setClimbingPowerLevels() {
 
-        frontLeftMotor.setPower(-0.4d);
-        frontRightMotor.setPower(-0.4d);
+        frontLeftMotor.setPower(-0.6d);
+        frontRightMotor.setPower(-0.6d);
     }
 }

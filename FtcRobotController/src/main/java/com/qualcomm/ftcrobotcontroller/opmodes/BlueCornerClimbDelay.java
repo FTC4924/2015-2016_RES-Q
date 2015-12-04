@@ -19,4 +19,3 @@ public class BlueCornerClimbDelay extends DeviClimbBase {
         };
     }
 }
- 

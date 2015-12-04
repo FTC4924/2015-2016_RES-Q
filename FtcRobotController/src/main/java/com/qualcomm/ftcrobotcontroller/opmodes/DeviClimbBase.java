@@ -24,6 +24,7 @@ public class DeviClimbBase extends OpMode {
     public ElapsedTime elapsedGameTime = new ElapsedTime();
     private FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
     private ElapsedTime elapsedTimeForCurrentState = new ElapsedTime();
+    private ElapsedTime elapsedTimeForCurrentSegment = new ElapsedTime();
     private EncoderTargets zeroEncoderTargets = new EncoderTargets(0, 0);
     final int COUNTS_PER_REVOLUTION = 1120;
     final double WHEEL_DIAMETER = 4.5f;
@@ -197,6 +198,8 @@ public class DeviClimbBase extends OpMode {
         int Left;
         int Right;
 
+        elapsedTimeForCurrentSegment.reset();
+
         if (currentPath != null) {
 
             if (segment.isTurn) {
@@ -221,13 +224,25 @@ public class DeviClimbBase extends OpMode {
 
             } else {
 
-                UseRunToPosition();
-                Left  = (int)(segment.LeftSideDistance * countsPerInch);
-                Right = (int)(segment.RightSideDistance * countsPerInch);
-                addEncoderTarget(Left, Right);
-                FourWheelDrivePowerLevels powerLevels =
-                        new FourWheelDrivePowerLevels(segment.Power, segment.Power);
-                SetDriveMotorPowerLevels(powerLevels);
+                if (segment.isDelay) {
+
+                    runWithoutEncoders();
+
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(0.0f, 0.0f);
+                    SetDriveMotorPowerLevels(powerLevels);
+
+                } else {
+
+                    UseRunToPosition();
+
+                    Left  = (int)(segment.LeftSideDistance * countsPerInch);
+                    Right = (int)(segment.RightSideDistance * countsPerInch);
+                    addEncoderTarget(Left, Right);
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(segment.Power, segment.Power);
+                    SetDriveMotorPowerLevels(powerLevels);
+                }
             }
 
             currentPathSegmentIndex++;
@@ -248,7 +263,7 @@ public class DeviClimbBase extends OpMode {
 
     private boolean pathComplete() {
         // Wait for this Segement to end and then see what's next.
-        if (moveComplete()) {
+        if (segmentComplete()) {
             // Start next Segement if there is one.
             if (currentPathSegmentIndex < currentPath.length) {
 
@@ -288,7 +303,7 @@ public class DeviClimbBase extends OpMode {
                 Math.abs(segment.Angle) >= turningGyro.getHeading() - TURNING_ANGLE_MARGIN;
     }
 
-    public boolean moveComplete() {
+    public boolean segmentComplete() {
 
         if (segment.isTurn) {
 
@@ -296,8 +311,20 @@ public class DeviClimbBase extends OpMode {
 
         } else {
 
-            return linearMoveComplete();
+            if (segment.isDelay) {
+
+                return delayComplete();
+
+            } else {
+
+                return linearMoveComplete();
+            }
         }
+    }
+
+    private boolean delayComplete() {
+
+        return elapsedTimeForCurrentSegment.time() >= segment.delayTime;
     }
 
     public void setClimbingPowerLevels() {

@@ -45,7 +45,7 @@ public class FtcOpModeRegister implements OpModeRegister {
    *
    * @param manager op mode manager
    */
-  public void register(OpModeManager manager) {
+    public void register(OpModeManager manager) {
 
     /*
      * register your op modes here.
@@ -55,10 +55,14 @@ public class FtcOpModeRegister implements OpModeRegister {
      * If two or more op modes are registered with the same name, the app will display an error.
      */
 
-    manager.register ("battel_tank", battel_tank.class);
-    manager.register("RedWallClimb", RedWallClimb.class);
-    manager.register("BlueWallClimb", BlueWallClimb.class);
-    manager.register("RedCornerClimb", RedCornerClimb.class);
-    manager.register("BlueCornerClimb", BlueCornerClimb.class);
-  }
+        manager.register("battel_tank", battel_tank.class);
+        manager.register("RedWallClimb", RedWallClimb.class);
+        manager.register("BlueWallClimb", BlueWallClimb.class);
+        manager.register("RedCornerClimb", RedCornerClimb.class);
+        manager.register("BlueCornerClimb", BlueCornerClimb.class);
+        manager.register("RedWallClimbDelay", RedWallClimbDelay.class);
+        manager.register("BlueWallClimbDelay", BlueWallClimbDelay.class);
+        manager.register("RedCornerClimbDelay", RedCornerClimbDelay.class);
+        manager.register("BlueCornerClimbDelay", BlueCornerClimbDelay.class);
+    }
 }

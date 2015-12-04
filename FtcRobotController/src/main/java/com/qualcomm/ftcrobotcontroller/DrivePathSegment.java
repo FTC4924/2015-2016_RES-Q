@@ -8,9 +8,9 @@ public class DrivePathSegment {
     public float RightSideDistance;
     public float Angle;
     public float Power;
+    public float delayTime;
     public boolean isTurn = false;
     public boolean isDelay = false;
-    public float delayTime;
 
     public DrivePathSegment() {}
 

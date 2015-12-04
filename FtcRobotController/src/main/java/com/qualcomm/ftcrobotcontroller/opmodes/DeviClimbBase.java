@@ -194,10 +194,11 @@ public class DeviClimbBase extends OpMode {
     private void startSeg() {
 
         segment = currentPath[currentPathSegmentIndex];
-        elapsedTimeForCurrentSegment.reset();
 
         int Left;
         int Right;
+
+        elapsedTimeForCurrentSegment.reset();
 
         if (currentPath != null) {
 
@@ -225,6 +226,8 @@ public class DeviClimbBase extends OpMode {
 
                 if (segment.isDelay) {
 
+                    runWithoutEncoders();
+
                     FourWheelDrivePowerLevels powerLevels =
                             new FourWheelDrivePowerLevels(0.0f, 0.0f);
                     SetDriveMotorPowerLevels(powerLevels);
@@ -232,6 +235,7 @@ public class DeviClimbBase extends OpMode {
                 } else {
 
                     UseRunToPosition();
+
                     Left  = (int)(segment.LeftSideDistance * countsPerInch);
                     Right = (int)(segment.RightSideDistance * countsPerInch);
                     addEncoderTarget(Left, Right);
@@ -259,7 +263,7 @@ public class DeviClimbBase extends OpMode {
 
     private boolean pathComplete() {
         // Wait for this Segement to end and then see what's next.
-        if (moveComplete()) {
+        if (segmentComplete()) {
             // Start next Segement if there is one.
             if (currentPathSegmentIndex < currentPath.length) {
 
@@ -299,7 +303,7 @@ public class DeviClimbBase extends OpMode {
                 Math.abs(segment.Angle) >= turningGyro.getHeading() - TURNING_ANGLE_MARGIN;
     }
 
-    public boolean moveComplete() {
+    public boolean segmentComplete() {
 
         if (segment.isTurn) {
 
@@ -318,7 +322,7 @@ public class DeviClimbBase extends OpMode {
         }
     }
 
-    public boolean delayComplete() {
+    private boolean delayComplete() {
 
         return elapsedTimeForCurrentSegment.time() >= segment.delayTime;
     }

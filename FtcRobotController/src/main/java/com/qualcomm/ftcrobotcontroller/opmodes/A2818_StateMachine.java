@@ -468,7 +468,7 @@ public class A2818_StateMachine extends OpMode
     }
 
     //--------------------------------------------------------------------------
-    // moveComplete()
+    // segmentComplete()
     // Return true if motors have both reached the desired encoder target
     //--------------------------------------------------------------------------
     boolean moveComplete()

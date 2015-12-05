@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -34,6 +35,7 @@ public class DeviClimbBase extends OpMode {
     final double WHEEL_DIAMETER = 4.5f;
     final double GEAR_RATIO = 24.0f/16.0f;
     double countsPerInch;
+    double mustacheMotorAngle = 0.0d;
     static final int ENCODER_TARGET_MARGIN = 10;
     static final float TURNING_ANGLE_MARGIN = 2.0f;
     static final float CALIBRATION_FACTOR = 1.414f;
@@ -42,6 +44,7 @@ public class DeviClimbBase extends OpMode {
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
+    Servo mustacheMotor;
     GyroSensor turningGyro;
 
     public DrivePathSegment[] mountainPath = {
@@ -69,6 +72,7 @@ public class DeviClimbBase extends OpMode {
 
         frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
+        mustacheMotor = hardwareMap.servo.get("servo3");
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -76,6 +80,8 @@ public class DeviClimbBase extends OpMode {
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
         turningGyro.calibrate();
+
+        mustacheMotor.setPosition(0.0d);
     }
 
     @Override
@@ -108,6 +114,7 @@ public class DeviClimbBase extends OpMode {
 
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
+                    mustacheMotorAngle = 0.5d;
                     SetCurrentState(State.STATE_CLIMB_MOUNTAIN);      // Next State:
                 }
 
@@ -115,7 +122,7 @@ public class DeviClimbBase extends OpMode {
 
             case STATE_CLIMB_MOUNTAIN:
 
-                if (elapsedTimeForCurrentState.time() >= 10.0f) {
+                if (elapsedTimeForCurrentState.time() >= 8.0f) {
 
                     TurnOffAllDriveMotors();
                     SetCurrentState(State.STATE_STOP);
@@ -135,7 +142,7 @@ public class DeviClimbBase extends OpMode {
         }
 
         SetEncoderTargets();
-
+        mustacheMotor.setPosition(mustacheMotorAngle);
         addTelemetry();
     }
 

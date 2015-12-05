@@ -64,5 +64,6 @@ public class FtcOpModeRegister implements OpModeRegister {
         manager.register("BlueWallClimbDelay", BlueWallClimbDelay.class);
         manager.register("RedCornerClimbDelay", RedCornerClimbDelay.class);
         manager.register("BlueCornerClimbDelay", BlueCornerClimbDelay.class);
+        manager.register("DoNothingAutonomous", DoNothingAutonomous.class);
     }
 }

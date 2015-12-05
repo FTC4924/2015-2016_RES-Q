@@ -144,6 +144,13 @@ public class DeviClimbBase extends OpMode {
         SetEncoderTargets();
         mustacheMotor.setPosition(mustacheMotorAngle);
         addTelemetry();
+
+        if (elapsedGameTime.time() >= 30.0f) {
+
+            TurnOffAllDriveMotors();
+            runWithoutEncoders();
+            SetCurrentState(State.STATE_STOP);
+        }
     }
 
     private void addTelemetry() {

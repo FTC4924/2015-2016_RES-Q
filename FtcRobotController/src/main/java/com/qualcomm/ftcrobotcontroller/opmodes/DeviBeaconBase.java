@@ -21,6 +21,7 @@ public class DeviBeaconBase extends OpMode {
         STATE_INITIAL,
         STATE_DRIVE_TO_BEACON,
         STATE_FOLLOW_LINE,
+        STATE_APPROACH_BEACON,
         STATE_DEPLOY_CLIMBERS,
         STATE_STOP
     }
@@ -129,23 +130,37 @@ public class DeviBeaconBase extends OpMode {
 
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
-                    SetCurrentState(State.STATE_FOLLOW_LINE);      // Next State:
+                    SetCurrentState(State.STATE_APPROACH_BEACON);      // Next State:
                 }
 
                 break;
+
+            case STATE_APPROACH_BEACON:
+
+                if (elapsedTimeForCurrentState.time() >= 3.0f) {
+
+                    TurnOffAllDriveMotors();
+                    SetCurrentState(State.STATE_FOLLOW_LINE);
+
+                } else {
+
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(0.9f, 0.9f);
+                    SetDriveMotorPowerLevels(powerLevels);
+                }
 
             case STATE_FOLLOW_LINE:
 
                 if (lineFinder.getLightDetected() > 0.2f) {
 
                     FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.5f, 0.2f);
+                            new FourWheelDrivePowerLevels(0.7f, 0.2f);
                     SetDriveMotorPowerLevels(powerLevels);
 
                 } else {
 
                     FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.2f, 0.5f);
+                            new FourWheelDrivePowerLevels(0.2f, 0.7f);
                     SetDriveMotorPowerLevels(powerLevels);
                 }
 

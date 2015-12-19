@@ -137,9 +137,10 @@ public class DeviBeaconBase extends OpMode {
 
             case STATE_APPROACH_BEACON:
 
-                if (elapsedTimeForCurrentState.time() >= 3.0f) {
+                if (elapsedTimeForCurrentState.time() >= 5.0f) {
 
                     TurnOffAllDriveMotors();
+                    runWithoutEncoders();
                     SetCurrentState(State.STATE_FOLLOW_LINE);
 
                 } else {
@@ -167,6 +168,7 @@ public class DeviBeaconBase extends OpMode {
                 if (bumper.isPressed()) {
 
                     TurnOffAllDriveMotors();
+                    runWithoutEncoders();
                     SetCurrentState(State.STATE_DEPLOY_CLIMBERS);
                 }
 
@@ -209,13 +211,9 @@ public class DeviBeaconBase extends OpMode {
     }
 
     private void addTelemetry() {
+
         telemetry.addData("State Time: ", String.format("%4.1f ", elapsedTimeForCurrentState.time()) + currentState.toString());
         telemetry.addData("Elapsed Time: ", String.format("%4.1f ", elapsedGameTime.time()));
-    }
-
-    private boolean encodersAtZero() {
-
-        return ((Math.abs(getLeftPosition()) < 5) && (Math.abs(getRightPosition()) < 5));
     }
 
     private int getRightPosition() {

@@ -39,6 +39,7 @@ public class DeviClimbBase extends OpMode {
     static final int ENCODER_TARGET_MARGIN = 10;
     static final float TURNING_ANGLE_MARGIN = 2.0f;
     static final float CALIBRATION_FACTOR = 1.414f;
+    static float climbingTime = 8.0f;
     int turnStartValueLeft;
     int turnStartValueRight;
 
@@ -134,7 +135,7 @@ public class DeviClimbBase extends OpMode {
 
             case STATE_CLIMB_MOUNTAIN:
 
-                if (elapsedTimeForCurrentState.time() >= 8.0f) {
+                if (elapsedTimeForCurrentState.time() >= climbingTime) {
 
                     TurnOffAllDriveMotors();
                     SetCurrentState(State.STATE_STOP);

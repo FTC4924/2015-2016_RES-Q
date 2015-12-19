@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -34,6 +35,7 @@ public class DeviClimbBase extends OpMode {
     final double WHEEL_DIAMETER = 4.5f;
     final double GEAR_RATIO = 24.0f/16.0f;
     double countsPerInch;
+    double mustacheMotorAngle = 0.0d;
     static final int ENCODER_TARGET_MARGIN = 10;
     static final float TURNING_ANGLE_MARGIN = 2.0f;
     static final float CALIBRATION_FACTOR = 1.414f;
@@ -42,6 +44,10 @@ public class DeviClimbBase extends OpMode {
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
+    Servo leftsideservo; //leftsideservo is a 180
+    Servo rightsideservo; //rightsideservo is a
+    Servo mustacheMotor; //mustachmotor is a 180
+    Servo frontrightservo; //frontrightservo is a 180
     GyroSensor turningGyro;
 
     public DrivePathSegment[] mountainPath = {
@@ -69,6 +75,10 @@ public class DeviClimbBase extends OpMode {
 
         frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
+        leftsideservo = hardwareMap.servo.get("servo1");
+        rightsideservo = hardwareMap.servo.get("servo2");
+        mustacheMotor = hardwareMap.servo.get("servo3");
+        frontrightservo = hardwareMap.servo.get("servo4");
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -76,17 +86,26 @@ public class DeviClimbBase extends OpMode {
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
         turningGyro.calibrate();
+
+        mustacheMotor.setPosition(0.0d);
+        rightsideservo.setPosition(1.0d);
+        frontrightservo.setPosition(1.0d);
+        leftsideservo.setPosition(0.0d);
     }
 
     @Override
     public void start() {
-
+        
         elapsedGameTime.reset();
         SetCurrentState(State.STATE_INITIAL);
     }
 
     @Override
     public void loop() {
+
+        rightsideservo.setPosition(1.0d);
+        frontrightservo.setPosition(1.0d);
+        leftsideservo.setPosition(0.0d);
 
         switch (currentState) {
 
@@ -115,7 +134,7 @@ public class DeviClimbBase extends OpMode {
 
             case STATE_CLIMB_MOUNTAIN:
 
-                if (elapsedTimeForCurrentState.time() >= 10.0f) {
+                if (elapsedTimeForCurrentState.time() >= 8.0f) {
 
                     TurnOffAllDriveMotors();
                     SetCurrentState(State.STATE_STOP);
@@ -135,8 +154,20 @@ public class DeviClimbBase extends OpMode {
         }
 
         SetEncoderTargets();
-
+        mustacheMotor.setPosition(mustacheMotorAngle);
         addTelemetry();
+
+        if (elapsedGameTime.time() >= 30.0f) {
+
+            TurnOffAllDriveMotors();
+            runWithoutEncoders();
+            SetCurrentState(State.STATE_STOP);
+        }
+
+        if (elapsedGameTime.time() >= 2.0f) {
+
+            mustacheMotorAngle = 0.5f;
+        }
     }
 
     private void addTelemetry() {

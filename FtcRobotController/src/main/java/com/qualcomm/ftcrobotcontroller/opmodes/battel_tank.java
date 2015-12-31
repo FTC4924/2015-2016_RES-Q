@@ -23,7 +23,7 @@ public class battel_tank extends OpMode {
     Servo rightsideservo; //rightsideservo is a
     Servo mustachmotor; //mustachmotor is a 180
     Servo frontrightservo; //frontrightservo is a 180
-    //Servo servo5;     //servo5 is a 180
+    Servo servo5; //servo5 is a continuis
     ElapsedTime time;
     ElapsedTime servo_time;
     battel_tank_servo_angles servo_angles;
@@ -45,7 +45,7 @@ public class battel_tank extends OpMode {
         rightsideservo = hardwareMap.servo.get("servo2");
         mustachmotor = hardwareMap.servo.get("servo3");
         frontrightservo = hardwareMap.servo.get("servo4");
-        //servo5 = hardwareMap.servo.get("servo5");
+        servo5 = hardwareMap.servo.get("servo5");
         servo_angles = new battel_tank_servo_angles();
         frontleftmotor.setDirection(DcMotor.Direction.REVERSE);
         //backleftmotor.setDirection(DcMotor.Direction.REVERSE);
@@ -57,13 +57,26 @@ public class battel_tank extends OpMode {
         servo_angles.rightsideservo = 1.00f;
         servo_angles.mustachmotor = 0.00f;
         servo_angles.frotrightservo = 1.00f;
+        servo_angles.servo5 = 0.5f;
     }
 
     @Override
     public void loop(){
-        if (gamepad1.right_bumper && (time.time() > DELAY)) {
+        if (gamepad1.right_bumper && (time.time() > DELAY)){
             reversed = !reversed;
             time.reset();
+        }
+
+        if (gamepad1.dpad_left){
+            servo_angles.servo5 = 0.3f;
+        }else{
+            servo_angles.servo5 = 0.5f;
+        }
+
+        if (gamepad1.dpad_right){
+            servo_angles.servo5 = 0.7f;
+        }else{
+            servo_angles.servo5 = 0.5f;
         }
 
         if (gamepad1.x && (servo_time.time() > DELAY)){
@@ -130,13 +143,13 @@ public class battel_tank extends OpMode {
         servo_angles.rightsideservo = Range.clip(servo_angles.rightsideservo, 0.0f, 1.0f);
         servo_angles.mustachmotor = Range.clip(servo_angles.mustachmotor, 0.0f, 1.0f);
         servo_angles.frotrightservo = Range.clip(servo_angles.frotrightservo, 0.0f, 1.0f);
-        //servo_angles.servo5 = Range.clip(servo_angles.servo5, 0.0f, 1.0f);
+        servo_angles.servo5 = Range.clip(servo_angles.servo5, 0.0f, 1.0f);
 
         leftsideservo.setPosition(servo_angles.leftsideservo);
         rightsideservo.setPosition(servo_angles.rightsideservo);
         mustachmotor.setPosition(servo_angles.mustachmotor);
         frontrightservo.setPosition(servo_angles.frotrightservo);
-        //servo5.setPosition(servo_angles.servo5);
+        servo5.setPosition(servo_angles.servo5);
 
         float frontright = -gamepad1.right_stick_y;
         float frontleft = -gamepad1.left_stick_y;
@@ -204,7 +217,7 @@ public class battel_tank extends OpMode {
         telemetry.addData("servo2", servo_angles.rightsideservo);
         telemetry.addData("servo3", servo_angles.mustachmotor);
         telemetry.addData("servo4", servo_angles.frotrightservo);
-        //telemetry.addData("servo5", servo_angles.servo5);
+        telemetry.addData("servo5", servo_angles.servo5);
         telemetry.addData("time", time.time());
         telemetry.addData("servo_time", servo_time.time());
         if(reversed){

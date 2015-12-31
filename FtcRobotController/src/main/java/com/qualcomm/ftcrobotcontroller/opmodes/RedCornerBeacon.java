@@ -11,7 +11,7 @@ public class RedCornerBeacon extends DeviBeaconBase {
 
         beaconPath = new DrivePathSegment[] {
 
-                new DrivePathSegment(100.0f, 100.0f, 1.0f),
+                new DrivePathSegment(100.0f, 100.0f, 0.9f),
                 new DrivePathSegment(315.0f, 0.7f),
         };
     }

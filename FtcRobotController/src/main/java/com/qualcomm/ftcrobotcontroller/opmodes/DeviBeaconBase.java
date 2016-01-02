@@ -21,7 +21,6 @@ public class DeviBeaconBase extends OpMode {
         STATE_INITIAL,
         STATE_DRIVE_TO_BEACON,
         STATE_FOLLOW_LINE,
-        STATE_APPROACH_BEACON,
         STATE_DEPLOY_CLIMBERS,
         STATE_STOP
     }
@@ -55,7 +54,7 @@ public class DeviBeaconBase extends OpMode {
 
     public DrivePathSegment[] beaconPath = {
 
-            new DrivePathSegment(96.0f, 96.0f, 0.9f),
+            new DrivePathSegment(105.0f, 105.0f, 0.9f),
             new DrivePathSegment(315.0f, 0.7f),
             new DrivePathSegment(8.0f, 8.0f, 0.9f)
     };
@@ -133,25 +132,10 @@ public class DeviBeaconBase extends OpMode {
 
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
-                    SetCurrentState(State.STATE_APPROACH_BEACON);      // Next State:
+                    SetCurrentState(State.STATE_FOLLOW_LINE);      // Next State:
                 }
 
                 break;
-
-            case STATE_APPROACH_BEACON:
-
-                if (elapsedTimeForCurrentState.time() >= 5.0f) {
-
-                    TurnOffAllDriveMotors();
-                    runWithoutEncoders();
-                    SetCurrentState(State.STATE_FOLLOW_LINE);
-
-                } else {
-
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.9f, 0.9f);
-                    SetDriveMotorPowerLevels(powerLevels);
-                }
 
             case STATE_FOLLOW_LINE:
 

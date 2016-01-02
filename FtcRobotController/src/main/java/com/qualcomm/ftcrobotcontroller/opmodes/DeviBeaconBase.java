@@ -48,6 +48,7 @@ public class DeviBeaconBase extends OpMode {
     Servo rightsideservo; //rightsideservo is a
     Servo mustacheMotor; //mustachmotor is a 180
     Servo climberDeployer; //frontrightservo is a 180
+    Servo ziplinerTripper;
     GyroSensor turningGyro;
     OpticalDistanceSensor lineFinder;
     TouchSensor bumper;
@@ -80,11 +81,12 @@ public class DeviBeaconBase extends OpMode {
         rightsideservo = hardwareMap.servo.get("servo2");
         mustacheMotor = hardwareMap.servo.get("servo3");
         climberDeployer = hardwareMap.servo.get("servo4");
+        ziplinerTripper = hardwareMap.servo.get("servo5");
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         lineFinder = hardwareMap.opticalDistanceSensor.get("lineFinder");
         bumper = hardwareMap.touchSensor.get("bumper");
 
-        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
@@ -94,6 +96,7 @@ public class DeviBeaconBase extends OpMode {
         rightsideservo.setPosition(1.0d);
         climberDeployer.setPosition(1.0d);
         leftsideservo.setPosition(0.0d);
+        ziplinerTripper.setPosition(0.5d);
     }
 
     @Override

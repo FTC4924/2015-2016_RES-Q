@@ -248,7 +248,7 @@ public class DeviClimbBase extends OpMode {
 
                 runWithoutEncoders();
 
-                if (segment.Angle > 0) {
+                if (segment.Angle < 0) {
 
                     FourWheelDrivePowerLevels powerLevels =
                             new FourWheelDrivePowerLevels(segment.Power, 0.0f);

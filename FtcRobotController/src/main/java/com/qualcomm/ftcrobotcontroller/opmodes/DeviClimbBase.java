@@ -49,6 +49,7 @@ public class DeviClimbBase extends OpMode {
     Servo rightsideservo; //rightsideservo is a
     Servo mustacheMotor; //mustachmotor is a 180
     Servo frontrightservo; //frontrightservo is a 180
+    Servo ziplinerTripper;
     GyroSensor turningGyro;
 
     public DrivePathSegment[] mountainPath = {
@@ -80,6 +81,7 @@ public class DeviClimbBase extends OpMode {
         rightsideservo = hardwareMap.servo.get("servo2");
         mustacheMotor = hardwareMap.servo.get("servo3");
         frontrightservo = hardwareMap.servo.get("servo4");
+        ziplinerTripper = hardwareMap.servo.get("servo5");
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
 
         frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -92,6 +94,7 @@ public class DeviClimbBase extends OpMode {
         rightsideservo.setPosition(1.0d);
         frontrightservo.setPosition(1.0d);
         leftsideservo.setPosition(0.0d);
+        ziplinerTripper.setPosition(0.5d);
     }
 
     @Override
@@ -245,7 +248,7 @@ public class DeviClimbBase extends OpMode {
 
                 runWithoutEncoders();
 
-                if (segment.Angle > 0) {
+                if (segment.Angle < 0) {
 
                     FourWheelDrivePowerLevels powerLevels =
                             new FourWheelDrivePowerLevels(segment.Power, 0.0f);

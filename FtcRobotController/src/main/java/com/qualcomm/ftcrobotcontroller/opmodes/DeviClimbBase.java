@@ -45,6 +45,7 @@ public class DeviClimbBase extends OpMode {
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
+    DcMotor collectmotor;
     Servo leftsideservo; //leftsideservo is a 180
     Servo rightsideservo; //rightsideservo is a
     Servo mustacheMotor; //mustachmotor is a 180
@@ -83,6 +84,7 @@ public class DeviClimbBase extends OpMode {
         frontrightservo = hardwareMap.servo.get("servo4");
         ziplinerTripper = hardwareMap.servo.get("servo5");
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
+        collectmotor = hardwareMap.dcMotor.get("collection");
 
         frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
@@ -99,7 +101,8 @@ public class DeviClimbBase extends OpMode {
 
     @Override
     public void start() {
-        
+
+        collectmotor.setPower(1.0f);
         elapsedGameTime.reset();
         SetCurrentState(State.STATE_INITIAL);
     }
@@ -115,7 +118,7 @@ public class DeviClimbBase extends OpMode {
 
             case STATE_INITIAL:
 
-                if (encodersAtZero() && !turningGyro.isCalibrating()) {
+                if (!turningGyro.isCalibrating()) {
 
                     startPath(mountainPath);
                     SetCurrentState(State.STATE_DRIVE_TO_MOUNTAIN);
@@ -153,6 +156,7 @@ public class DeviClimbBase extends OpMode {
             case STATE_STOP:
 
                 TurnOffAllDriveMotors();
+                collectmotor.setPower(0.0f);
 
                 break;
         }

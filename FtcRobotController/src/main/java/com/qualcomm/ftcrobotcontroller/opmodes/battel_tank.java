@@ -27,7 +27,7 @@ public class battel_tank extends OpMode {
     ElapsedTime servo_time;
     battel_tank_servo_angles servo_angles;
     static final float DELAY = 1.0f;
-    boolean reversed;
+    boolean reversed = true;
         public battel_tank(){
 
         }
@@ -45,7 +45,7 @@ public class battel_tank extends OpMode {
         frontrightservo = hardwareMap.servo.get("servo4");
         servo5 = hardwareMap.servo.get("servo5");
         servo_angles = new battel_tank_servo_angles();
-        frontleftmotor.setDirection(DcMotor.Direction.REVERSE);
+        //frontrightmotor.setDirection(DcMotor.Direction.REVERSE);
 
         time = new ElapsedTime();
         time.reset();

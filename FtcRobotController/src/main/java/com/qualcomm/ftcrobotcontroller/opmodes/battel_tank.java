@@ -45,7 +45,7 @@ public class battel_tank extends OpMode {
         frontrightservo = hardwareMap.servo.get("servo4");
         servo5 = hardwareMap.servo.get("servo5");
         servo_angles = new battel_tank_servo_angles();
-        //frontrightmotor.setDirection(DcMotor.Direction.REVERSE);
+        //frontleftmotor.setDirection(DcMotor.Direction.REVERSE);
 
         time = new ElapsedTime();
         time.reset();

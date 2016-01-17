@@ -152,7 +152,7 @@ public class DeviBeaconBase extends OpMode {
                     SetDriveMotorPowerLevels(powerLevels);
                 }
 
-                if (bumper.isPressed()) {
+                if (bumper.isPressed() || elapsedTimeForCurrentState.time() >= 5.0f) {
 
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();

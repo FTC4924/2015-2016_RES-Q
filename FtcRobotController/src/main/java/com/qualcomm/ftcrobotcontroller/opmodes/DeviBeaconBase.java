@@ -7,22 +7,21 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
- * Created by 4924_Users on 10/23/2015.
+ * Created by 4924_Users on 12/19/2015.
  */
-
-//Thanks to team #2818 for the base template of this autonomous program.
-//We created the turning and delay DrivePathSegment variants.
-
-public class DeviClimbBase extends OpMode {
+public class DeviBeaconBase extends OpMode {
 
     public enum State {
         STATE_INITIAL,
-        STATE_DRIVE_TO_MOUNTAIN,
-        STATE_CLIMB_MOUNTAIN,
+        STATE_DRIVE_TO_BEACON,
+        STATE_FOLLOW_LINE,
+        STATE_DEPLOY_CLIMBERS,
         STATE_STOP
     }
 
@@ -39,31 +38,30 @@ public class DeviClimbBase extends OpMode {
     static final int ENCODER_TARGET_MARGIN = 10;
     static final float TURNING_ANGLE_MARGIN = 2.0f;
     static final float CALIBRATION_FACTOR = 1.414f;
-    static float climbingTime = 8.0f;
     int turnStartValueLeft;
     int turnStartValueRight;
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
-    DcMotor collectmotor;
     Servo leftsideservo; //leftsideservo is a 180
     Servo rightsideservo; //rightsideservo is a
     Servo mustacheMotor; //mustachmotor is a 180
-    Servo frontrightservo; //frontrightservo is a 180
+    Servo climberDeployer; //frontrightservo is a 180
     Servo ziplinerTripper;
     GyroSensor turningGyro;
+    OpticalDistanceSensor lineFinder;
+    TouchSensor bumper;
 
-    public DrivePathSegment[] mountainPath = {
+    public DrivePathSegment[] beaconPath = {
 
-            new DrivePathSegment(20.0f, 20.0f, 0.9f),
+            new DrivePathSegment(105.0f, 105.0f, 0.9f),
             new DrivePathSegment(315.0f, 0.7f),
-            new DrivePathSegment(35.0f, 35.0f, 0.9f),
-            new DrivePathSegment(-50.0f, 0.7f)
+            new DrivePathSegment(8.0f, 8.0f, 0.9f)
     };
 
     private State currentState;
     private int currentPathSegmentIndex = 0;
-    private DrivePathSegment[] currentPath = mountainPath;
+    private DrivePathSegment[] currentPath = beaconPath;
     DrivePathSegment segment = currentPath[currentPathSegmentIndex];
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
@@ -81,10 +79,11 @@ public class DeviClimbBase extends OpMode {
         leftsideservo = hardwareMap.servo.get("servo1");
         rightsideservo = hardwareMap.servo.get("servo2");
         mustacheMotor = hardwareMap.servo.get("servo3");
-        frontrightservo = hardwareMap.servo.get("servo4");
+        climberDeployer = hardwareMap.servo.get("servo4");
         ziplinerTripper = hardwareMap.servo.get("servo5");
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
-        collectmotor = hardwareMap.dcMotor.get("collection");
+        lineFinder = hardwareMap.opticalDistanceSensor.get("lineFinder");
+        bumper = hardwareMap.touchSensor.get("bumper");
 
         frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
@@ -94,7 +93,7 @@ public class DeviClimbBase extends OpMode {
 
         mustacheMotor.setPosition(0.0d);
         rightsideservo.setPosition(1.0d);
-        frontrightservo.setPosition(1.0d);
+        climberDeployer.setPosition(1.0d);
         leftsideservo.setPosition(0.0d);
         ziplinerTripper.setPosition(0.5d);
     }
@@ -102,7 +101,6 @@ public class DeviClimbBase extends OpMode {
     @Override
     public void start() {
 
-        collectmotor.setPower(1.0f);
         elapsedGameTime.reset();
         SetCurrentState(State.STATE_INITIAL);
     }
@@ -111,7 +109,7 @@ public class DeviClimbBase extends OpMode {
     public void loop() {
 
         rightsideservo.setPosition(1.0d);
-        frontrightservo.setPosition(1.0d);
+        climberDeployer.setPosition(1.0d);
         leftsideservo.setPosition(0.0d);
 
         switch (currentState) {
@@ -120,43 +118,64 @@ public class DeviClimbBase extends OpMode {
 
                 if (!turningGyro.isCalibrating()) {
 
-                    startPath(mountainPath);
-                    SetCurrentState(State.STATE_DRIVE_TO_MOUNTAIN);
+                    startPath(beaconPath);
+                    SetCurrentState(State.STATE_DRIVE_TO_BEACON);
                     telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
                             getRightPosition()));
                 }
 
                 break;
 
-            case STATE_DRIVE_TO_MOUNTAIN: // Follow mountainPath until last segment is completed
+            case STATE_DRIVE_TO_BEACON: // Follow mountainPath until last segment is completed
 
                 if (pathComplete()) {
 
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
-                    SetCurrentState(State.STATE_CLIMB_MOUNTAIN);      // Next State:
+                    SetCurrentState(State.STATE_FOLLOW_LINE);      // Next State:
                 }
 
                 break;
 
-            case STATE_CLIMB_MOUNTAIN:
+            case STATE_FOLLOW_LINE:
 
-                if (elapsedTimeForCurrentState.time() >= climbingTime) {
+                if (lineFinder.getLightDetected() > 0.2f) {
+
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(0.7f, 0.2f);
+                    SetDriveMotorPowerLevels(powerLevels);
+
+                } else {
+
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(0.2f, 0.7f);
+                    SetDriveMotorPowerLevels(powerLevels);
+                }
+
+                if (bumper.isPressed()) {
 
                     TurnOffAllDriveMotors();
+                    runWithoutEncoders();
+                    SetCurrentState(State.STATE_DEPLOY_CLIMBERS);
+                }
+
+                break;
+
+            case STATE_DEPLOY_CLIMBERS:
+
+                if (elapsedTimeForCurrentState.time() >= 2.0f) {
+
+                    climberDeployer.setPosition(1.0f);
                     SetCurrentState(State.STATE_STOP);
 
                 } else {
 
-                    setClimbingPowerLevels();
+                    climberDeployer.setPosition(0.0f);
                 }
-
-                break;
 
             case STATE_STOP:
 
                 TurnOffAllDriveMotors();
-                collectmotor.setPower(0.0f);
 
                 break;
         }
@@ -179,16 +198,9 @@ public class DeviClimbBase extends OpMode {
     }
 
     private void addTelemetry() {
+
         telemetry.addData("State Time: ", String.format("%4.1f ", elapsedTimeForCurrentState.time()) + currentState.toString());
         telemetry.addData("Elapsed Time: ", String.format("%4.1f ", elapsedGameTime.time()));
-        /*telemetry.addData("Left: ", currentEncoderTargets.LeftTarget);
-        telemetry.addData("Right: ", currentEncoderTargets.RightTarget);
-        telemetry.addData("Heading: ", turningGyro.getHeading());*/
-    }
-
-    private boolean encodersAtZero() {
-
-        return ((Math.abs(getLeftPosition()) < 5) && (Math.abs(getRightPosition()) < 5));
     }
 
     private int getRightPosition() {
@@ -252,7 +264,7 @@ public class DeviClimbBase extends OpMode {
 
                 runWithoutEncoders();
 
-                if (segment.Angle < 0) {
+                if (segment.Angle > 0) {
 
                     FourWheelDrivePowerLevels powerLevels =
                             new FourWheelDrivePowerLevels(segment.Power, 0.0f);
@@ -328,7 +340,7 @@ public class DeviClimbBase extends OpMode {
     private boolean linearMoveComplete() {
 
         return ((Math.abs(getLeftPosition() - currentEncoderTargets.LeftTarget) < ENCODER_TARGET_MARGIN) &&
-               (Math.abs(getRightPosition() - currentEncoderTargets.RightTarget) < ENCODER_TARGET_MARGIN));
+                (Math.abs(getRightPosition() - currentEncoderTargets.RightTarget) < ENCODER_TARGET_MARGIN));
     }
 
     private void TurnOffAllDriveMotors() {
@@ -368,11 +380,5 @@ public class DeviClimbBase extends OpMode {
     private boolean delayComplete() {
 
         return elapsedTimeForCurrentSegment.time() >= segment.delayTime;
-    }
-
-    public void setClimbingPowerLevels() {
-
-        frontLeftMotor.setPower(-0.6d);
-        frontRightMotor.setPower(-0.6d);
     }
 }

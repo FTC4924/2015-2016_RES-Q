@@ -157,6 +157,8 @@ public class DeviClimbBase extends OpMode {
 
                 TurnOffAllDriveMotors();
                 collectmotor.setPower(0.0f);
+                frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
+                frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
 
                 break;
         }

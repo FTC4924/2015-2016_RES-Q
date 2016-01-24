@@ -27,7 +27,7 @@ public class battel_tank extends OpMode {
     ElapsedTime servo_time;
     battel_tank_servo_angles servo_angles;
     static final float DELAY = 1.0f;
-    boolean reversed = true;
+    boolean reversed;
         public battel_tank(){
 
         }

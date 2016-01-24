@@ -86,7 +86,7 @@ public class DeviClimbBase extends OpMode {
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         collectmotor = hardwareMap.dcMotor.get("collection");
 
-        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 

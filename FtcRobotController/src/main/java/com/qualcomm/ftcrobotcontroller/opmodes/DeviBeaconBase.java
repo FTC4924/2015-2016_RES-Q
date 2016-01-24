@@ -49,7 +49,6 @@ public class DeviBeaconBase extends OpMode {
     Servo climberDeployer; //frontrightservo is a 180
     Servo ziplinerTripper;
     GyroSensor turningGyro;
-    OpticalDistanceSensor lineFinder;
     TouchSensor bumper;
 
     public DrivePathSegment[] beaconPath = {
@@ -82,7 +81,6 @@ public class DeviBeaconBase extends OpMode {
         climberDeployer = hardwareMap.servo.get("servo4");
         ziplinerTripper = hardwareMap.servo.get("servo5");
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
-        lineFinder = hardwareMap.opticalDistanceSensor.get("lineFinder");
         bumper = hardwareMap.touchSensor.get("bumper");
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);

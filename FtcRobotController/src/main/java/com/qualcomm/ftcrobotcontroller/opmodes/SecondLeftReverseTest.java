@@ -4,9 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
- * Created by Bob on 1/23/2016.
+ * Created by 4924_Users on 1/24/2016.
  */
-public class LeftReverseTest extends OpMode {
+public class SecondLeftReverseTest extends OpMode {
 
     DcMotor leftMotor;
     DcMotor rightMotor;
@@ -24,11 +24,5 @@ public class LeftReverseTest extends OpMode {
 
         leftMotor.setPower(0.5d);
         rightMotor.setPower(0.5d);
-    }
-
-    @Override
-    public void stop() {
-
-        //leftMotor.setDirection(DcMotor.Direction.FORWARD);
     }
 }

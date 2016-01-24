@@ -20,7 +20,6 @@ public class DeviBeaconBase extends OpMode {
     public enum State {
         STATE_INITIAL,
         STATE_DRIVE_TO_BEACON,
-        STATE_FOLLOW_LINE,
         STATE_APPROACH_BEACON,
         STATE_DEPLOY_CLIMBERS,
         STATE_STOP
@@ -55,7 +54,7 @@ public class DeviBeaconBase extends OpMode {
 
     public DrivePathSegment[] beaconPath = {
 
-            new DrivePathSegment(96.0f, 96.0f, 0.9f),
+            new DrivePathSegment(105.0f, 105.0f, 0.9f),
             new DrivePathSegment(315.0f, 0.7f),
             new DrivePathSegment(8.0f, 8.0f, 0.9f)
     };
@@ -86,7 +85,7 @@ public class DeviBeaconBase extends OpMode {
         lineFinder = hardwareMap.opticalDistanceSensor.get("lineFinder");
         bumper = hardwareMap.touchSensor.get("bumper");
 
-        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
@@ -140,39 +139,17 @@ public class DeviBeaconBase extends OpMode {
 
             case STATE_APPROACH_BEACON:
 
-                if (elapsedTimeForCurrentState.time() >= 5.0f) {
-
-                    TurnOffAllDriveMotors();
-                    runWithoutEncoders();
-                    SetCurrentState(State.STATE_FOLLOW_LINE);
-
-                } else {
-
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.9f, 0.9f);
-                    SetDriveMotorPowerLevels(powerLevels);
-                }
-
-            case STATE_FOLLOW_LINE:
-
-                if (lineFinder.getLightDetected() > 0.2f) {
-
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.7f, 0.2f);
-                    SetDriveMotorPowerLevels(powerLevels);
-
-                } else {
-
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.2f, 0.7f);
-                    SetDriveMotorPowerLevels(powerLevels);
-                }
-
                 if (bumper.isPressed()) {
 
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
                     SetCurrentState(State.STATE_DEPLOY_CLIMBERS);
+
+                } else {
+
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(0.5f, 0.5f);
+                    SetDriveMotorPowerLevels(powerLevels);
                 }
 
                 break;
@@ -192,6 +169,8 @@ public class DeviBeaconBase extends OpMode {
             case STATE_STOP:
 
                 TurnOffAllDriveMotors();
+                frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
+                frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
 
                 break;
         }

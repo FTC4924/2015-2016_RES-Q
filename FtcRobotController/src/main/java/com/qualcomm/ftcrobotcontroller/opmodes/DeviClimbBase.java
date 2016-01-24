@@ -45,10 +45,12 @@ public class DeviClimbBase extends OpMode {
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
+    DcMotor collectmotor;
     Servo leftsideservo; //leftsideservo is a 180
     Servo rightsideservo; //rightsideservo is a
     Servo mustacheMotor; //mustachmotor is a 180
     Servo frontrightservo; //frontrightservo is a 180
+    Servo ziplinerTripper;
     GyroSensor turningGyro;
 
     public DrivePathSegment[] mountainPath = {
@@ -80,9 +82,11 @@ public class DeviClimbBase extends OpMode {
         rightsideservo = hardwareMap.servo.get("servo2");
         mustacheMotor = hardwareMap.servo.get("servo3");
         frontrightservo = hardwareMap.servo.get("servo4");
+        ziplinerTripper = hardwareMap.servo.get("servo5");
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
+        collectmotor = hardwareMap.dcMotor.get("collection");
 
-        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
@@ -92,11 +96,13 @@ public class DeviClimbBase extends OpMode {
         rightsideservo.setPosition(1.0d);
         frontrightservo.setPosition(1.0d);
         leftsideservo.setPosition(0.0d);
+        ziplinerTripper.setPosition(0.5d);
     }
 
     @Override
     public void start() {
-        
+
+        collectmotor.setPower(1.0f);
         elapsedGameTime.reset();
         SetCurrentState(State.STATE_INITIAL);
     }
@@ -112,7 +118,7 @@ public class DeviClimbBase extends OpMode {
 
             case STATE_INITIAL:
 
-                if (encodersAtZero() && !turningGyro.isCalibrating()) {
+                if (!turningGyro.isCalibrating()) {
 
                     startPath(mountainPath);
                     SetCurrentState(State.STATE_DRIVE_TO_MOUNTAIN);
@@ -150,6 +156,9 @@ public class DeviClimbBase extends OpMode {
             case STATE_STOP:
 
                 TurnOffAllDriveMotors();
+                collectmotor.setPower(0.0f);
+                frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
+                frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
 
                 break;
         }
@@ -245,7 +254,7 @@ public class DeviClimbBase extends OpMode {
 
                 runWithoutEncoders();
 
-                if (segment.Angle > 0) {
+                if (segment.Angle < 0) {
 
                     FourWheelDrivePowerLevels powerLevels =
                             new FourWheelDrivePowerLevels(segment.Power, 0.0f);
@@ -365,7 +374,7 @@ public class DeviClimbBase extends OpMode {
 
     public void setClimbingPowerLevels() {
 
-        frontLeftMotor.setPower(-0.6d);
-        frontRightMotor.setPower(-0.6d);
+        frontLeftMotor.setPower(0.6d);
+        frontRightMotor.setPower(0.6d);
     }
 }

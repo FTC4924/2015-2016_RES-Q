@@ -15,7 +15,7 @@ public class RedMountainBaseClimbDelay extends DeviClimbBase {
                 new DrivePathSegment(20.0f, 20.0f, 1.0f),
                 new DrivePathSegment(-315.0f, 0.7f),
                 new DrivePathSegment(35.0f, 35.0f, 1.0f),
-                new DrivePathSegment(50.0f, 0.7f)
+                new DrivePathSegment(270.0f, 0.7f)
         };
 
         climbingTime = 8.0f;

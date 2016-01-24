@@ -374,7 +374,7 @@ public class DeviClimbBase extends OpMode {
 
     public void setClimbingPowerLevels() {
 
-        frontLeftMotor.setPower(-0.6d);
-        frontRightMotor.setPower(-0.6d);
+        frontLeftMotor.setPower(0.6d);
+        frontRightMotor.setPower(0.6d);
     }
 }

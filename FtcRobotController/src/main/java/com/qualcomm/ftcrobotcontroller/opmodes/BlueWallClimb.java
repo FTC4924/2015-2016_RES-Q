@@ -14,7 +14,7 @@ public class BlueWallClimb extends DeviClimbBase {
                 new DrivePathSegment(10.0f, 10.0f, 1.0f),
                 new DrivePathSegment(45.0f, 0.7f),
                 new DrivePathSegment(61.5f, 61.5f, 1.0f), //Because of similar triangles, this distance is 1.5 times larger than the wall version.
-                new DrivePathSegment(-315.0f, 0.7f)
+                new DrivePathSegment(-45.0f, 0.7f)
         };
 
         climbingTime = 10.0f;

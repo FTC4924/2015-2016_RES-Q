@@ -153,7 +153,7 @@ public class battel_tank extends OpMode {
 
         frontright = Range.clip(frontright, -1.0f, 1.0f);
         frontleft = Range.clip(frontleft, -1.0f, 1.0f);
-        arm = Range.clip(arm, -0.50f, 0.50f);
+        arm = Range.clip(arm, -0.75f, 0.75f);
         winch = Range.clip(winch, -1.00f, 1.00f);
 
         frontright = frontright * accelerator;

@@ -83,7 +83,7 @@ public class DeviBeaconBase extends OpMode {
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
 
-        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
@@ -190,6 +190,13 @@ public class DeviBeaconBase extends OpMode {
         }
     }
 
+    @Override
+    public void stop() {
+
+        frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
+    }
+
     private void addTelemetry() {
 
         telemetry.addData("State Time: ", String.format("%4.1f ", elapsedTimeForCurrentState.time()) + currentState.toString());
@@ -257,7 +264,7 @@ public class DeviBeaconBase extends OpMode {
 
                 runWithoutEncoders();
 
-                if (segment.Angle > 0) {
+                if (segment.Angle < 0) {
 
                     FourWheelDrivePowerLevels powerLevels =
                             new FourWheelDrivePowerLevels(segment.Power, 0.0f);

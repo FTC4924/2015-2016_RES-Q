@@ -17,14 +17,15 @@ public class EncoderTest extends OpMode {
     @Override
     public void init() {
 
-        leftMotor = hardwareMap.dcMotor.get("leftMotor");
-        rightMotor = hardwareMap.dcMotor.get("rightMotor");
+        leftMotor = hardwareMap.dcMotor.get("frontleftMotor");
+        rightMotor = hardwareMap.dcMotor.get("frontrightMotor");
+        leftMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override
     public void loop() {
 
-        if (leftMotor.getCurrentPosition() >= 1000) {
+        if (leftMotor.getCurrentPosition() >= 2000) {
 
             leftMotor.setPower(0.0d);
 
@@ -33,7 +34,7 @@ public class EncoderTest extends OpMode {
             leftMotor.setPower(0.5d);
         }
 
-        if (rightMotor.getCurrentPosition() >= 1000) {
+        if (rightMotor.getCurrentPosition() >= 2000) {
 
             rightMotor.setPower(0.0d);
 

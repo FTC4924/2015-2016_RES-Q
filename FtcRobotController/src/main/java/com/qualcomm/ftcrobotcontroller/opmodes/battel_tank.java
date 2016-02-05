@@ -66,7 +66,7 @@ public class battel_tank extends OpMode {
         }
 
         if (gamepad1.dpad_left){
-            servo_angles.servo5 = 0.70f;
+            servo_angles.servo5 = 1.00f;
         }else{
             if (gamepad1.dpad_right){
                     servo_angles.servo5 = 0.00f;

@@ -201,8 +201,10 @@ public class DeviBeaconBase extends OpMode {
 
     private void addTelemetry() {
 
-        telemetry.addData("State Time: ", String.format("%4.1f ", elapsedTimeForCurrentState.time()) + currentState.toString());
-        telemetry.addData("Elapsed Time: ", String.format("%4.1f ", elapsedGameTime.time()));
+        telemetry.addData("L Target: ", currentEncoderTargets.LeftTarget);
+        telemetry.addData("L Pos: ", getLeftPosition());
+        telemetry.addData("R Target: ", currentEncoderTargets.RightTarget);
+        telemetry.addData("R Pos: ", getRightPosition());
     }
 
     private int getRightPosition() {
@@ -346,8 +348,25 @@ public class DeviBeaconBase extends OpMode {
 
     private boolean linearMoveComplete() {
 
-        return ((Math.abs(getLeftPosition() - currentEncoderTargets.LeftTarget) < ENCODER_TARGET_MARGIN) &&
-                (Math.abs(getRightPosition() - currentEncoderTargets.RightTarget) < ENCODER_TARGET_MARGIN));
+        int leftPosition = getLeftPosition();
+        int leftTarget = currentEncoderTargets.LeftTarget;
+        int rightPosition = getRightPosition();
+        int rightTarget = currentEncoderTargets.RightTarget;
+
+        return (isPositionClose(leftPosition, leftTarget) &&
+                isPositionClose(rightPosition, rightTarget)) ||
+                (isPastTarget(leftPosition, leftTarget) &&
+                isPastTarget(rightPosition, rightTarget));
+    }
+
+    private boolean isPositionClose(int position, int target) {
+
+        return Math.abs(position - target) < ENCODER_TARGET_MARGIN;
+    }
+
+    private boolean isPastTarget(int position, int target) {
+
+        return position > target;
     }
 
     private void TurnOffAllDriveMotors() {

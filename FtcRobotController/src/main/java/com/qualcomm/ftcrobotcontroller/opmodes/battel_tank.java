@@ -55,7 +55,8 @@ public class battel_tank extends OpMode {
         servo_time.reset();
         servo_angles.servo3 = 0.50f;
         servo_angles.climers = 1.00f;
-        servo_angles.servo5 = 0.5f;
+        servo_angles.servo5 = 0.50f;
+        servo_angles.gateservo = 0.50f;
     }
 
     @Override
@@ -117,12 +118,12 @@ public class battel_tank extends OpMode {
 
         if (gamepad2.dpad_left && (servo_time.time() > DELAY)){
             servo_angles.gateservo = 0.00f;
-            servo_time.reset();
-        }
-
-        if (gamepad2.dpad_right && (servo_time.time() > DELAY)){
-            servo_angles.gateservo = 1.00f;
-            servo_time.reset();
+        }else {
+            if (gamepad2.dpad_right && (servo_time.time() > DELAY)){
+                servo_angles.gateservo = 1.00f;
+            }else {
+                servo_angles.gateservo = 0.50f;
+            }
         }
 
         if (gamepad2.dpad_up){
@@ -166,7 +167,7 @@ public class battel_tank extends OpMode {
 
         frontright = Range.clip(frontright, -1.0f, 1.0f);
         frontleft = Range.clip(frontleft, -1.0f, 1.0f);
-        arm = Range.clip(arm, -1.00f, 1.00f);
+        arm = Range.clip(arm, -0.75f, 0.75f);
         winch = Range.clip(winch, -1.00f, 1.00f);
 
         frontright = frontright * accelerator;

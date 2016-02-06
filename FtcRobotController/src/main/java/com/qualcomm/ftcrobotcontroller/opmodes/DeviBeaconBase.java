@@ -48,6 +48,8 @@ public class DeviBeaconBase extends OpMode {
     Servo climberDeployer; //frontrightservo is a 180
     Servo ziplinerTripper;
     Servo deliveryBelt;
+    Servo bumperServo;
+    Servo gateServo;
     GyroSensor turningGyro;
     TouchSensor bumper;
 
@@ -75,12 +77,12 @@ public class DeviBeaconBase extends OpMode {
 
         frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
-        leftsideservo = hardwareMap.servo.get("servo1");
         rightsideservo = hardwareMap.servo.get("servo2");
-        mustacheMotor = hardwareMap.servo.get("servo6");
         climberDeployer = hardwareMap.servo.get("servo4");
         ziplinerTripper = hardwareMap.servo.get("servo5");
         deliveryBelt = hardwareMap.servo.get("servo3");
+        bumperServo = hardwareMap.servo.get("servo1");
+        gateServo = hardwareMap.servo.get("servo6");
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
 

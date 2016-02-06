@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -48,6 +47,7 @@ public class DeviBeaconBase extends OpMode {
     Servo mustacheMotor; //mustachmotor is a 180
     Servo climberDeployer; //frontrightservo is a 180
     Servo ziplinerTripper;
+    Servo deliveryBelt;
     GyroSensor turningGyro;
     TouchSensor bumper;
 
@@ -77,9 +77,10 @@ public class DeviBeaconBase extends OpMode {
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
         leftsideservo = hardwareMap.servo.get("servo1");
         rightsideservo = hardwareMap.servo.get("servo2");
-        mustacheMotor = hardwareMap.servo.get("servo3");
+        mustacheMotor = hardwareMap.servo.get("servo6");
         climberDeployer = hardwareMap.servo.get("servo4");
         ziplinerTripper = hardwareMap.servo.get("servo5");
+        deliveryBelt = hardwareMap.servo.get("servo3");
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
 
@@ -94,6 +95,7 @@ public class DeviBeaconBase extends OpMode {
         climberDeployer.setPosition(1.0d);
         leftsideservo.setPosition(0.0d);
         ziplinerTripper.setPosition(0.5d);
+        deliveryBelt.setPosition(0.5d);
     }
 
     @Override
@@ -199,8 +201,10 @@ public class DeviBeaconBase extends OpMode {
 
     private void addTelemetry() {
 
-        telemetry.addData("State Time: ", String.format("%4.1f ", elapsedTimeForCurrentState.time()) + currentState.toString());
-        telemetry.addData("Elapsed Time: ", String.format("%4.1f ", elapsedGameTime.time()));
+        telemetry.addData("L Target: ", currentEncoderTargets.LeftTarget);
+        telemetry.addData("L Pos: ", getLeftPosition());
+        telemetry.addData("R Target: ", currentEncoderTargets.RightTarget);
+        telemetry.addData("R Pos: ", getRightPosition());
     }
 
     private int getRightPosition() {
@@ -218,7 +222,7 @@ public class DeviBeaconBase extends OpMode {
         currentPath = path;
         currentPathSegmentIndex = 0;
         setEncoderTargetsToCurrentPosition();
-        UseRunToPosition();
+        useRunUsingEncoders();
         startSeg();
     }
 
@@ -231,6 +235,11 @@ public class DeviBeaconBase extends OpMode {
     public void UseRunToPosition() {
 
         setDriveMode(DcMotorController.RunMode.RUN_TO_POSITION);
+    }
+
+    public void useRunUsingEncoders() {
+
+        setDriveMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
     }
 
     public void runWithoutEncoders() {
@@ -289,7 +298,7 @@ public class DeviBeaconBase extends OpMode {
 
                 } else {
 
-                    UseRunToPosition();
+                    useRunUsingEncoders();
 
                     Left  = (int)(segment.LeftSideDistance * countsPerInch);
                     Right = (int)(segment.RightSideDistance * countsPerInch);
@@ -339,8 +348,25 @@ public class DeviBeaconBase extends OpMode {
 
     private boolean linearMoveComplete() {
 
-        return ((Math.abs(getLeftPosition() - currentEncoderTargets.LeftTarget) < ENCODER_TARGET_MARGIN) &&
-                (Math.abs(getRightPosition() - currentEncoderTargets.RightTarget) < ENCODER_TARGET_MARGIN));
+        int leftPosition = getLeftPosition();
+        int leftTarget = currentEncoderTargets.LeftTarget;
+        int rightPosition = getRightPosition();
+        int rightTarget = currentEncoderTargets.RightTarget;
+
+        return (isPositionClose(leftPosition, leftTarget) &&
+                isPositionClose(rightPosition, rightTarget)) ||
+                (isPastTarget(leftPosition, leftTarget) &&
+                isPastTarget(rightPosition, rightTarget));
+    }
+
+    private boolean isPositionClose(int position, int target) {
+
+        return Math.abs(position - target) < ENCODER_TARGET_MARGIN;
+    }
+
+    private boolean isPastTarget(int position, int target) {
+
+        return position > target;
     }
 
     private void TurnOffAllDriveMotors() {

@@ -37,6 +37,8 @@ public class DeviBeaconBase extends OpMode {
     static final int ENCODER_TARGET_MARGIN = 10;
     static final float TURNING_ANGLE_MARGIN = 2.0f;
     static final float CALIBRATION_FACTOR = 1.414f;
+    static final float BUMPER_DEPLOYED_ANGLE = 0.0f;
+    static final float BUMPER_FOLDED_ANGLE = 0.6f;
     int turnStartValueLeft;
     int turnStartValueRight;
 
@@ -44,7 +46,6 @@ public class DeviBeaconBase extends OpMode {
     DcMotor frontRightMotor;
     Servo leftsideservo; //leftsideservo is a 180
     Servo rightsideservo; //rightsideservo is a
-    Servo mustacheMotor; //mustachmotor is a 180
     Servo climberDeployer; //frontrightservo is a 180
     Servo ziplinerTripper;
     Servo deliveryBelt;
@@ -77,12 +78,12 @@ public class DeviBeaconBase extends OpMode {
 
         frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
-        rightsideservo = hardwareMap.servo.get("servo2");
-        climberDeployer = hardwareMap.servo.get("servo4");
-        ziplinerTripper = hardwareMap.servo.get("servo5");
-        deliveryBelt = hardwareMap.servo.get("servo3");
         bumperServo = hardwareMap.servo.get("servo1");
-        gateServo = hardwareMap.servo.get("servo6");
+        rightsideservo = hardwareMap.servo.get("servo2");
+        deliveryBelt = hardwareMap.servo.get("servo3");             //continuous
+        climberDeployer = hardwareMap.servo.get("servo4");
+        ziplinerTripper = hardwareMap.servo.get("servo5");          //continuous
+        gateServo = hardwareMap.servo.get("servo6");                //continuous?
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
 
@@ -92,12 +93,12 @@ public class DeviBeaconBase extends OpMode {
 
         turningGyro.calibrate();
 
-        mustacheMotor.setPosition(0.0d);
         rightsideservo.setPosition(1.0d);
         climberDeployer.setPosition(1.0d);
-        leftsideservo.setPosition(0.0d);
+        gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);
+        bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
     }
 
     @Override
@@ -111,8 +112,9 @@ public class DeviBeaconBase extends OpMode {
     public void loop() {
 
         rightsideservo.setPosition(1.0d);
-        climberDeployer.setPosition(1.0d);
-        leftsideservo.setPosition(0.0d);
+        gateServo.setPosition(0.5d);
+        ziplinerTripper.setPosition(0.5d);
+        deliveryBelt.setPosition(0.5d);
 
         switch (currentState) {
 
@@ -132,6 +134,7 @@ public class DeviBeaconBase extends OpMode {
 
                 if (pathComplete()) {
 
+                    //bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
                     SetCurrentState(State.STATE_APPROACH_BEACON);      // Next State:
@@ -178,7 +181,6 @@ public class DeviBeaconBase extends OpMode {
         }
 
         SetEncoderTargets();
-        mustacheMotor.setPosition(mustacheMotorAngle);
         addTelemetry();
 
         if (elapsedGameTime.time() >= 30.0f) {
@@ -207,6 +209,7 @@ public class DeviBeaconBase extends OpMode {
         telemetry.addData("L Pos: ", getLeftPosition());
         telemetry.addData("R Target: ", currentEncoderTargets.RightTarget);
         telemetry.addData("R Pos: ", getRightPosition());
+        telemetry.addData("State: ", currentState);
     }
 
     private int getRightPosition() {

@@ -37,7 +37,7 @@ public class BumperServoTest extends OpMode {
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);
         rightsideservo.setPosition(0.0d);
-        gateServo.setPosition(0.0d);
+        gateServo.setPosition(0.5d);
     }
 
     @Override
@@ -55,13 +55,13 @@ public class BumperServoTest extends OpMode {
             delayTime.reset();
         }
 
-        Range.clip(bumperServoAngle, 0.0f, 1.0f);
+        bumperServoAngle = Range.clip(bumperServoAngle, 0.0f, 1.0f);
         bumperServo.setPosition(bumperServoAngle);
         climberDeployer.setPosition(1.0d);
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);
         rightsideservo.setPosition(0.0d);
-        gateServo.setPosition(0.0d);
+        gateServo.setPosition(0.5d);
         telemetry.addData("Bumper Servo Angle: ", bumperServoAngle);
     }
 }

@@ -77,12 +77,12 @@ public class battel_tank extends OpMode {
         }
 
         if (gamepad1.dpad_up && (servo_time.time() > DELAY)){
-            servo_angles.backrightservo = 1.00f;
+            servo_angles.backmidservo = 1.00f;
             servo_time.reset();
         }
 
         if (gamepad1.dpad_down && (servo_time.time() > DELAY)){
-            servo_angles.backrightservo = 0.00f;
+            servo_angles.backmidservo = 0.00f;
             servo_time.reset();
         }
 
@@ -102,17 +102,17 @@ public class battel_tank extends OpMode {
         }
 
         if (gamepad2.a && (servo_time.time() > DELAY)){
-            servo_angles.backmidservo = 0.00f;
+            servo_angles.backrightservo = 0.00f;
             servo_time.reset();
         }
 
         if (gamepad2.b && (servo_time.time() > DELAY)){
-            servo_angles.backmidservo = 1.00f;
+            servo_angles.backrightservo = 0.50f;
             servo_time.reset();
         }
 
         if (gamepad2.y && (servo_time.time() > DELAY)){
-            servo_angles.backmidservo = 0.80f;
+            servo_angles.backrightservo = 0.95f;
             servo_time.reset();
         }
 
@@ -126,24 +126,15 @@ public class battel_tank extends OpMode {
             }
         }
 
-        if (gamepad2.dpad_up){
-            servo_angles.servo3 = 0.70f;
-        }else {
-            if (gamepad2.dpad_down){
-                    servo_angles.servo3 = 0.00f;
-            }else {
-                servo_angles.servo3 = 0.50f;
-            }
-        }
-
         servo_angles.servo3 = Range.clip(servo_angles.servo3, 0.0f, 1.0f);
         servo_angles.climers = Range.clip(servo_angles.climers, 0.0f, 1.0f);
         servo_angles.servo5 = Range.clip(servo_angles.servo5, 0.0f, 1.0f);
 
+        backmidservo.setPosition(servo_angles.backmidservo);
+        backrightservo.setPosition(servo_angles.backrightservo);
         servo3.setPosition(servo_angles.servo3);
         climers.setPosition(servo_angles.climers);
         servo5.setPosition(servo_angles.servo5);
-        backmidservo.setPosition(servo_angles.backmidservo);
         gateservo.setPosition(servo_angles.gateservo);
 
         float frontright = -gamepad1.right_stick_y;
@@ -167,7 +158,7 @@ public class battel_tank extends OpMode {
 
         frontright = Range.clip(frontright, -1.0f, 1.0f);
         frontleft = Range.clip(frontleft, -1.0f, 1.0f);
-        arm = Range.clip(arm, -0.75f, 0.75f);
+        arm = Range.clip(arm, -0.25f, 0.35f);
         winch = Range.clip(winch, -1.00f, 1.00f);
 
         frontright = frontright * accelerator;

@@ -157,7 +157,6 @@ public class DeviBeaconBase extends OpMode {
                 if (bumper.isPressed()) {
 
                     TurnOffAllDriveMotors();
-                    startPath(backingUpPath);
                     SetCurrentState(State.STATE_DEPLOY_CLIMBERS);
 
                 } else {

@@ -39,8 +39,13 @@ public class DeviBeaconBase extends OpMode {
     static final float CALIBRATION_FACTOR = 1.414f;
     static final float BUMPER_DEPLOYED_ANGLE = 0.0f;
     static final float BUMPER_FOLDED_ANGLE = 0.6f;
+    static final float CLIMBER_ARM_DEPLOYED_ANGLE = 0.0f;
+    static final float CLIMBER_ARM_FOLDED_ANGLE = 1.0f;
     int turnStartValueLeft;
     int turnStartValueRight;
+    float climberArmAngle = 1.0f;
+    final float CLIMBER_ARM_WAIT_TIME = 4.0f;
+    final float CLIMBER_ARM_ANGLE_INCREMENTATION = 0.01f;
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
@@ -59,6 +64,11 @@ public class DeviBeaconBase extends OpMode {
             new DrivePathSegment(105.0f, 105.0f, 0.9f),
             new DrivePathSegment(315.0f, 0.7f),
             new DrivePathSegment(8.0f, 8.0f, 0.9f)
+    };
+
+    public DrivePathSegment[] backingUpPath = {
+
+            new DrivePathSegment(-2.0f, -2.0f, 0.4f),
     };
 
     private State currentState;
@@ -94,7 +104,7 @@ public class DeviBeaconBase extends OpMode {
         turningGyro.calibrate();
 
         rightsideservo.setPosition(1.0d);
-        climberDeployer.setPosition(1.0d);
+        climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);
@@ -147,7 +157,7 @@ public class DeviBeaconBase extends OpMode {
                 if (bumper.isPressed()) {
 
                     TurnOffAllDriveMotors();
-                    runWithoutEncoders();
+                    startPath(backingUpPath);
                     SetCurrentState(State.STATE_DEPLOY_CLIMBERS);
 
                 } else {
@@ -161,15 +171,21 @@ public class DeviBeaconBase extends OpMode {
 
             case STATE_DEPLOY_CLIMBERS:
 
-                if (elapsedTimeForCurrentState.time() >= 2.0f) {
+                if (climberArmAngle <= CLIMBER_ARM_DEPLOYED_ANGLE) {
 
-                    climberDeployer.setPosition(1.0f);
-                    SetCurrentState(State.STATE_STOP);
+                    if (elapsedTimeForCurrentState.time() >= CLIMBER_ARM_WAIT_TIME) {
+
+                        climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
+                        SetCurrentState(State.STATE_STOP);
+                    }
 
                 } else {
 
-                    climberDeployer.setPosition(0.0f);
+                    climberArmAngle -= CLIMBER_ARM_ANGLE_INCREMENTATION;
+                    climberDeployer.setPosition(climberArmAngle);
                 }
+
+                break;
 
             case STATE_STOP:
 

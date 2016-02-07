@@ -1,13 +1,7 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
-import com.qualcomm.ftcrobotcontroller.EncoderTargets;
-import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.GyroSensor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * Created by 4924_Users on 2/7/2016.
@@ -23,12 +17,6 @@ public class DeviClimbBaseTest extends AutonomousBase {
             new DrivePathSegment(35.0f, 35.0f, 0.9f),
             new DrivePathSegment(-50.0f, 0.7f)
     };
-
-    private State currentState;
-    private int currentPathSegmentIndex = 0;
-    private DrivePathSegment[] currentPath = mountainPath;
-    DrivePathSegment segment = currentPath[currentPathSegmentIndex];
-    EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     @Override
     public void loop() {

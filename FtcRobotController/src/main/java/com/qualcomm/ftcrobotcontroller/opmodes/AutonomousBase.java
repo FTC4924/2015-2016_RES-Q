@@ -16,21 +16,26 @@ import java.util.ArrayList;
 /**
  * Created by 4924_Users on 2/6/2016.
  */
-/*
+
 public class AutonomousBase extends OpMode {
 
     public enum State {
         STATE_INITIAL,
+        STATE_DRIVE_TO_BEACON,
+        STATE_APPROACH_BEACON,
+        STATE_DEPLOY_CLIMBERS,
+        STATE_DRIVE_TO_MOUNTAIN,
+        STATE_CLIMB_MOUNTAIN,
         STATE_STOP
     }
 
     public ArrayList<State> stateList = new ArrayList<State>();
     int stateIndex = 0;
     public ElapsedTime elapsedGameTime = new ElapsedTime();
-    private FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
-    private ElapsedTime elapsedTimeForCurrentState = new ElapsedTime();
-    private ElapsedTime elapsedTimeForCurrentSegment = new ElapsedTime();
-    private EncoderTargets zeroEncoderTargets = new EncoderTargets(0, 0);
+    public FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
+    public ElapsedTime elapsedTimeForCurrentState = new ElapsedTime();
+    public ElapsedTime elapsedTimeForCurrentSegment = new ElapsedTime();
+    public EncoderTargets zeroEncoderTargets = new EncoderTargets(0, 0);
     final int COUNTS_PER_REVOLUTION = 1120;
     final double WHEEL_DIAMETER = 4.5f;
     final double GEAR_RATIO = 24.0f/16.0f;
@@ -44,6 +49,7 @@ public class AutonomousBase extends OpMode {
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
+    DcMotor collectMotor;
     Servo rightsideservo; //rightsideservo is a
     Servo climberDeployer; //frontrightservo is a 180
     Servo ziplinerTripper;
@@ -53,16 +59,16 @@ public class AutonomousBase extends OpMode {
     GyroSensor turningGyro;
     TouchSensor bumper;
 
-    private State currentState;
-    private int currentPathSegmentIndex = 0;
-    private DrivePathSegment[] currentPath = beaconPath;
+    public State currentState;
+    public int currentPathSegmentIndex = 0;
+    public DrivePathSegment[] currentPath;
     DrivePathSegment segment = currentPath[currentPathSegmentIndex];
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     public void SetCurrentState(State newState) {
 
-        //elapsedTimeForCurrentState.reset();
-        //currentState = newState;
+        elapsedTimeForCurrentState.reset();
+        currentState = newState;
     }
 
     @Override
@@ -70,6 +76,7 @@ public class AutonomousBase extends OpMode {
 
         frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
+        collectMotor = hardwareMap.dcMotor.get("collection");
         bumperServo = hardwareMap.servo.get("servo1");
         rightsideservo = hardwareMap.servo.get("servo2");
         deliveryBelt = hardwareMap.servo.get("servo3");             //continuous
@@ -97,75 +104,13 @@ public class AutonomousBase extends OpMode {
 
         elapsedGameTime.reset();
         SetCurrentState(State.STATE_INITIAL);
+        collectMotor.setPower(1.0f);
+        addStates();
     }
 
     @Override
     public void loop() {
 
-        rightsideservo.setPosition(1.0d);
-        gateServo.setPosition(0.5d);
-        ziplinerTripper.setPosition(0.5d);
-        deliveryBelt.setPosition(0.5d);
-
-        switch (currentState) {
-
-            case STATE_INITIAL:
-
-                if (!turningGyro.isCalibrating()) {
-
-                    startPath(beaconPath);
-                    SetCurrentState(State.STATE_DRIVE_TO_BEACON);
-                    telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
-                            getRightPosition()));
-                }
-
-                break;
-
-            case STATE_DRIVE_TO_BEACON: // Follow mountainPath until last segment is completed
-
-                if (pathComplete()) {
-
-                    //bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
-                    TurnOffAllDriveMotors();
-                    runWithoutEncoders();
-                    SetCurrentState(State.STATE_APPROACH_BEACON);      // Next State:
-                }
-
-                break;
-
-            case STATE_DEPLOY_CLIMBERS:
-
-                if (elapsedTimeForCurrentState.time() >= 2.0f) {
-
-                    SetCurrentState(State.STATE_STOP);
-
-                } else {
-
-                }
-
-            case STATE_STOP:
-
-                TurnOffAllDriveMotors();
-                frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
-                frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
-
-                break;
-        }
-
-        SetEncoderTargets();
-        addTelemetry();
-
-        if (elapsedGameTime.time() >= 30.0f) {
-
-            TurnOffAllDriveMotors();
-            runWithoutEncoders();
-            SetCurrentState(State.STATE_STOP);
-        }
-
-        if (elapsedGameTime.time() >= 2.0f) {
-
-            mustacheMotorAngle = 0.5f;
-        }
     }
 
     @Override
@@ -175,7 +120,7 @@ public class AutonomousBase extends OpMode {
         frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
     }
 
-    private void addTelemetry() {
+    public void addTelemetry() {
 
         telemetry.addData("L Target: ", currentEncoderTargets.LeftTarget);
         telemetry.addData("L Pos: ", getLeftPosition());
@@ -184,17 +129,17 @@ public class AutonomousBase extends OpMode {
         telemetry.addData("State: ", currentState);
     }
 
-    private int getRightPosition() {
+    public int getRightPosition() {
 
         return frontRightMotor.getCurrentPosition();
     }
 
-    private int getLeftPosition() {
+    public int getLeftPosition() {
 
         return frontLeftMotor.getCurrentPosition();
     }
 
-    private void startPath(DrivePathSegment[] path) {
+    public void startPath(DrivePathSegment[] path) {
 
         currentPath = path;
         currentPathSegmentIndex = 0;
@@ -203,7 +148,7 @@ public class AutonomousBase extends OpMode {
         startSeg();
     }
 
-    private void setEncoderTargetsToCurrentPosition() {
+    public void setEncoderTargetsToCurrentPosition() {
 
         currentEncoderTargets.LeftTarget = getLeftPosition();
         currentEncoderTargets.RightTarget = getRightPosition();
@@ -227,7 +172,7 @@ public class AutonomousBase extends OpMode {
             frontLeftMotor.setChannelMode(mode);
     }
 
-    private void startSeg() {
+    public void startSeg() {
 
         segment = currentPath[currentPathSegmentIndex];
 
@@ -285,19 +230,19 @@ public class AutonomousBase extends OpMode {
         }
     }
 
-    void addEncoderTarget(int leftEncoderAdder, int rightEncoderAdder) {
+    public void addEncoderTarget(int leftEncoderAdder, int rightEncoderAdder) {
 
         currentEncoderTargets.LeftTarget += leftEncoderAdder;
         currentEncoderTargets.RightTarget += rightEncoderAdder;
     }
 
-    private void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
+    public void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
 
         frontRightMotor.setPower(levels.frontLeft);
         frontLeftMotor.setPower(levels.backRight);
     }
 
-    private boolean pathComplete() {
+    public boolean pathComplete() {
         // Wait for this Segement to end and then see what's next.
         if (segmentComplete()) {
             // Start next Segement if there is one.
@@ -318,7 +263,7 @@ public class AutonomousBase extends OpMode {
         return false;
     }
 
-    private boolean linearMoveComplete() {
+    public boolean linearMoveComplete() {
 
         int leftPosition = getLeftPosition();
         int leftTarget = currentEncoderTargets.LeftTarget;
@@ -331,21 +276,21 @@ public class AutonomousBase extends OpMode {
                         isPastTarget(rightPosition, rightTarget));
     }
 
-    private boolean isPositionClose(int position, int target) {
+    public boolean isPositionClose(int position, int target) {
 
         return Math.abs(position - target) < ENCODER_TARGET_MARGIN;
     }
 
-    private boolean isPastTarget(int position, int target) {
+    public boolean isPastTarget(int position, int target) {
 
         return position > target;
     }
 
-    private void TurnOffAllDriveMotors() {
+    public void TurnOffAllDriveMotors() {
         SetDriveMotorPowerLevels(zeroPowerLevels);
     }
 
-    private void SetEncoderTargets() {
+    public void SetEncoderTargets() {
         frontLeftMotor.setTargetPosition(currentEncoderTargets.LeftTarget);
         frontRightMotor.setTargetPosition(currentEncoderTargets.RightTarget);
     }
@@ -375,17 +320,18 @@ public class AutonomousBase extends OpMode {
         }
     }
 
-    private boolean delayComplete() {
+    public boolean delayComplete() {
 
         return elapsedTimeForCurrentSegment.time() >= segment.delayTime;
     }
 
-    private void transitionToNextState() {
+    public void transitionToNextState() {
 
         stateIndex++;
         SetCurrentState(stateList.get(stateIndex));
     }
 
-}
+    public void addStates() {
 
-*/
+    }
+}

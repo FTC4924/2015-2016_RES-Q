@@ -11,7 +11,7 @@ public class BlueCornerBeacon extends DeviBeaconBase {
 
         beaconPath = new DrivePathSegment[] {
 
-                new DrivePathSegment(110.0f, 110.0f, 1.0f),
+                new DrivePathSegment(110.0f, 110.0f, 0.5f),
                 new DrivePathSegment(-45.0f, 0.7f)
         };
     }

@@ -109,7 +109,7 @@ public class DeviBeaconBase extends OpMode {
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);
-        bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
+        bumperServo.setPosition(BUMPER_FOLDED_ANGLE);
     }
 
     @Override
@@ -126,6 +126,7 @@ public class DeviBeaconBase extends OpMode {
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);
+        bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
 
         switch (currentState) {
 
@@ -145,7 +146,6 @@ public class DeviBeaconBase extends OpMode {
 
                 if (pathComplete()) {
 
-                    //bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
                     SetCurrentState(State.STATE_APPROACH_BEACON);      // Next State:

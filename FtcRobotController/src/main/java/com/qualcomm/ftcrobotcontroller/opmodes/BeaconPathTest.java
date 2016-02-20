@@ -11,9 +11,9 @@ public class BeaconPathTest extends DeviBeaconBaseTest {
 
         beaconPath = new DrivePathSegment[] {
 
-                new DrivePathSegment(27.0f, 27.0f, 0.9f),
+                new DrivePathSegment(80.0f, 80.0f, 0.9f),
                 new DrivePathSegment(50.0f, 0.7f),
-                new DrivePathSegment(-10.0f, -10.0f, 0.9f)
+                new DrivePathSegment(-20.0f, -20.0f, 0.9f)
         };
     }
 }

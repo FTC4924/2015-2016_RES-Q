@@ -86,7 +86,7 @@ public class AutonomousBase extends OpMode {
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
 
-        reverseMotor();
+        setReversedMotor();
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
@@ -176,9 +176,6 @@ public class AutonomousBase extends OpMode {
 
         segment = currentPath[currentPathSegmentIndex];
 
-        int Left;
-        int Right;
-
         elapsedTimeForCurrentSegment.reset();
 
         if (currentPath != null) {
@@ -215,13 +212,19 @@ public class AutonomousBase extends OpMode {
 
                 } else {
 
-                    useRunUsingEncoders();
+                    int moveCounts  = (int)(segment.LeftSideDistance * countsPerInch);
+                    float power = segment.Power;
 
-                    Left  = (int)(segment.LeftSideDistance * countsPerInch);
-                    Right = (int)(segment.RightSideDistance * countsPerInch);
-                    addEncoderTarget(Left, Right);
+                    useRunUsingEncoders();
+                    addEncoderTarget(moveCounts, moveCounts);
+
+                    if (moveCounts < 0) {
+
+                        power *= -1;
+                    }
+
                     FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(segment.Power, segment.Power);
+                            new FourWheelDrivePowerLevels(power, power);
                     SetDriveMotorPowerLevels(powerLevels);
                 }
             }
@@ -270,15 +273,15 @@ public class AutonomousBase extends OpMode {
         int rightPosition = getRightPosition();
         int rightTarget = currentEncoderTargets.RightTarget;
 
-        return (isPositionClose(leftPosition, leftTarget) &&
-                isPositionClose(rightPosition, rightTarget)) ||
-                (isPastTarget(leftPosition, leftTarget) &&
-                        isPastTarget(rightPosition, rightTarget));
+        return (isPositionClose(leftPosition, leftTarget, segment.LeftSideDistance) &&
+                isPositionClose(rightPosition, rightTarget, segment.LeftSideDistance)) ||
+                (isPastTarget(leftPosition, leftTarget, segment.LeftSideDistance) &&
+                        isPastTarget(rightPosition, rightTarget, segment.LeftSideDistance));
     }
 
-    public boolean isPositionClose(int position, int target) {
+    public boolean isPositionClose(int position, int target, float distanceToMove) {
 
-        if (segment.LeftSideDistance < 0) {
+        if (distanceToMove < 0) {
 
             return position - target < ENCODER_TARGET_MARGIN;
         }
@@ -286,9 +289,9 @@ public class AutonomousBase extends OpMode {
         return target - position < ENCODER_TARGET_MARGIN;
     }
 
-    public boolean isPastTarget(int position, int target) {
+    public boolean isPastTarget(int position, int target, float distanceToMove) {
 
-        if (segment.LeftSideDistance < 0) {
+        if (distanceToMove < 0) {
 
             return position < target;
         }
@@ -345,8 +348,7 @@ public class AutonomousBase extends OpMode {
 
     }
 
-    public void reverseMotor() {
+    public void setReversedMotor() {
 
-        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 }

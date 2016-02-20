@@ -108,7 +108,7 @@ public class DeviClimbBaseTest extends AutonomousBase {
     }
 
     @Override
-    public void reverseMotor() {
+    public void setReversedMotor() {
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
     }

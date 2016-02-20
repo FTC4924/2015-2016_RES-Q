@@ -1,6 +1,6 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import com.qualcomm.hardware.ModernRoboticsUsbDeviceInterfaceModule;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsUsbDeviceInterfaceModule;
 
 /**
  * Created by 4924_Users on 2/19/2016.

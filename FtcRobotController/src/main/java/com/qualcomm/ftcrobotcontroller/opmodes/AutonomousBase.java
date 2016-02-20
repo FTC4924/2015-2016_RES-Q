@@ -86,7 +86,7 @@ public class AutonomousBase extends OpMode {
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
 
-        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        reverseMotor();
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
@@ -278,10 +278,20 @@ public class AutonomousBase extends OpMode {
 
     public boolean isPositionClose(int position, int target) {
 
-        return Math.abs(position - target) < ENCODER_TARGET_MARGIN;
+        if (segment.LeftSideDistance < 0) {
+
+            return position - target < ENCODER_TARGET_MARGIN;
+        }
+
+        return target - position < ENCODER_TARGET_MARGIN;
     }
 
     public boolean isPastTarget(int position, int target) {
+
+        if (segment.LeftSideDistance < 0) {
+
+            return position < target;
+        }
 
         return position > target;
     }
@@ -333,5 +343,10 @@ public class AutonomousBase extends OpMode {
 
     public void addStates() {
 
+    }
+
+    public void reverseMotor() {
+
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 }

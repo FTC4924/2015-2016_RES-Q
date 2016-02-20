@@ -106,4 +106,10 @@ public class DeviClimbBaseTest extends AutonomousBase {
         stateList.add(AutonomousBase.State.STATE_CLIMB_MOUNTAIN);
         stateList.add(AutonomousBase.State.STATE_STOP);
     }
+
+    @Override
+    public void reverseMotor() {
+
+        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+    }
 }

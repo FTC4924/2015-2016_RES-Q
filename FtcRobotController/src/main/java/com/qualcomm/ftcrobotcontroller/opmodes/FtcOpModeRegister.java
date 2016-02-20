@@ -67,6 +67,7 @@ public class FtcOpModeRegister implements OpModeRegister {
         manager.register("RedCornerBeacon", RedCornerBeacon.class);
         manager.register("BlueCornerBeacon", BlueCornerBeacon.class);
         manager.register("BumperServoTest", BumperServoTest.class);
+        manager.register("BeaconPathTest", BeaconPathTest.class);
         //manager.register("DoNothingAutonomous", DoNothingAutonomous.class);
         //manager.register("LeftReverseTest", LeftReverseTest.class);
         //manager.register("SecondLeftReverseTest", SecondLeftReverseTest.class);

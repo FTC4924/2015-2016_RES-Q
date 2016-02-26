@@ -19,6 +19,7 @@ public class SharpIRTest extends OpMode {
     @Override
     public void loop() {
 
-        telemetry.addData("Sharp IR Value: ", irSensor.getDistance());
+        telemetry.addData("Sharp IR Distance: ", irSensor.getDistance());
+        telemetry.addData("Sharp IR Value: ", irSensor.getRawDistance());
     }
 }

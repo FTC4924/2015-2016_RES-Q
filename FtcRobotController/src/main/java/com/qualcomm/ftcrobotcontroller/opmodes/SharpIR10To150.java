@@ -11,10 +11,11 @@ import com.qualcomm.robotcore.hardware.I2cController;
 public class SharpIR10To150 extends SharpIRSensor {
 
     private AnalogInput input;
-    private final int MINIMUM_DISTANCE_CM = 5;
+    private final int MINIMUM_DISTANCE_CM = 0;
     private final int MAXIMUM_DISTANCE_CM = 30;
-    private final int MINIMUM_DISTANCE = 90;
-    private final int MAXIMUM_DISTANCE = 880;
+    private final int MINIMUM_DISTANCE = 0;
+    private final int MAXIMUM_DISTANCE = 1023;
+    private final double CALIBRATION_FACTOR = 1.3d;
     private final double CENTIMETER_CONVERSION_RATE = (MAXIMUM_DISTANCE - MINIMUM_DISTANCE) / (MAXIMUM_DISTANCE_CM - MINIMUM_DISTANCE_CM);
 
     public SharpIR10To150(AnalogInput analogInput) {
@@ -27,7 +28,7 @@ public class SharpIR10To150 extends SharpIRSensor {
 
         int reversedScaleDistance = MAXIMUM_DISTANCE - (input.getValue() - MINIMUM_DISTANCE);
 
-        return (double) reversedScaleDistance / CENTIMETER_CONVERSION_RATE;
+        return (double) reversedScaleDistance / CENTIMETER_CONVERSION_RATE * CALIBRATION_FACTOR;
     }
 
     @Override

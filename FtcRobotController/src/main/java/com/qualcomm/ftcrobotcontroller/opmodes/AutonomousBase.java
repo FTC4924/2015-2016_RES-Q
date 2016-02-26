@@ -44,6 +44,10 @@ public class AutonomousBase extends OpMode {
     static final int ENCODER_TARGET_MARGIN = 10;
     static final float TURNING_ANGLE_MARGIN = 2.0f;
     static final float CALIBRATION_FACTOR = 1.414f;
+    static final float CLIMBER_ARM_DEPLOYED_ANGLE = 0.0f;
+    static final float CLIMBER_ARM_FOLDED_ANGLE = 1.0f;
+    static final float BUMPER_DEPLOYED_ANGLE = 0.0f;
+    static final float BUMPER_FOLDED_ANGLE = 0.6f;
     int turnStartValueLeft;
     int turnStartValueRight;
 
@@ -62,7 +66,7 @@ public class AutonomousBase extends OpMode {
     public State currentState;
     public int currentPathSegmentIndex = 0;
     public DrivePathSegment[] currentPath;
-    DrivePathSegment segment = currentPath[currentPathSegmentIndex];
+    DrivePathSegment segment;
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     public void SetCurrentState(State newState) {
@@ -93,10 +97,11 @@ public class AutonomousBase extends OpMode {
         turningGyro.calibrate();
 
         rightsideservo.setPosition(1.0d);
-        climberDeployer.setPosition(1.0d);
+        climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);
+        bumperServo.setPosition(BUMPER_FOLDED_ANGLE);
     }
 
     @Override

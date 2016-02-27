@@ -115,4 +115,10 @@ public class DeviBeaconBaseTest extends AutonomousBase {
         stateList.add(State.STATE_DEPLOY_CLIMBERS);
         stateList.add(State.STATE_STOP);
     }
+
+    @Override
+    public void setReversedMotor() {
+
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+    }
 }

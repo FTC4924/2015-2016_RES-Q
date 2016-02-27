@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -39,6 +40,8 @@ public class DeviClimbBase extends OpMode {
     static final int ENCODER_TARGET_MARGIN = 10;
     static final float TURNING_ANGLE_MARGIN = 2.0f;
     static final float CALIBRATION_FACTOR = 1.414f;
+    static final float BUMPER_FOLDED_ANGLE = 0.6f;
+    static final float CLIMBER_ARM_FOLDED_ANGLE = 1.0f;
     static float climbingTime = 8.0f;
     int turnStartValueLeft;
     int turnStartValueRight;
@@ -48,10 +51,13 @@ public class DeviClimbBase extends OpMode {
     DcMotor collectmotor;
     Servo leftsideservo; //leftsideservo is a 180
     Servo rightsideservo; //rightsideservo is a
-    Servo mustacheMotor; //mustachmotor is a 180
-    Servo frontrightservo; //frontrightservo is a 180
+    Servo climberDeployer; //frontrightservo is a 180
     Servo ziplinerTripper;
+    Servo deliveryBelt;
+    Servo bumperServo;
+    Servo gateServo;
     GyroSensor turningGyro;
+    TouchSensor bumper;
 
     public DrivePathSegment[] mountainPath = {
 
@@ -78,12 +84,14 @@ public class DeviClimbBase extends OpMode {
 
         frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
-        leftsideservo = hardwareMap.servo.get("servo1");
+        bumperServo = hardwareMap.servo.get("servo1");
         rightsideservo = hardwareMap.servo.get("servo2");
-        mustacheMotor = hardwareMap.servo.get("servo3");
-        frontrightservo = hardwareMap.servo.get("servo4");
-        ziplinerTripper = hardwareMap.servo.get("servo5");
+        deliveryBelt = hardwareMap.servo.get("servo3");             //continuous
+        climberDeployer = hardwareMap.servo.get("servo4");
+        ziplinerTripper = hardwareMap.servo.get("servo5");          //continuous
+        gateServo = hardwareMap.servo.get("servo6");                //continuous?
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
+        bumper = hardwareMap.touchSensor.get("bumper");
         collectmotor = hardwareMap.dcMotor.get("collection");
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -92,17 +100,18 @@ public class DeviClimbBase extends OpMode {
 
         turningGyro.calibrate();
 
-        mustacheMotor.setPosition(0.0d);
         rightsideservo.setPosition(1.0d);
-        frontrightservo.setPosition(1.0d);
-        leftsideservo.setPosition(0.0d);
+        climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
+        gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
+        deliveryBelt.setPosition(0.5d);
+        bumperServo.setPosition(BUMPER_FOLDED_ANGLE);
     }
 
     @Override
     public void start() {
 
-        collectmotor.setPower(1.0f);
+        collectmotor.setPower(-1.0f);
         elapsedGameTime.reset();
         SetCurrentState(State.STATE_INITIAL);
     }
@@ -111,8 +120,6 @@ public class DeviClimbBase extends OpMode {
     public void loop() {
 
         rightsideservo.setPosition(1.0d);
-        frontrightservo.setPosition(1.0d);
-        leftsideservo.setPosition(0.0d);
 
         switch (currentState) {
 
@@ -164,7 +171,6 @@ public class DeviClimbBase extends OpMode {
         }
 
         SetEncoderTargets();
-        mustacheMotor.setPosition(mustacheMotorAngle);
         addTelemetry();
 
         if (elapsedGameTime.time() >= 30.0f) {
@@ -253,8 +259,9 @@ public class DeviClimbBase extends OpMode {
                 turnStartValueRight = getRightPosition();
 
                 runWithoutEncoders();
+                double currentAngle = turningGyro.getHeading();
 
-                if (segment.Angle < 0) {
+                if (counterclockwiseTurnNeeded(currentAngle)) {
 
                     FourWheelDrivePowerLevels powerLevels =
                             new FourWheelDrivePowerLevels(segment.Power, 0.0f);
@@ -376,5 +383,17 @@ public class DeviClimbBase extends OpMode {
 
         frontLeftMotor.setPower(0.6d);
         frontRightMotor.setPower(0.6d);
+    }
+
+    private boolean counterclockwiseTurnNeeded(double currentAngle) {
+
+        telemetry.addData("Angle: ", currentAngle);
+
+        if (currentAngle < Math.abs(segment.Angle)) {
+
+            return (Math.abs(segment.Angle) - currentAngle) >= 180.0f;
+        }
+
+        return (currentAngle - Math.abs(segment.Angle)) <= 180.0f;
     }
 }

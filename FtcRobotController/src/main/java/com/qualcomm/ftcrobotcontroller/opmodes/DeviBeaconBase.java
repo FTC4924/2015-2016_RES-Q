@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * Created by 4924_Users on 12/19/2015.
@@ -45,7 +46,7 @@ public class DeviBeaconBase extends OpMode {
     int turnStartValueRight;
     float climberArmAngle = 1.0f;
     final float CLIMBER_ARM_WAIT_TIME = 4.0f;
-    final float CLIMBER_ARM_ANGLE_INCREMENTATION = 0.01f;
+    final float CLIMBER_ARM_ANGLE_INCREMENTATION = 0.005f;
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
@@ -108,7 +109,7 @@ public class DeviBeaconBase extends OpMode {
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);
-        bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
+        bumperServo.setPosition(BUMPER_FOLDED_ANGLE);
     }
 
     @Override
@@ -125,6 +126,7 @@ public class DeviBeaconBase extends OpMode {
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);
+        bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
 
         switch (currentState) {
 
@@ -144,7 +146,6 @@ public class DeviBeaconBase extends OpMode {
 
                 if (pathComplete()) {
 
-                    //bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
                     SetCurrentState(State.STATE_APPROACH_BEACON);      // Next State:
@@ -181,6 +182,7 @@ public class DeviBeaconBase extends OpMode {
                 } else {
 
                     climberArmAngle -= CLIMBER_ARM_ANGLE_INCREMENTATION;
+                    climberArmAngle = Range.clip(climberArmAngle, 0.0f, 1.0f);
                     climberDeployer.setPosition(climberArmAngle);
                 }
 
@@ -292,8 +294,9 @@ public class DeviBeaconBase extends OpMode {
                 turnStartValueRight = getRightPosition();
 
                 runWithoutEncoders();
+                double currentAngle = turningGyro.getHeading();
 
-                if (segment.Angle < 0) {
+                if (!counterclockwiseTurnNeeded(currentAngle)) {
 
                     FourWheelDrivePowerLevels powerLevels =
                             new FourWheelDrivePowerLevels(segment.Power, 0.0f);
@@ -331,6 +334,18 @@ public class DeviBeaconBase extends OpMode {
 
             currentPathSegmentIndex++;
         }
+    }
+
+    private boolean counterclockwiseTurnNeeded(double currentAngle) {
+
+        telemetry.addData("Angle: ", currentAngle);
+
+        if (currentAngle < Math.abs(segment.Angle)) {
+
+            return (Math.abs(segment.Angle) - currentAngle) >= 180.0f;
+        }
+
+        return (currentAngle - Math.abs(segment.Angle)) <= 180.0f;
     }
 
     void addEncoderTarget(int leftEncoderAdder, int rightEncoderAdder) {

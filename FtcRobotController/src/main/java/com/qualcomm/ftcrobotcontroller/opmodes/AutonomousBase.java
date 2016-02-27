@@ -44,6 +44,10 @@ public class AutonomousBase extends OpMode {
     static final int ENCODER_TARGET_MARGIN = 10;
     static final float TURNING_ANGLE_MARGIN = 2.0f;
     static final float CALIBRATION_FACTOR = 1.414f;
+    static final float CLIMBER_ARM_DEPLOYED_ANGLE = 0.0f;
+    static final float CLIMBER_ARM_FOLDED_ANGLE = 1.0f;
+    static final float BUMPER_DEPLOYED_ANGLE = 0.0f;
+    static final float BUMPER_FOLDED_ANGLE = 0.6f;
     int turnStartValueLeft;
     int turnStartValueRight;
 
@@ -62,7 +66,7 @@ public class AutonomousBase extends OpMode {
     public State currentState;
     public int currentPathSegmentIndex = 0;
     public DrivePathSegment[] currentPath;
-    DrivePathSegment segment = currentPath[currentPathSegmentIndex];
+    DrivePathSegment segment;
     EncoderTargets currentEncoderTargets = zeroEncoderTargets;
 
     public void SetCurrentState(State newState) {
@@ -86,17 +90,18 @@ public class AutonomousBase extends OpMode {
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
 
-        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        setReversedMotor();
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
         turningGyro.calibrate();
 
         rightsideservo.setPosition(1.0d);
-        climberDeployer.setPosition(1.0d);
+        climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);
+        bumperServo.setPosition(BUMPER_FOLDED_ANGLE);
     }
 
     @Override
@@ -176,9 +181,6 @@ public class AutonomousBase extends OpMode {
 
         segment = currentPath[currentPathSegmentIndex];
 
-        int Left;
-        int Right;
-
         elapsedTimeForCurrentSegment.reset();
 
         if (currentPath != null) {
@@ -215,13 +217,19 @@ public class AutonomousBase extends OpMode {
 
                 } else {
 
-                    useRunUsingEncoders();
+                    int moveCounts  = (int)(segment.LeftSideDistance * countsPerInch);
+                    float power = segment.Power;
 
-                    Left  = (int)(segment.LeftSideDistance * countsPerInch);
-                    Right = (int)(segment.RightSideDistance * countsPerInch);
-                    addEncoderTarget(Left, Right);
+                    useRunUsingEncoders();
+                    addEncoderTarget(moveCounts, moveCounts);
+
+                    if (moveCounts < 0) {
+
+                        power *= -1;
+                    }
+
                     FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(segment.Power, segment.Power);
+                            new FourWheelDrivePowerLevels(power, power);
                     SetDriveMotorPowerLevels(powerLevels);
                 }
             }
@@ -270,18 +278,28 @@ public class AutonomousBase extends OpMode {
         int rightPosition = getRightPosition();
         int rightTarget = currentEncoderTargets.RightTarget;
 
-        return (isPositionClose(leftPosition, leftTarget) &&
-                isPositionClose(rightPosition, rightTarget)) ||
-                (isPastTarget(leftPosition, leftTarget) &&
-                        isPastTarget(rightPosition, rightTarget));
+        return (isPositionClose(leftPosition, leftTarget, segment.LeftSideDistance) &&
+                isPositionClose(rightPosition, rightTarget, segment.LeftSideDistance)) ||
+                (isPastTarget(leftPosition, leftTarget, segment.LeftSideDistance) &&
+                        isPastTarget(rightPosition, rightTarget, segment.LeftSideDistance));
     }
 
-    public boolean isPositionClose(int position, int target) {
+    public boolean isPositionClose(int position, int target, float distanceToMove) {
 
-        return Math.abs(position - target) < ENCODER_TARGET_MARGIN;
+        if (distanceToMove < 0) {
+
+            return position - target < ENCODER_TARGET_MARGIN;
+        }
+
+        return target - position < ENCODER_TARGET_MARGIN;
     }
 
-    public boolean isPastTarget(int position, int target) {
+    public boolean isPastTarget(int position, int target, float distanceToMove) {
+
+        if (distanceToMove < 0) {
+
+            return position < target;
+        }
 
         return position > target;
     }
@@ -332,6 +350,10 @@ public class AutonomousBase extends OpMode {
     }
 
     public void addStates() {
+
+    }
+
+    public void setReversedMotor() {
 
     }
 }

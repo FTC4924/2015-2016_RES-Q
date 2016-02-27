@@ -20,7 +20,7 @@ public class battel_tank extends OpMode {
 
     Servo backmidservo; //leftsideservo is a 180
     Servo backrightservo; //backrightservo is a 180
-    Servo servo3; //servo3 is a continuis
+    Servo servo3; //servo3 is a 180
     Servo climers; //frontrightservo is a 180
     Servo servo5; //servo5 is a continuis
     Servo gateservo; //gateservo is a 180
@@ -124,6 +124,14 @@ public class battel_tank extends OpMode {
             }else {
                 servo_angles.gateservo = 0.50f;
             }
+        }
+
+        if (gamepad2.dpad_up && (servo_time.time() > DELAY)){
+            servo_angles.servo3 = 0.00f;
+        }
+
+        if (gamepad2.dpad_down && (servo_time.time() > DELAY)){
+            servo_angles.servo3 = 1.00f;
         }
 
         servo_angles.servo3 = Range.clip(servo_angles.servo3, 0.0f, 1.0f);

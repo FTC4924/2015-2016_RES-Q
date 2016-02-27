@@ -196,13 +196,13 @@ public class DistanceTest extends OpMode {
                 if (segment.Angle > 0) {
 
                     FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(segment.Power, 0.0f);
+                            new FourWheelDrivePowerLevels(segment.leftPower, 0.0f);
                     SetDriveMotorPowerLevels(powerLevels);
 
                 } else {
 
                     FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.0f, segment.Power);
+                            new FourWheelDrivePowerLevels(0.0f, segment.leftPower);
                     SetDriveMotorPowerLevels(powerLevels);
                 }
 
@@ -212,7 +212,7 @@ public class DistanceTest extends OpMode {
                 Right = (int)(segment.RightSideDistance * countsPerInch);
                 addEncoderTarget(Left, Right);
                 FourWheelDrivePowerLevels powerLevels =
-                        new FourWheelDrivePowerLevels(segment.Power, segment.Power);
+                        new FourWheelDrivePowerLevels(segment.leftPower, segment.leftPower);
                 SetDriveMotorPowerLevels(powerLevels);
             }
 

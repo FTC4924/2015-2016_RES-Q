@@ -289,8 +289,8 @@ public class A2818_StateMachine extends OpMode
             case STATE_DRIVE_TO_MOUNTAIN: // Follow path until last segment is completed
                 if (pathComplete())
                 {
-                    useConstantPower();                     // Action: Switch to constant Power
-                    setDrivePower(0.5, 0.5);                // Action: Start Driving forward at 50 Power
+                    useConstantPower();                     // Action: Switch to constant leftPower
+                    setDrivePower(0.5, 0.5);                // Action: Start Driving forward at 50 leftPower
                     newState(State.STATE_CLIMB_MOUNTAIN);   // Next State:
                 }
                 else
@@ -306,7 +306,7 @@ public class A2818_StateMachine extends OpMode
             case STATE_CLIMB_MOUNTAIN:   // Drive up mountain for 5 seconds
                 if (mStateTime.time() > 5.0)
                 {
-                    useConstantPower();                     // Switch to constant Power
+                    useConstantPower();                     // Switch to constant leftPower
                     setDrivePower(0, 0);                    // Set target speed to zero
                     newState(State.STATE_STOP);             // Next State:
                 }

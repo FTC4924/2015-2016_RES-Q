@@ -4,6 +4,7 @@ import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
 import com.qualcomm.ftcrobotcontroller.EncoderTargets;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
@@ -24,10 +25,12 @@ public abstract class AutonomousBase extends OpMode {
         STATE_DRIVE_TO_BEACON,
         STATE_APPROACH_BEACON,
         STATE_DEPLOY_CLIMBERS,
+        STATE_READ_BEACON,
         STATE_DRIVE_TO_MOUNTAIN,
         STATE_CLIMB_MOUNTAIN,
         STATE_MOVE_TO_FLOOR_GOAL,
-        STATE_STOP
+        STATE_STOP,
+        STATE_WAIT,
     }
 
     public ArrayList<State> stateList = new ArrayList<State>();
@@ -49,9 +52,10 @@ public abstract class AutonomousBase extends OpMode {
     static final float CLIMBER_ARM_FOLDED_ANGLE = 1.0f;
     static final float BUMPER_DEPLOYED_ANGLE = 0.0f;
     static final float BUMPER_FOLDED_ANGLE = 0.6f;
-    static final float LEFT_MOTOR_POWER_ADJUST = -0.1f;
+    static final float MOTOR_POWER_ADJUST = -0.1f;
     int turnStartValueLeft;
     int turnStartValueRight;
+    int pausedStateIndex = 0;
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
@@ -64,6 +68,7 @@ public abstract class AutonomousBase extends OpMode {
     Servo gateServo;
     GyroSensor turningGyro;
     TouchSensor bumper;
+    ColorSensor colorSensor;
 
     public State currentState;
     public int currentPathSegmentIndex = 0;
@@ -91,6 +96,7 @@ public abstract class AutonomousBase extends OpMode {
         gateServo = hardwareMap.servo.get("servo6");                //continuous?
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
+        colorSensor = hardwareMap.colorSensor.get("colorSensor");
 
         setReversedMotor();
 
@@ -196,15 +202,11 @@ public abstract class AutonomousBase extends OpMode {
 
                 if (segment.Angle < 0) {
 
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(segment.Power, 0.0f);
-                    SetDriveMotorPowerLevels(powerLevels);
+                    segment.rightPower = 0.0f;
 
                 } else {
 
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.0f, segment.Power);
-                    SetDriveMotorPowerLevels(powerLevels);
+                    segment.leftPower = 0.0f;
                 }
 
             } else {
@@ -212,29 +214,28 @@ public abstract class AutonomousBase extends OpMode {
                 if (segment.isDelay) {
 
                     runWithoutEncoders();
-
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.0f, 0.0f);
-                    SetDriveMotorPowerLevels(powerLevels);
+                    segment.leftPower = 0.0f;
+                    segment.rightPower = 0.0f;
 
                 } else {
 
                     int moveCounts  = (int)(segment.LeftSideDistance * countsPerInch);
-                    float power = segment.Power;
+                    float power = segment.leftPower;
 
                     useRunUsingEncoders();
                     addEncoderTarget(moveCounts, moveCounts);
 
                     if (moveCounts < 0) {
 
-                        power *= -1;
+                        segment.leftPower *= -1;
+                        segment.rightPower *= -1;
                     }
-
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(power, power);
-                    SetDriveMotorPowerLevels(powerLevels);
                 }
             }
+
+            FourWheelDrivePowerLevels powerLevels =
+                    new FourWheelDrivePowerLevels(segment.leftPower, segment.rightPower);
+            SetDriveMotorPowerLevels(powerLevels);
 
             currentPathSegmentIndex++;
         }
@@ -248,8 +249,8 @@ public abstract class AutonomousBase extends OpMode {
 
     public void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
 
-        frontRightMotor.setPower(levels.frontRight);
-        frontLeftMotor.setPower(levels.frontLeft + LEFT_MOTOR_POWER_ADJUST);
+        frontRightMotor.setPower(levels.frontRight + MOTOR_POWER_ADJUST);
+        frontLeftMotor.setPower(levels.frontLeft);
     }
 
     public boolean pathComplete() {

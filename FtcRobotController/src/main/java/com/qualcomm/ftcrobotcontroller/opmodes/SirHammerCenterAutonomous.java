@@ -1,6 +1,5 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
 import com.qualcomm.ftcrobotcontroller.EncoderTargets;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.ftcrobotcontroller.LegacyDrivePathSegment;
@@ -354,8 +353,8 @@ public class SirHammerCenterAutonomous extends OpMode {
             segmentTime = currentPath[currentPathSegmentIndex].Time;
             addEncoderTarget(Left, Right);
             FourWheelDrivePowerLevels powerLevels =
-                    new FourWheelDrivePowerLevels(currentPath[currentPathSegmentIndex].Power,
-                            currentPath[currentPathSegmentIndex].Power);
+                    new FourWheelDrivePowerLevels(currentPath[currentPathSegmentIndex].leftPower,
+                            currentPath[currentPathSegmentIndex].leftPower);
             SetDriveMotorPowerLevels(powerLevels);
 
             currentPathSegmentIndex++;

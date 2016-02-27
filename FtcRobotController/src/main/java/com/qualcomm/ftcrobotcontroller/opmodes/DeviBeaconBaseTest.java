@@ -4,8 +4,6 @@ import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import java.util.ArrayList;
-
 /**
  * Created by 4924_Users on 2/7/2016.
  */
@@ -17,6 +15,9 @@ public class DeviBeaconBaseTest extends AutonomousBase {
             new DrivePathSegment(315.0f, 0.7f),
             new DrivePathSegment(8.0f, 8.0f, 0.9f)
     };
+
+    public boolean isRobotOnRedAlliance = false;
+    private float COLOR_THRESHOLD = 2.0f;
 
     @Override
     public void loop() {
@@ -44,6 +45,13 @@ public class DeviBeaconBaseTest extends AutonomousBase {
                     //bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
+                    transitionToNextState();
+                }
+
+                if (pathIsBlocked()) {
+
+                    pausedStateIndex = stateIndex;
+                    stateIndex = stateList.size() - 2;
                     transitionToNextState();
                 }
 
@@ -78,6 +86,28 @@ public class DeviBeaconBaseTest extends AutonomousBase {
                     climberDeployer.setPosition(0.0f);
                 }
 
+                break;
+
+            case STATE_READ_BEACON:
+
+                telemetry.addData("Red: ", isRed());
+                telemetry.addData("Blue: ", isBlue());
+
+                if (isRobotOnRedAlliance) {
+
+                    if (isRed()) {
+
+
+                    }
+
+                } else {
+
+                    if (isBlue()) {
+
+
+                    }
+                }
+
             case STATE_STOP:
 
                 TurnOffAllDriveMotors();
@@ -85,6 +115,20 @@ public class DeviBeaconBaseTest extends AutonomousBase {
                 frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
 
                 break;
+
+            case STATE_WAIT:
+
+                TurnOffAllDriveMotors();
+
+                if (!pathIsBlocked()) {
+
+                    stateIndex = pausedStateIndex - 1;
+                    transitionToNextState();
+
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(segment.leftPower, segment.rightPower);
+                    SetDriveMotorPowerLevels(powerLevels);
+                }
         }
 
         SetEncoderTargets();
@@ -103,6 +147,21 @@ public class DeviBeaconBaseTest extends AutonomousBase {
         }
     }
 
+    private boolean pathIsBlocked() {
+
+        return false;
+    }
+
+    public boolean isRed() {
+
+        return colorSensor.red() >= COLOR_THRESHOLD;
+    }
+
+    public boolean isBlue() {
+
+        return colorSensor.blue() >= COLOR_THRESHOLD;
+    }
+
     @Override
     public void addStates() {
 
@@ -110,7 +169,9 @@ public class DeviBeaconBaseTest extends AutonomousBase {
         stateList.add(State.STATE_DRIVE_TO_BEACON);
         stateList.add(State.STATE_APPROACH_BEACON);
         stateList.add(State.STATE_DEPLOY_CLIMBERS);
+        stateList.add(State.STATE_READ_BEACON);
         stateList.add(State.STATE_STOP);
+        stateList.add(State.STATE_WAIT);
     }
 
     @Override

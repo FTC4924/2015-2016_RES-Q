@@ -49,6 +49,7 @@ public abstract class AutonomousBase extends OpMode {
     static final float CLIMBER_ARM_FOLDED_ANGLE = 1.0f;
     static final float BUMPER_DEPLOYED_ANGLE = 0.0f;
     static final float BUMPER_FOLDED_ANGLE = 0.6f;
+    static final float LEFT_MOTOR_POWER_ADJUST = -0.1f;
     int turnStartValueLeft;
     int turnStartValueRight;
 
@@ -247,8 +248,8 @@ public abstract class AutonomousBase extends OpMode {
 
     public void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
 
-        frontRightMotor.setPower(levels.frontLeft);
-        frontLeftMotor.setPower(levels.backRight);
+        frontRightMotor.setPower(levels.frontRight);
+        frontLeftMotor.setPower(levels.frontLeft + LEFT_MOTOR_POWER_ADJUST);
     }
 
     public boolean pathComplete() {

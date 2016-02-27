@@ -21,11 +21,8 @@ public class DeviClimbBaseTest extends AutonomousBase {
     @Override
     public void loop() {
 
-        rightsideservo.setPosition(1.0d);
         climberDeployer.setPosition(1.0d);
-        gateServo.setPosition(0.5d);
-        ziplinerTripper.setPosition(0.5d);
-        deliveryBelt.setPosition(0.5d);
+        initServos();
 
         switch (currentState) {
 

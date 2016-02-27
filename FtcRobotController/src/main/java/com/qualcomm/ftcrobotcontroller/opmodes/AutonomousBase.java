@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * Created by 4924_Users on 2/6/2016.
  */
 
-public class AutonomousBase extends OpMode {
+public abstract class AutonomousBase extends OpMode {
 
     public enum State {
         STATE_INITIAL,
@@ -26,6 +26,7 @@ public class AutonomousBase extends OpMode {
         STATE_DEPLOY_CLIMBERS,
         STATE_DRIVE_TO_MOUNTAIN,
         STATE_CLIMB_MOUNTAIN,
+        STATE_MOVE_TO_FLOOR_GOAL,
         STATE_STOP
     }
 
@@ -109,7 +110,7 @@ public class AutonomousBase extends OpMode {
 
         elapsedGameTime.reset();
         SetCurrentState(State.STATE_INITIAL);
-        collectMotor.setPower(1.0f);
+        //collectMotor.setPower(1.0f);
         addStates();
     }
 
@@ -349,11 +350,15 @@ public class AutonomousBase extends OpMode {
         SetCurrentState(stateList.get(stateIndex));
     }
 
-    public void addStates() {
+    public void initServos() {
 
+        rightsideservo.setPosition(1.0d);
+        gateServo.setPosition(0.5d);
+        ziplinerTripper.setPosition(0.5d);
+        deliveryBelt.setPosition(0.5d);
     }
 
-    public void setReversedMotor() {
+    public abstract void addStates();
 
-    }
+    public abstract void setReversedMotor();
 }

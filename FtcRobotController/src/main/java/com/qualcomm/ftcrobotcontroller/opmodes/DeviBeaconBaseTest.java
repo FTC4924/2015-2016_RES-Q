@@ -21,10 +21,7 @@ public class DeviBeaconBaseTest extends AutonomousBase {
     @Override
     public void loop() {
 
-        rightsideservo.setPosition(1.0d);
-        gateServo.setPosition(0.5d);
-        ziplinerTripper.setPosition(0.5d);
-        deliveryBelt.setPosition(0.5d);
+        initServos();
 
         switch (currentState) {
 
@@ -93,12 +90,12 @@ public class DeviBeaconBaseTest extends AutonomousBase {
         SetEncoderTargets();
         addTelemetry();
 
-        if (elapsedGameTime.time() >= 30.0f) {
+        /*if (elapsedGameTime.time() >= 30.0f) {
 
             TurnOffAllDriveMotors();
             runWithoutEncoders();
             SetCurrentState(State.STATE_STOP);
-        }
+        }*/
 
         if (elapsedGameTime.time() >= 2.0f) {
 

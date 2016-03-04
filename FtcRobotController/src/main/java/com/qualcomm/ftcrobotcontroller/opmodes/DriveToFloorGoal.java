@@ -1,67 +1,45 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * Created by 4924_Users on 2/27/2016.
  */
-public class DriveToFloorGoal extends AutonomousBase {
+public class DriveToFloorGoal extends OpMode {
 
-    public DrivePathSegment[] floorGoalPath = {
+    DcMotor frontLeftMotor;
+    DcMotor frontRightMotor;
+    ElapsedTime elapsedGameTime = new ElapsedTime();
 
-            new DrivePathSegment(70.0f, 70.0f, 0.9f),
-    };
+    @Override
+    public void init() {
+
+        frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
+        frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+    }
+
+    @Override
+    public void start() {
+
+        elapsedGameTime.reset();
+    }
 
     @Override
     public void loop() {
 
-        climberDeployer.setPosition(1.0d);
-        initServos();
+        if (elapsedGameTime.time() <= 5.0f) {
 
-        switch (currentState) {
+            frontLeftMotor.setPower(0.9f);
+            frontRightMotor.setPower(0.9f);
 
-            case STATE_INITIAL:
+        } else {
 
-                if (!turningGyro.isCalibrating()) {
-
-                    startPath(floorGoalPath);
-                    transitionToNextState();
-                    telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
-                            getRightPosition()));
-                }
-
-                break;
-
-            case STATE_MOVE_TO_FLOOR_GOAL:
-
-                if (pathComplete()) {
-
-                    TurnOffAllDriveMotors();
-                    transitionToNextState();
-                }
-
-                break;
-
-            case STATE_STOP:
-
-                TurnOffAllDriveMotors();
-
-                break;
+            frontLeftMotor.setPower(0.0f);
+            frontRightMotor.setPower(0.0f);
         }
-    }
-
-    @Override
-    public void addStates() {
-
-        stateList.add(State.STATE_INITIAL);
-        stateList.add(State.STATE_MOVE_TO_FLOOR_GOAL);
-        stateList.add(State.STATE_STOP);
-    }
-
-    @Override
-    public void setReversedMotor() {
-
-        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 }

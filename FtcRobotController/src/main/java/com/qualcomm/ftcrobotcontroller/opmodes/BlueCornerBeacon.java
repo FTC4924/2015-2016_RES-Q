@@ -5,7 +5,7 @@ import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
 /**
  * Created by 4924_Users on 12/19/2015.
  */
-public class BlueCornerBeacon extends DeviBeaconBase {
+public class BlueCornerBeacon extends DeviBeaconBaseTest {
 
     public BlueCornerBeacon() {
 

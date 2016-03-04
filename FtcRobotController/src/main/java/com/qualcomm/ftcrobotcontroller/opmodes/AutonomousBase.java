@@ -96,7 +96,7 @@ public abstract class AutonomousBase extends OpMode {
         gateServo = hardwareMap.servo.get("servo6");                //continuous?
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
-        colorSensor = hardwareMap.colorSensor.get("colorSensor");
+        //colorSensor = hardwareMap.colorSensor.get("colorSensor");
 
         setReversedMotor();
 
@@ -199,8 +199,9 @@ public abstract class AutonomousBase extends OpMode {
                 turnStartValueRight = getRightPosition();
 
                 runWithoutEncoders();
+                double currentAngle = turningGyro.getHeading();
 
-                if (segment.Angle < 0) {
+                if (!counterclockwiseTurnNeeded(currentAngle)) {
 
                     segment.rightPower = 0.0f;
 
@@ -239,6 +240,18 @@ public abstract class AutonomousBase extends OpMode {
 
             currentPathSegmentIndex++;
         }
+    }
+
+    private boolean counterclockwiseTurnNeeded(double currentAngle) {
+
+        telemetry.addData("Angle: ", currentAngle);
+
+        if (currentAngle < Math.abs(segment.Angle)) {
+
+            return (Math.abs(segment.Angle) - currentAngle) >= 180.0f;
+        }
+
+        return (currentAngle - Math.abs(segment.Angle)) <= 180.0f;
     }
 
     public void addEncoderTarget(int leftEncoderAdder, int rightEncoderAdder) {

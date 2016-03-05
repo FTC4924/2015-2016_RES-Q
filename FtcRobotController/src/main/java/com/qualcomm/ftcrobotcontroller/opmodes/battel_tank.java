@@ -53,6 +53,7 @@ public class battel_tank extends OpMode {
         time.reset();
         servo_time = new ElapsedTime();
         servo_time.reset();
+        servo_angles.backrightservo = 0.95f;
         servo_angles.servo3 = 0.50f;
         servo_angles.climers = 1.00f;
         servo_angles.servo5 = 0.50f;

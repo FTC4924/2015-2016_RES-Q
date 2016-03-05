@@ -18,6 +18,7 @@ public class DeviBeaconBaseTest extends AutonomousBase {
 
     public boolean isRobotOnRedAlliance = false;
     private float COLOR_THRESHOLD = 2.0f;
+    private boolean isCloseToBeacon = false;
 
     @Override
     public void loop() {
@@ -35,6 +36,7 @@ public class DeviBeaconBaseTest extends AutonomousBase {
                     transitionToNextState();
                     telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
                             getRightPosition()));
+                    bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
                 }
 
                 break;
@@ -43,13 +45,17 @@ public class DeviBeaconBaseTest extends AutonomousBase {
 
                 if (pathComplete()) {
 
-                    bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
                     transitionToNextState();
                 }
 
-                if (pathIsBlocked()) {
+                if (currentPathSegmentIndex == beaconPath.length - 1) {
+
+                    isCloseToBeacon = true;
+                }
+
+                if (pathIsBlocked() && !isCloseToBeacon) {
 
                     pausedStateIndex = stateIndex;
                     stateIndex = stateList.size() - 2;
@@ -135,12 +141,12 @@ public class DeviBeaconBaseTest extends AutonomousBase {
         SetEncoderTargets();
         addTelemetry();
 
-        /*if (elapsedGameTime.time() >= 30.0f) {
+        if (elapsedGameTime.time() >= 30.0f) {
 
             TurnOffAllDriveMotors();
             runWithoutEncoders();
             SetCurrentState(State.STATE_STOP);
-        }*/
+        }
 
         if (elapsedGameTime.time() >= 2.0f) {
 
@@ -150,8 +156,7 @@ public class DeviBeaconBaseTest extends AutonomousBase {
 
     private boolean pathIsBlocked() {
 
-        //return sharpIRSensor.getDistance() <= 80.0f;
-        return false;
+        return sharpIRSensor.getDistance() <= 50.0f;
     }
 
     public boolean isRed() {

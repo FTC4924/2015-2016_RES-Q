@@ -91,8 +91,8 @@ public class DeviClimbBaseTest extends AutonomousBase {
 
     public void setClimbingPowerLevels() {
 
-        frontLeftMotor.setPower(0.6d);
-        frontRightMotor.setPower(0.6d);
+        frontLeftMotor.setPower(1.0d);
+        frontRightMotor.setPower(1.0d);
     }
 
     @Override

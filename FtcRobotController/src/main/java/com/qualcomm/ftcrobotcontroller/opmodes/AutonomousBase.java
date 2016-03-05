@@ -69,6 +69,7 @@ public abstract class AutonomousBase extends OpMode {
     GyroSensor turningGyro;
     TouchSensor bumper;
     ColorSensor colorSensor;
+    SharpIR10To150 sharpIRSensor;
 
     public State currentState;
     public int currentPathSegmentIndex = 0;
@@ -96,7 +97,8 @@ public abstract class AutonomousBase extends OpMode {
         gateServo = hardwareMap.servo.get("servo6");                //continuous?
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
-        //colorSensor = hardwareMap.colorSensor.get("colorSensor");
+        colorSensor = hardwareMap.colorSensor.get("colorSensor");
+        sharpIRSensor = new SharpIR10To150(hardwareMap.analogInput.get("sharpIR"));
 
         setReversedMotor();
 
@@ -201,7 +203,7 @@ public abstract class AutonomousBase extends OpMode {
                 runWithoutEncoders();
                 double currentAngle = turningGyro.getHeading();
 
-                if (!counterclockwiseTurnNeeded(currentAngle)) {
+                if (counterclockwiseTurnNeeded(currentAngle)) {
 
                     segment.rightPower = 0.0f;
 
@@ -262,7 +264,7 @@ public abstract class AutonomousBase extends OpMode {
 
     public void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
 
-        frontRightMotor.setPower(levels.frontRight + MOTOR_POWER_ADJUST);
+        frontRightMotor.setPower(levels.frontRight);
         frontLeftMotor.setPower(levels.frontLeft);
     }
 

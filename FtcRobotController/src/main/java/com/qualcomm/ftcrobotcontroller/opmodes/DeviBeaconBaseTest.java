@@ -22,6 +22,7 @@ public class DeviBeaconBaseTest extends AutonomousBase {
     @Override
     public void loop() {
 
+        colorSensor.enableLed(false);
         initServos();
 
         switch (currentState) {
@@ -42,7 +43,7 @@ public class DeviBeaconBaseTest extends AutonomousBase {
 
                 if (pathComplete()) {
 
-                    //bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
+                    bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
                     transitionToNextState();
@@ -149,6 +150,7 @@ public class DeviBeaconBaseTest extends AutonomousBase {
 
     private boolean pathIsBlocked() {
 
+        //return sharpIRSensor.getDistance() <= 80.0f;
         return false;
     }
 

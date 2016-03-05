@@ -69,8 +69,9 @@ public class FtcOpModeRegister implements OpModeRegister {
         manager.register("BumperServoTest", BumperServoTest.class);
         manager.register("BeaconPathTest", BeaconPathTest.class);
         manager.register("ColorSensorTest", ColorSensorTest.class);
-        manager.register("SharpIRTest", SharpIRTest.class);
+        //manager.register("SharpIRTest", SharpIRTest.class);
         manager.register("DriveToFloorGoal", DriveToFloorGoal.class);
+        manager.register("RedPushAndClimb", RedPushAndClimb.class);
         //manager.register("DoNothingAutonomous", DoNothingAutonomous.class);
         //manager.register("LeftReverseTest", LeftReverseTest.class);
         //manager.register("SecondLeftReverseTest", SecondLeftReverseTest.class);

@@ -13,9 +13,9 @@ public class RedPushAndClimb extends DeviClimbBaseTest {
 
                 new DrivePathSegment(40.0f, 40.0f, 1.0f),
                 new DrivePathSegment(-6.0f, -6.0f, 1.0f),
-                new DrivePathSegment(270.0f, 0.7f)
+                new DrivePathSegment(267.0f, 0.7f)
         };
 
-        climbingTime = 30.0f;
+        climbingTime = 7.0f;
     }
 }

@@ -80,7 +80,7 @@ public class DeviClimbBaseTest extends AutonomousBase {
 
             TurnOffAllDriveMotors();
             runWithoutEncoders();
-            transitionToNextState();
+            SetCurrentState(State.STATE_STOP);
         }
 
         if (elapsedGameTime.time() >= 2.0f) {

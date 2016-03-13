@@ -50,7 +50,7 @@ public class DeviBeaconBaseTest extends AutonomousBase {
                     transitionToNextState();
                 }
 
-                if (currentPathSegmentIndex == beaconPath.length - 1) {
+                if (elapsedGameTime.time() >= 20) {
 
                     isCloseToBeacon = true;
                 }

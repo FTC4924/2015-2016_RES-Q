@@ -16,6 +16,6 @@ public class BluePushAndClimb extends DeviClimbBaseTest {
                 new DrivePathSegment(93.0f, 0.7f)
         };
 
-        climbingTime = 7.0f;
+        climbingTime = 5.0f;
     }
 }

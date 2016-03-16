@@ -363,6 +363,7 @@ public abstract class AutonomousBase extends OpMode {
 
     public void transitionToNextState() {
 
+        
         stateIndex++;
         SetCurrentState(stateList.get(stateIndex));
     }

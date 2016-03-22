@@ -56,19 +56,19 @@ public class FtcOpModeRegister implements OpModeRegister {
      */
 
         manager.register("battel_tank", battel_tank.class);
-        manager.register("RedMountainBaseClimb", RedMountainBaseClimb.class);
-        manager.register("BlueMountainBaseClimb", BlueMountainBaseClimb.class);
-        manager.register("RedWallClimb", RedWallClimb.class);
-        manager.register("BlueWallClimb", BlueWallClimb.class);
+        //manager.register("RedMountainBaseClimb", RedMountainBaseClimb.class);
+        //manager.register("BlueMountainBaseClimb", BlueMountainBaseClimb.class);
+        //manager.register("RedWallClimb", RedWallClimb.class);
+        //manager.register("BlueWallClimb", BlueWallClimb.class);
         //manager.register("RedMountainBaseClimbDelay", RedMountainBaseClimbDelay.class);
         //manager.register("BlueMountainBaseClimbDelay", BlueMountainBaseClimbDelay.class);
         //manager.register("RedWallClimbDelay", RedWallClimbDelay.class);
         //manager.register("BlueWallClimbDelay", BlueWallClimbDelay.class);
         manager.register("RedCornerBeacon", RedCornerBeacon.class);
         manager.register("BlueCornerBeacon", BlueCornerBeacon.class);
-        manager.register("BumperServoTest", BumperServoTest.class);
-        manager.register("BeaconPathTest", BeaconPathTest.class);
-        manager.register("ColorSensorTest", ColorSensorTest.class);
+        //manager.register("BumperServoTest", BumperServoTest.class);
+        //manager.register("BeaconPathTest", BeaconPathTest.class);
+        //manager.register("ColorSensorTest", ColorSensorTest.class);
         //manager.register("SharpIRTest", SharpIRTest.class);
         manager.register("DriveToFloorGoal", DriveToFloorGoal.class);
         manager.register("RedPushAndClimb", RedPushAndClimb.class);

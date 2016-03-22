@@ -30,7 +30,7 @@ public class DeviBeaconBaseTest extends AutonomousBase {
 
             case STATE_INITIAL:
 
-                if (!turningGyro.isCalibrating()) {
+                if (!turningGyro.isCalibrating() && elapsedGameTime.time() >= 5.0f) {
 
                     startPath(beaconPath);
                     transitionToNextState();
@@ -50,7 +50,7 @@ public class DeviBeaconBaseTest extends AutonomousBase {
                     transitionToNextState();
                 }
 
-                if (elapsedGameTime.time() >= 20) {
+                if (elapsedGameTime.time() >= 22) {
 
                     isCloseToBeacon = true;
                 }

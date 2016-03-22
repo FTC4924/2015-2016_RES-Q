@@ -28,7 +28,7 @@ public class DeviClimbBaseTest extends AutonomousBase {
 
             case STATE_INITIAL:
 
-                if (!turningGyro.isCalibrating()) {
+                if (!turningGyro.isCalibrating() && elapsedGameTime.time() >= 5.0fqacvc ) {
 
                     startPath(mountainPath);
                     transitionToNextState();

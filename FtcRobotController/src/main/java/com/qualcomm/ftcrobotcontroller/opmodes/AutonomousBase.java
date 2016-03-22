@@ -104,8 +104,6 @@ public abstract class AutonomousBase extends OpMode {
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
-        turningGyro.calibrate();
-
         rightsideservo.setPosition(1.0d);
         climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
         gateServo.setPosition(0.5d);
@@ -117,6 +115,7 @@ public abstract class AutonomousBase extends OpMode {
     @Override
     public void start() {
 
+        turningGyro.calibrate();
         elapsedGameTime.reset();
         SetCurrentState(State.STATE_INITIAL);
         //collectMotor.setPower(1.0f);

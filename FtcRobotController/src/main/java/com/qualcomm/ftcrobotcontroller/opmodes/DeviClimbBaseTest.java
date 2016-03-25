@@ -1,6 +1,7 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
+import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class DeviClimbBaseTest extends AutonomousBase {
 
     static float climbingTime = 8.0f;
+    static boolean isCloseToMountain = false;
 
     public DrivePathSegment[] mountainPath = {
 
@@ -28,7 +30,7 @@ public class DeviClimbBaseTest extends AutonomousBase {
 
             case STATE_INITIAL:
 
-                if (!turningGyro.isCalibrating() && elapsedGameTime.time() >= 5.0fqacvc ) {
+                if (!turningGyro.isCalibrating() && elapsedGameTime.time() >= 5.0f) {
 
                     startPath(mountainPath);
                     transitionToNextState();
@@ -45,6 +47,18 @@ public class DeviClimbBaseTest extends AutonomousBase {
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
                     transitionToNextState();      // Next State:
+                }
+
+                if (elapsedGameTime.time() >= 22) {
+
+                    isCloseToMountain = true;
+                }
+
+                if (pathIsBlocked() && !isCloseToMountain) {
+
+                    pausedStateIndex = stateIndex;
+                    stateIndex = stateList.size() - 2;
+                    transitionToNextState();
                 }
 
                 break;
@@ -71,6 +85,20 @@ public class DeviClimbBaseTest extends AutonomousBase {
                 frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
 
                 break;
+
+            case STATE_WAIT:
+
+                TurnOffAllDriveMotors();
+
+                if (!pathIsBlocked()) {
+
+                    stateIndex = pausedStateIndex - 1;
+                    transitionToNextState();
+
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(segment.leftPower, segment.rightPower);
+                    SetDriveMotorPowerLevels(powerLevels);
+                }
         }
 
         SetEncoderTargets();
@@ -89,6 +117,11 @@ public class DeviClimbBaseTest extends AutonomousBase {
         }
     }
 
+    private boolean pathIsBlocked() {
+
+        return sharpIRSensor.getDistance() <= 50.0f;
+    }
+
     public void setClimbingPowerLevels() {
 
         frontLeftMotor.setPower(1.0d);
@@ -102,6 +135,7 @@ public class DeviClimbBaseTest extends AutonomousBase {
         stateList.add(AutonomousBase.State.STATE_DRIVE_TO_MOUNTAIN);
         stateList.add(AutonomousBase.State.STATE_CLIMB_MOUNTAIN);
         stateList.add(AutonomousBase.State.STATE_STOP);
+        stateList.add(State.STATE_WAIT);
     }
 
     @Override

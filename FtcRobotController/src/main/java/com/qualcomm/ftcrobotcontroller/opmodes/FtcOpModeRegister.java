@@ -74,6 +74,7 @@ public class FtcOpModeRegister implements OpModeRegister {
         manager.register("RedPushAndClimb", RedPushAndClimb.class);
         manager.register("BluePushAndClimb", BluePushAndClimb.class);
         manager.register("RedOppositeClimb", RedOppositeClimb.class);
+        manager.register("BlueOppositeClimb", BlueOppositeClimb.class);
         //manager.register("DoNothingAutonomous", DoNothingAutonomous.class);
         //manager.register("LeftReverseTest", LeftReverseTest.class);
         //manager.register("SecondLeftReverseTest", SecondLeftReverseTest.class);

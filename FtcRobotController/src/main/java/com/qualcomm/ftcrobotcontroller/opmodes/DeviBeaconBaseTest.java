@@ -126,11 +126,17 @@ public class DeviBeaconBaseTest extends AutonomousBase {
                     }
                 }
 
+                transitionToNextState();
+                finalTime = elapsedGameTime.time();
+
+                break;
+
             case STATE_STOP:
 
                 TurnOffAllDriveMotors();
                 frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
                 frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+                telemetry.addData("Final Time: ", finalTime);
 
                 break;
 

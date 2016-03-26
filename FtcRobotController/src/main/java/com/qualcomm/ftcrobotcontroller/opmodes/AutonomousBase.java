@@ -56,6 +56,7 @@ public abstract class AutonomousBase extends OpMode {
     int turnStartValueLeft;
     int turnStartValueRight;
     int pausedStateIndex = 0;
+    double finalTime = 0.0f;
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;

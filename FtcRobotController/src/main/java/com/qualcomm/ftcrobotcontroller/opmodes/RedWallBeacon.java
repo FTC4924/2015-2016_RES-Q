@@ -11,8 +11,10 @@ public class RedWallBeacon extends DeviBeaconBaseTest {
 
         beaconPath = new DrivePathSegment[] {
 
-                new DrivePathSegment(50.0f, 50.0f, 0.9f),
-                new DrivePathSegment(270.0f, 0.9f)
+                new DrivePathSegment(25.0f, 25.0f, 0.9f),
+                new DrivePathSegment(315.0f, 0.9f),
+                new DrivePathSegment(35.0f, 35.0f, 0.9f),
+                new DrivePathSegment(272.0f, 0.9f)
         };
     }
 }

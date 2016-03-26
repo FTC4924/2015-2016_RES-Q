@@ -69,6 +69,8 @@ public class DeviClimbBaseTest extends AutonomousBase {
 
                     TurnOffAllDriveMotors();
                     transitionToNextState();
+                    finalTime = elapsedGameTime.time();
+
 
                 } else {
 
@@ -83,6 +85,7 @@ public class DeviClimbBaseTest extends AutonomousBase {
                 collectMotor.setPower(0.0f);
                 frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
                 frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+                telemetry.addData("Final Time: ", finalTime);
 
                 break;
 

@@ -3,6 +3,7 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * Created by 4924_Users on 2/7/2016.
@@ -19,6 +20,11 @@ public class DeviBeaconBaseTest extends AutonomousBase {
     public boolean isRobotOnRedAlliance = false;
     private float COLOR_THRESHOLD = 2.0f;
     private boolean isCloseToBeacon = false;
+    static final float CLIMBER_ARM_DEPLOYED_ANGLE = 0.0f;
+    static final float CLIMBER_ARM_FOLDED_ANGLE = 1.0f;
+    final float CLIMBER_ARM_WAIT_TIME = 4.0f;
+    float climberArmAngle = 1.0f;
+    final float CLIMBER_ARM_ANGLE_INCREMENTATION = 0.005f;
 
     @Override
     public void loop() {
@@ -83,14 +89,19 @@ public class DeviBeaconBaseTest extends AutonomousBase {
 
             case STATE_DEPLOY_CLIMBERS:
 
-                if (elapsedTimeForCurrentState.time() >= 2.0f) {
+                if (climberArmAngle <= CLIMBER_ARM_DEPLOYED_ANGLE) {
 
-                    climberDeployer.setPosition(1.0f);
-                    transitionToNextState();
+                    if (elapsedTimeForCurrentState.time() >= CLIMBER_ARM_WAIT_TIME) {
+
+                        climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
+                        SetCurrentState(State.STATE_STOP);
+                    }
 
                 } else {
 
-                    climberDeployer.setPosition(0.0f);
+                    climberArmAngle -= CLIMBER_ARM_ANGLE_INCREMENTATION;
+                    climberArmAngle = Range.clip(climberArmAngle, 0.0f, 1.0f);
+                    climberDeployer.setPosition(climberArmAngle);
                 }
 
                 break;

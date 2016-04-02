@@ -11,6 +11,7 @@ public class BlueCornerOppositeClimb extends DeviClimbBaseTest {
 
         mountainPath = new DrivePathSegment[] {
 
+                new DrivePathSegment(5.0f),
                 new DrivePathSegment(20.0f, 20.0f, 1.0f),
                 new DrivePathSegment(0.0f, 0.7f),
                 new DrivePathSegment(20.0f, 20.0f, 1.0f),

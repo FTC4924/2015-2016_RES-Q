@@ -152,7 +152,7 @@ public class battel_tank extends OpMode {
         float accelerator2 = gamepad2.right_trigger;
         float accelerator3 = gamepad1.left_trigger;
         float winch = gamepad2.right_stick_y;
-        float arm = gamepad2.left_stick_y;
+        float arm = -gamepad2.left_stick_y;
         boolean collect1 = gamepad2.right_bumper;
         boolean collect2 = gamepad2.left_bumper;
         float colllectpower1 = 0.00f;

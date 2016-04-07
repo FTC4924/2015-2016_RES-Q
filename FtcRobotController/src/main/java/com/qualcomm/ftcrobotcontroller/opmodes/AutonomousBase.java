@@ -31,6 +31,7 @@ public abstract class AutonomousBase extends OpMode {
         STATE_MOVE_TO_FLOOR_GOAL,
         STATE_STOP,
         STATE_WAIT,
+        STATE_CHANGE_PATH,
     }
 
     public ArrayList<State> stateList = new ArrayList<State>();
@@ -57,6 +58,7 @@ public abstract class AutonomousBase extends OpMode {
     int turnStartValueRight;
     int pausedStateIndex = 0;
     double finalTime = 0.0f;
+    boolean newPathSet = false;
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;

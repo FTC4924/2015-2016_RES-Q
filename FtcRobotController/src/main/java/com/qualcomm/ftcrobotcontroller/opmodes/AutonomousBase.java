@@ -4,6 +4,7 @@ import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
 import com.qualcomm.ftcrobotcontroller.EncoderTargets;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
@@ -17,16 +18,20 @@ import java.util.ArrayList;
  * Created by 4924_Users on 2/6/2016.
  */
 
-public class AutonomousBase extends OpMode {
+public abstract class AutonomousBase extends OpMode {
 
     public enum State {
         STATE_INITIAL,
         STATE_DRIVE_TO_BEACON,
         STATE_APPROACH_BEACON,
         STATE_DEPLOY_CLIMBERS,
+        STATE_READ_BEACON,
         STATE_DRIVE_TO_MOUNTAIN,
         STATE_CLIMB_MOUNTAIN,
-        STATE_STOP
+        STATE_MOVE_TO_FLOOR_GOAL,
+        STATE_STOP,
+        STATE_WAIT,
+        STATE_CHANGE_PATH,
     }
 
     public ArrayList<State> stateList = new ArrayList<State>();
@@ -48,8 +53,12 @@ public class AutonomousBase extends OpMode {
     static final float CLIMBER_ARM_FOLDED_ANGLE = 1.0f;
     static final float BUMPER_DEPLOYED_ANGLE = 0.0f;
     static final float BUMPER_FOLDED_ANGLE = 0.6f;
+    static final float MOTOR_POWER_ADJUST = -0.1f;
     int turnStartValueLeft;
     int turnStartValueRight;
+    int pausedStateIndex = 0;
+    double finalTime = 0.0f;
+    boolean newPathSet = false;
 
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
@@ -62,6 +71,8 @@ public class AutonomousBase extends OpMode {
     Servo gateServo;
     GyroSensor turningGyro;
     TouchSensor bumper;
+    ColorSensor colorSensor;
+    SharpIR10To150 sharpIRSensor;
 
     public State currentState;
     public int currentPathSegmentIndex = 0;
@@ -89,12 +100,12 @@ public class AutonomousBase extends OpMode {
         gateServo = hardwareMap.servo.get("servo6");                //continuous?
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
+        colorSensor = hardwareMap.colorSensor.get("colorSensor");
+        sharpIRSensor = new SharpIR10To150(hardwareMap.analogInput.get("sharpIR"));
 
         setReversedMotor();
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
-
-        turningGyro.calibrate();
 
         rightsideservo.setPosition(1.0d);
         climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
@@ -107,9 +118,10 @@ public class AutonomousBase extends OpMode {
     @Override
     public void start() {
 
+        turningGyro.calibrate();
         elapsedGameTime.reset();
         SetCurrentState(State.STATE_INITIAL);
-        collectMotor.setPower(1.0f);
+        //collectMotor.setPower(1.0f);
         addStates();
     }
 
@@ -191,18 +203,15 @@ public class AutonomousBase extends OpMode {
                 turnStartValueRight = getRightPosition();
 
                 runWithoutEncoders();
+                double currentAngle = turningGyro.getHeading();
 
-                if (segment.Angle < 0) {
+                if (counterclockwiseTurnNeeded(currentAngle)) {
 
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(segment.Power, 0.0f);
-                    SetDriveMotorPowerLevels(powerLevels);
+                    segment.rightPower = 0.0f;
 
                 } else {
 
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.0f, segment.Power);
-                    SetDriveMotorPowerLevels(powerLevels);
+                    segment.leftPower = 0.0f;
                 }
 
             } else {
@@ -210,32 +219,43 @@ public class AutonomousBase extends OpMode {
                 if (segment.isDelay) {
 
                     runWithoutEncoders();
-
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.0f, 0.0f);
-                    SetDriveMotorPowerLevels(powerLevels);
+                    segment.leftPower = 0.0f;
+                    segment.rightPower = 0.0f;
 
                 } else {
 
                     int moveCounts  = (int)(segment.LeftSideDistance * countsPerInch);
-                    float power = segment.Power;
+                    float power = segment.leftPower;
 
                     useRunUsingEncoders();
                     addEncoderTarget(moveCounts, moveCounts);
 
                     if (moveCounts < 0) {
 
-                        power *= -1;
+                        segment.leftPower *= -1;
+                        segment.rightPower *= -1;
                     }
-
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(power, power);
-                    SetDriveMotorPowerLevels(powerLevels);
                 }
             }
 
+            FourWheelDrivePowerLevels powerLevels =
+                    new FourWheelDrivePowerLevels(segment.leftPower, segment.rightPower);
+            SetDriveMotorPowerLevels(powerLevels);
+
             currentPathSegmentIndex++;
         }
+    }
+
+    private boolean counterclockwiseTurnNeeded(double currentAngle) {
+
+        telemetry.addData("Angle: ", currentAngle);
+
+        if (currentAngle < Math.abs(segment.Angle)) {
+
+            return (Math.abs(segment.Angle) - currentAngle) >= 180.0f;
+        }
+
+        return (currentAngle - Math.abs(segment.Angle)) <= 180.0f;
     }
 
     public void addEncoderTarget(int leftEncoderAdder, int rightEncoderAdder) {
@@ -246,8 +266,8 @@ public class AutonomousBase extends OpMode {
 
     public void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
 
-        frontRightMotor.setPower(levels.frontLeft);
-        frontLeftMotor.setPower(levels.backRight);
+        frontRightMotor.setPower(levels.frontRight);
+        frontLeftMotor.setPower(levels.frontLeft);
     }
 
     public boolean pathComplete() {
@@ -345,15 +365,20 @@ public class AutonomousBase extends OpMode {
 
     public void transitionToNextState() {
 
+        
         stateIndex++;
         SetCurrentState(stateList.get(stateIndex));
     }
 
-    public void addStates() {
+    public void initServos() {
 
+        rightsideservo.setPosition(1.0d);
+        gateServo.setPosition(0.5d);
+        ziplinerTripper.setPosition(0.5d);
+        deliveryBelt.setPosition(0.5d);
     }
 
-    public void setReversedMotor() {
+    public abstract void addStates();
 
-    }
+    public abstract void setReversedMotor();
 }

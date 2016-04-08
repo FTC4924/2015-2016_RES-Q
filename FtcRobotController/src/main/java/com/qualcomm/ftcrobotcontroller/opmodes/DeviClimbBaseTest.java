@@ -1,6 +1,7 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
+import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class DeviClimbBaseTest extends AutonomousBase {
 
     static float climbingTime = 8.0f;
+    static boolean isCloseToMountain = false;
 
     public DrivePathSegment[] mountainPath = {
 
@@ -21,17 +23,14 @@ public class DeviClimbBaseTest extends AutonomousBase {
     @Override
     public void loop() {
 
-        rightsideservo.setPosition(1.0d);
         climberDeployer.setPosition(1.0d);
-        gateServo.setPosition(0.5d);
-        ziplinerTripper.setPosition(0.5d);
-        deliveryBelt.setPosition(0.5d);
+        initServos();
 
         switch (currentState) {
 
             case STATE_INITIAL:
 
-                if (!turningGyro.isCalibrating()) {
+                if (!turningGyro.isCalibrating() && elapsedGameTime.time() >= 5.0f) {
 
                     startPath(mountainPath);
                     transitionToNextState();
@@ -50,6 +49,18 @@ public class DeviClimbBaseTest extends AutonomousBase {
                     transitionToNextState();      // Next State:
                 }
 
+                if (elapsedGameTime.time() >= 22) {
+
+                    isCloseToMountain = true;
+                }
+
+                if (pathIsBlocked() && !isCloseToMountain) {
+
+                    pausedStateIndex = stateIndex;
+                    stateIndex = stateList.size() - 2;
+                    transitionToNextState();
+                }
+
                 break;
 
             case STATE_CLIMB_MOUNTAIN:
@@ -58,6 +69,8 @@ public class DeviClimbBaseTest extends AutonomousBase {
 
                     TurnOffAllDriveMotors();
                     transitionToNextState();
+                    finalTime = elapsedGameTime.time();
+
 
                 } else {
 
@@ -72,8 +85,23 @@ public class DeviClimbBaseTest extends AutonomousBase {
                 collectMotor.setPower(0.0f);
                 frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
                 frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+                telemetry.addData("Final Time: ", finalTime);
 
                 break;
+
+            case STATE_WAIT:
+
+                TurnOffAllDriveMotors();
+
+                if (!pathIsBlocked()) {
+
+                    stateIndex = pausedStateIndex - 1;
+                    transitionToNextState();
+
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(segment.leftPower, segment.rightPower);
+                    SetDriveMotorPowerLevels(powerLevels);
+                }
         }
 
         SetEncoderTargets();
@@ -83,7 +111,7 @@ public class DeviClimbBaseTest extends AutonomousBase {
 
             TurnOffAllDriveMotors();
             runWithoutEncoders();
-            transitionToNextState();
+            SetCurrentState(State.STATE_STOP);
         }
 
         if (elapsedGameTime.time() >= 2.0f) {
@@ -92,10 +120,15 @@ public class DeviClimbBaseTest extends AutonomousBase {
         }
     }
 
+    private boolean pathIsBlocked() {
+
+        return sharpIRSensor.getDistance() <= 50.0f;
+    }
+
     public void setClimbingPowerLevels() {
 
-        frontLeftMotor.setPower(0.6d);
-        frontRightMotor.setPower(0.6d);
+        frontLeftMotor.setPower(1.0d);
+        frontRightMotor.setPower(1.0d);
     }
 
     @Override
@@ -105,11 +138,12 @@ public class DeviClimbBaseTest extends AutonomousBase {
         stateList.add(AutonomousBase.State.STATE_DRIVE_TO_MOUNTAIN);
         stateList.add(AutonomousBase.State.STATE_CLIMB_MOUNTAIN);
         stateList.add(AutonomousBase.State.STATE_STOP);
+        stateList.add(State.STATE_WAIT);
     }
 
     @Override
     public void setReversedMotor() {
 
-        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 }

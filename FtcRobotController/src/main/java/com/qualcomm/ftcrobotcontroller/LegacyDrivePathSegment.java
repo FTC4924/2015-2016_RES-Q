@@ -16,7 +16,7 @@ public class LegacyDrivePathSegment extends DrivePathSegment {
         LeftRearDistance = left;
         RightSideDistance = right;
         RightRearDistance = right;
-        Power = power;
+        leftPower = power;
         Time = time;
     }
 
@@ -27,7 +27,7 @@ public class LegacyDrivePathSegment extends DrivePathSegment {
         LeftRearDistance = leftRear;
         RightSideDistance = rightFront;
         RightRearDistance = rightRear;
-        Power = power;
+        leftPower = power;
         Time = time;
     }
 }

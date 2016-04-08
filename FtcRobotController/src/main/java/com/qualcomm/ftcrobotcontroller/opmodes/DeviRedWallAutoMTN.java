@@ -176,8 +176,8 @@ public class DeviRedWallAutoMTN extends OpMode {
             Right = (int)(currentPath[currentPathSegmentIndex].RightSideDistance * countsPerInch);
             addEncoderTarget(Left, Right);
             FourWheelDrivePowerLevels powerLevels =
-                    new FourWheelDrivePowerLevels(currentPath[currentPathSegmentIndex].Power,
-                            currentPath[currentPathSegmentIndex].Power);
+                    new FourWheelDrivePowerLevels(currentPath[currentPathSegmentIndex].leftPower,
+                            currentPath[currentPathSegmentIndex].leftPower);
             SetDriveMotorPowerLevels(powerLevels);
 
             currentPathSegmentIndex++;

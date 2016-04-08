@@ -53,6 +53,7 @@ public class battel_tank extends OpMode {
         time.reset();
         servo_time = new ElapsedTime();
         servo_time.reset();
+        servo_angles.backrightservo = 0.95f;
         servo_angles.servo3 = 0.50f;
         servo_angles.climers = 1.00f;
         servo_angles.servo5 = 0.50f;
@@ -153,7 +154,7 @@ public class battel_tank extends OpMode {
         float accelerator2 = gamepad2.right_trigger;
         float accelerator3 = gamepad1.left_trigger;
         float winch = gamepad2.right_stick_y;
-        float arm = gamepad2.left_stick_y;
+        float arm = -gamepad2.left_stick_y;
         boolean collect1 = gamepad2.right_bumper;
         boolean collect2 = gamepad2.left_bumper;
         float colllectpower1 = 0.00f;
@@ -168,7 +169,7 @@ public class battel_tank extends OpMode {
 
         frontright = Range.clip(frontright, -1.0f, 1.0f);
         frontleft = Range.clip(frontleft, -1.0f, 1.0f);
-        arm = Range.clip(arm, -0.35f, 0.35f);                //Negative is for raising, positive is for lowering
+        arm = Range.clip(arm, -0.7f, 0.7f);                //Negative is for raising, positive is for lowering
         winch = Range.clip(winch, -1.00f, 1.00f);
 
         frontright = frontright * accelerator;

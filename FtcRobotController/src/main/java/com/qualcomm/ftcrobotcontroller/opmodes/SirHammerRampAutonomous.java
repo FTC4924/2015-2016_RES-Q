@@ -1,7 +1,5 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import android.media.SoundPool;
-
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.ftcrobotcontroller.LegacyDrivePathSegment;
 import com.qualcomm.ftcrobotcontroller.SirHammerEncoderTargets;
@@ -319,8 +317,8 @@ public class SirHammerRampAutonomous extends OpMode {
             segmentTime = currentPath[currentPathSegmentIndex].Time;
             addEncoderTarget(leftFront, leftRear, rightFront, rightRear);
             FourWheelDrivePowerLevels powerLevels =
-                    new FourWheelDrivePowerLevels(currentPath[currentPathSegmentIndex].Power,
-                            currentPath[currentPathSegmentIndex].Power);
+                    new FourWheelDrivePowerLevels(currentPath[currentPathSegmentIndex].leftPower,
+                            currentPath[currentPathSegmentIndex].leftPower);
             SetDriveMotorPowerLevels(powerLevels);
 
             currentPathSegmentIndex++;

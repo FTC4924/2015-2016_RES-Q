@@ -139,6 +139,7 @@ public abstract class AutonomousBase extends OpMode {
 
     public void addTelemetry() {
 
+        telemetry.addData("IR Reading: ", sharpIRSensor.getDistance());
         telemetry.addData("L Target: ", currentEncoderTargets.LeftTarget);
         telemetry.addData("L Pos: ", getLeftPosition());
         telemetry.addData("R Target: ", currentEncoderTargets.RightTarget);
@@ -225,7 +226,6 @@ public abstract class AutonomousBase extends OpMode {
                 } else {
 
                     int moveCounts  = (int)(segment.LeftSideDistance * countsPerInch);
-                    float power = segment.leftPower;
 
                     useRunUsingEncoders();
                     addEncoderTarget(moveCounts, moveCounts);

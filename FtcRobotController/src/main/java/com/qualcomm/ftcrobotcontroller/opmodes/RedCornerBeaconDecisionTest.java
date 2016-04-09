@@ -23,4 +23,10 @@ public class RedCornerBeaconDecisionTest extends DeviBeaconBaseDecisionTest {
 
         return true;
     }
+
+    @Override
+    boolean isStartingOnWall() {
+
+        return false;
+    }
 }

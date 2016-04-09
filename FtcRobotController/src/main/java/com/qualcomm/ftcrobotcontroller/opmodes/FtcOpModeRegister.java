@@ -56,20 +56,8 @@ public class FtcOpModeRegister implements OpModeRegister {
      */
 
         manager.register("battel_tank", battel_tank.class);
-        //manager.register("RedMountainBaseClimb", RedMountainBaseClimb.class);
-        //manager.register("BlueMountainBaseClimb", BlueMountainBaseClimb.class);
-        //manager.register("RedWallClimb", RedWallClimb.class);
-        //manager.register("BlueWallClimb", BlueWallClimb.class);
-        //manager.register("RedMountainBaseClimbDelay", RedMountainBaseClimbDelay.class);
-        //manager.register("BlueMountainBaseClimbDelay", BlueMountainBaseClimbDelay.class);
-        //manager.register("RedWallClimbDelay", RedWallClimbDelay.class);
-        //manager.register("BlueWallClimbDelay", BlueWallClimbDelay.class);
-        manager.register("RedCornerBeacon", RedCornerBeacon.class);
-        manager.register("BlueCornerBeacon", BlueCornerBeacon.class);
-        //manager.register("BumperServoTest", BumperServoTest.class);
-        //manager.register("BeaconPathTest", BeaconPathTest.class);
-        //manager.register("ColorSensorTest", ColorSensorTest.class);
-        //manager.register("SharpIRTest", SharpIRTest.class);
+        //manager.register("RedCornerBeacon", RedCornerBeacon.class);
+        //manager.register("BlueCornerBeacon", BlueCornerBeacon.class);
         manager.register("DriveToFloorGoal", DriveToFloorGoal.class);
         manager.register("RedPushAndClimb", RedPushAndClimb.class);
         manager.register("BluePushAndClimb", BluePushAndClimb.class);
@@ -77,12 +65,11 @@ public class FtcOpModeRegister implements OpModeRegister {
         manager.register("BlueMtnBaseOppositeClimb", BlueMtnBaseOppositeClimb.class);
         manager.register("RedCornerOppositeClimb", RedCornerOppositeClimb.class);
         manager.register("BlueCornerOppositeClimb", BlueCornerOppositeClimb.class);
-        manager.register("RedWallBeacon", RedWallBeacon.class);
-        manager.register("BlueWallBeacon", BlueWallBeacon.class);
+        //manager.register("RedWallBeacon", RedWallBeacon.class);
+        //manager.register("BlueWallBeacon", BlueWallBeacon.class);
         manager.register("RedCornerBeaconDecisionTest", RedCornerBeaconDecisionTest.class);
-        //manager.register("DoNothingAutonomous", DoNothingAutonomous.class);
-        //manager.register("LeftReverseTest", LeftReverseTest.class);
-        //manager.register("SecondLeftReverseTest", SecondLeftReverseTest.class);
-        //manager.register("EncoderTest", EncoderTest.class);
+        manager.register("BlueCornerBeaconDecisionTest", BlueCornerBeaconDecisionTest.class);
+        manager.register("RedWallBeaconDecisionTest", RedWallBeaconDecisionTest.class);
+        manager.register("BlueWallBeaconDecisionTest", BlueWallBeaconDecisionTest.class);
     }
 }

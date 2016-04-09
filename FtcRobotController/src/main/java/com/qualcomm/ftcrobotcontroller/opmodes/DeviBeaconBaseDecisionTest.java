@@ -55,10 +55,10 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
                     transitionToNextState();
                 }
 
-                if (currentPathSegmentIndex == objectivePath.length - 1) {
+                /*if (currentPathSegmentIndex == objectivePath.length - 1) {
 
                     isCloseToBeacon = true;
-                }
+                }*/
 
                 if (pathIsBlocked() && !isCloseToBeacon) {
 
@@ -147,33 +147,69 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
 
                 if (!newPathSet) {
 
-                    float distanceToNewTarget = (float) (40.0f - (frontRightMotor.getCurrentPosition() / countsPerInch));
+                    float distanceToNewTarget;
 
-                    if (isRobotOnRedAlliance()) {
+                    if (isStartingOnWall()) {
 
-                        objectivePath = new DrivePathSegment[] {
+                        if (isRobotOnRedAlliance()) {
 
-                                new DrivePathSegment(0.0f, 0.7f),
-                                new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
-                                new DrivePathSegment(92.0f, 0.7f),
-                                new DrivePathSegment(20.0f, 20.0f, 1.0f),
-                                new DrivePathSegment(92.0f, 0.7f),
-                                new DrivePathSegment(20.0f, 20.0f, 1.0f),
-                                new DrivePathSegment(92.0f, 0.7f)
-                        };
+                            distanceToNewTarget = (float) (15.0f - (frontRightMotor.getCurrentPosition() / countsPerInch));
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(47.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 25.0f, 1.0f),
+                                    new DrivePathSegment(47.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 25.0f, 1.0f),
+                                    new DrivePathSegment(47.0f, 0.7f)
+                            };
+
+                        } else {
+
+                            distanceToNewTarget = (float) (15.0f - (frontLeftMotor.getCurrentPosition() / countsPerInch));
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(317.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 35.0f, 1.0f),
+                                    new DrivePathSegment(317.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 35.0f, 1.0f),
+                                    new DrivePathSegment(317.0f, 0.7f)
+                            };
+                        }
 
                     } else {
 
-                        objectivePath = new DrivePathSegment[] {
+                        distanceToNewTarget = (float) (40.0f - (frontLeftMotor.getCurrentPosition() / countsPerInch));
 
-                                new DrivePathSegment(0.0f, 0.7f),
-                                new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
-                                new DrivePathSegment(272.0f, 0.7f),
-                                new DrivePathSegment(20.0f, 20.0f, 1.0f),
-                                new DrivePathSegment(272.0f, 0.7f),
-                                new DrivePathSegment(20.0f, 20.0f, 1.0f),
-                                new DrivePathSegment(272.0f, 0.7f)
-                        };
+                        if (isRobotOnRedAlliance()) {
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(0.0f, 0.7f),
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(92.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(92.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(92.0f, 0.7f)
+                            };
+
+                        } else {
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(0.0f, 0.7f),
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(272.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(272.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(272.0f, 0.7f)
+                            };
+                        }
                     }
 
                     newPathSet = true;
@@ -258,4 +294,6 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
     }
 
     abstract boolean isRobotOnRedAlliance();
+
+    abstract boolean isStartingOnWall();
 }

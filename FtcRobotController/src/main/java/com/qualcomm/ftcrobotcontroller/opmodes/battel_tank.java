@@ -129,10 +129,12 @@ public class battel_tank extends OpMode {
 
         if (gamepad2.dpad_up && (servo_time.time() > DELAY)){
             servo_angles.servo3 = 0.00f;
+            servo_time.reset();
         }
 
         if (gamepad2.dpad_down && (servo_time.time() > DELAY)){
             servo_angles.servo3 = 1.00f;
+            servo_time.reset();
         }
 
         servo_angles.servo3 = Range.clip(servo_angles.servo3, 0.0f, 1.0f);

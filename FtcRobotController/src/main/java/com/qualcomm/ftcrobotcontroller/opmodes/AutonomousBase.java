@@ -69,6 +69,7 @@ public abstract class AutonomousBase extends OpMode {
     Servo deliveryBelt;
     Servo bumperServo;
     Servo gateServo;
+    Servo backBumperServo;
     GyroSensor turningGyro;
     TouchSensor bumper;
     ColorSensor colorSensor;
@@ -93,7 +94,7 @@ public abstract class AutonomousBase extends OpMode {
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
         collectMotor = hardwareMap.dcMotor.get("collection");
         bumperServo = hardwareMap.servo.get("servo1");
-        rightsideservo = hardwareMap.servo.get("servo2");
+        backBumperServo = hardwareMap.servo.get("servo2");
         deliveryBelt = hardwareMap.servo.get("servo3");             //continuous
         climberDeployer = hardwareMap.servo.get("servo4");
         ziplinerTripper = hardwareMap.servo.get("servo5");          //continuous
@@ -107,7 +108,7 @@ public abstract class AutonomousBase extends OpMode {
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
-        rightsideservo.setPosition(1.0d);
+        backBumperServo.setPosition(0.5d);
         climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);

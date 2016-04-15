@@ -28,7 +28,6 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
     @Override
     public void loop() {
 
-        colorSensor.enableLed(false);
         initServos();
 
         switch (currentState) {
@@ -101,15 +100,6 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
                     climberArmAngle = Range.clip(climberArmAngle, 0.0f, 1.0f);
                     climberDeployer.setPosition(climberArmAngle);
                 }
-
-                break;
-
-            case STATE_READ_BEACON:
-
-                telemetry.addData("Red: ", isRed());
-                telemetry.addData("Blue: ", isBlue());
-                transitionToNextState();
-                finalTime = elapsedGameTime.time();
 
                 break;
 
@@ -265,16 +255,6 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
         return sharpIRSensor.getDistance() <= 50.0f;
     }
 
-    public boolean isRed() {
-
-        return colorSensor.red() >= COLOR_THRESHOLD;
-    }
-
-    public boolean isBlue() {
-
-        return colorSensor.blue() >= COLOR_THRESHOLD;
-    }
-
     @Override
     public void addStates() {
 
@@ -282,7 +262,6 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
         stateList.add(State.STATE_DRIVE_TO_BEACON);
         stateList.add(State.STATE_APPROACH_BEACON);
         stateList.add(State.STATE_DEPLOY_CLIMBERS);
-        stateList.add(State.STATE_READ_BEACON);
         stateList.add(State.STATE_STOP);
         stateList.add(State.STATE_WAIT);
         stateList.add(State.STATE_CHANGE_PATH);

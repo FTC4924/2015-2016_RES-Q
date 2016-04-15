@@ -25,7 +25,6 @@ public abstract class AutonomousBase extends OpMode {
         STATE_DRIVE_TO_BEACON,
         STATE_APPROACH_BEACON,
         STATE_DEPLOY_CLIMBERS,
-        STATE_READ_BEACON,
         STATE_DRIVE_TO_MOUNTAIN,
         STATE_CLIMB_MOUNTAIN,
         STATE_MOVE_TO_FLOOR_GOAL,
@@ -72,7 +71,6 @@ public abstract class AutonomousBase extends OpMode {
     Servo backBumperServo;
     GyroSensor turningGyro;
     TouchSensor bumper;
-    ColorSensor colorSensor;
     SharpIR10To150 sharpIRSensor;
 
     public State currentState;
@@ -101,7 +99,6 @@ public abstract class AutonomousBase extends OpMode {
         gateServo = hardwareMap.servo.get("servo6");                //continuous?
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
-        colorSensor = hardwareMap.colorSensor.get("colorSensor");
         sharpIRSensor = new SharpIR10To150(hardwareMap.analogInput.get("sharpIR"));
 
         setReversedMotor();

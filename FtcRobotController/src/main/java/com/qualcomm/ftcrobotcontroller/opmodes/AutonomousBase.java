@@ -104,7 +104,7 @@ public abstract class AutonomousBase extends OpMode {
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
-        backBumperServo.setPosition(0.3d);
+        backBumperServo.setPosition(0.5d);
         climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);

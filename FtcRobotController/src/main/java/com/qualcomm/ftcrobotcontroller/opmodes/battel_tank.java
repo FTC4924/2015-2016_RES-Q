@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 public class battel_tank extends OpMode {
 
-    final float BUMPER_LOW_POSITION = 0.3f;
+    final float BUMPER_LOW_POSITION = 0.5f;
     final float BUMPER_HIGH_POSITION = 0.0f;
 
     DcMotor frontrightmotor;

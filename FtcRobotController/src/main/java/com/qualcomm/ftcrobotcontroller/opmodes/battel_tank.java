@@ -1,8 +1,10 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
+import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
 import com.qualcomm.ftcrobotcontroller.battel_tank_servo_angles;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -11,6 +13,8 @@ import com.qualcomm.robotcore.util.Range;
  * Created by 4924_Users on 10/16/2015.
  */
 public class battel_tank extends OpMode {
+
+    public FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
 
     final float BUMPER_LOW_POSITION = 0.5f;
     final float BUMPER_HIGH_POSITION = 0.0f;
@@ -50,6 +54,12 @@ public class battel_tank extends OpMode {
         servo5 = hardwareMap.servo.get("servo5");
         gateservo = hardwareMap.servo.get("servo6");
         servo_angles = new battel_tank_servo_angles();
+
+        frontleftmotor.setDirection(DcMotor.Direction.FORWARD);
+        frontrightmotor.setDirection(DcMotor.Direction.FORWARD);
+        TurnOffAllDriveMotors();
+        runWithoutEncoders();
+
         frontleftmotor.setDirection(DcMotor.Direction.REVERSE);
 
         time = new ElapsedTime();
@@ -210,6 +220,7 @@ public class battel_tank extends OpMode {
 
         telemetry.addData("frontright", frontright);
         telemetry.addData("frontleft", frontleft);
+        telemetry.addData("accelerator3", accelerator3);
         telemetry.addData("arm", arm);
         telemetry.addData("winch", winch);
         telemetry.addData("servo1", servo_angles.backmidservo);
@@ -254,5 +265,28 @@ public class battel_tank extends OpMode {
         }
 
         return dScale;
+    }
+
+    public void runWithoutEncoders() {
+
+        setDriveMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
+    }
+
+    public void TurnOffAllDriveMotors() {
+        SetDriveMotorPowerLevels(zeroPowerLevels);
+    }
+
+    public void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
+
+        frontrightmotor.setPower(levels.frontRight);
+        frontleftmotor.setPower(levels.frontLeft);
+    }
+
+    public void setDriveMode(DcMotorController.RunMode mode) {
+
+        if (frontleftmotor.getChannelMode() != mode)
+            frontrightmotor.setChannelMode(mode);
+        if (frontrightmotor.getChannelMode() != mode)
+            frontleftmotor.setChannelMode(mode);
     }
 }

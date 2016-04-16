@@ -132,6 +132,8 @@ public abstract class AutonomousBase extends OpMode {
 
         frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
         frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
+        TurnOffAllDriveMotors();
+        runWithoutEncoders();
     }
 
     public void addTelemetry() {

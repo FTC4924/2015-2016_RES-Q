@@ -54,10 +54,22 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
                     transitionToNextState();
                 }
 
-                /*if (currentPathSegmentIndex == objectivePath.length - 1) {
+                float encoderPositionAverage = (frontRightMotor.getCurrentPosition() + frontLeftMotor.getCurrentPosition()) / 2;
 
-                    isCloseToBeacon = true;
-                }*/
+                if (isStartingOnWall()) {
+
+                    if (encoderPositionAverage >= 50.0f * countsPerInch) {
+
+                        isCloseToBeacon = true;
+                    }
+
+                } else {
+
+                    if (encoderPositionAverage >= 68.0f * countsPerInch) {
+
+                        isCloseToBeacon = true;
+                    }
+                }
 
                 if (pathIsBlocked() && !isCloseToBeacon) {
 

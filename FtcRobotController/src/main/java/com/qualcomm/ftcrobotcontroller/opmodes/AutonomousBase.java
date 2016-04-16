@@ -62,7 +62,6 @@ public abstract class AutonomousBase extends OpMode {
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
     DcMotor collectMotor;
-    Servo rightsideservo; //rightsideservo is a
     Servo climberDeployer; //frontrightservo is a 180
     Servo ziplinerTripper;
     Servo deliveryBelt;
@@ -105,7 +104,7 @@ public abstract class AutonomousBase extends OpMode {
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
-        backBumperServo.setPosition(0.5d);
+        backBumperServo.setPosition(0.3d);
         climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
@@ -370,7 +369,6 @@ public abstract class AutonomousBase extends OpMode {
 
     public void initServos() {
 
-        rightsideservo.setPosition(1.0d);
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);

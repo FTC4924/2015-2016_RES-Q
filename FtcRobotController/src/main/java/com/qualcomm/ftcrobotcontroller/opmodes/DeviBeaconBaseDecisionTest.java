@@ -126,7 +126,7 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
                     SetDriveMotorPowerLevels(powerLevels);
                 }
 
-                if (elapsedGameTime.time() >= 15.0f) {
+                if (elapsedTimeForCurrentSegment.time() >= 2.0f && elapsedGameTime.time() >= 8.0f) {
 
                     SetCurrentState(State.STATE_CHANGE_PATH);
                 }
@@ -241,6 +241,7 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
 
             TurnOffAllDriveMotors();
             runWithoutEncoders();
+            finalTime = elapsedGameTime.time();
             SetCurrentState(State.STATE_STOP);
         }
 

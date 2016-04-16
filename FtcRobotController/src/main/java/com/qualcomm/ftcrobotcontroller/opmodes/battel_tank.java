@@ -12,6 +12,9 @@ import com.qualcomm.robotcore.util.Range;
  */
 public class battel_tank extends OpMode {
 
+    final float BUMPER_LOW_POSITION = 0.3f;
+    final float BUMPER_HIGH_POSITION = 0.0f;
+
     DcMotor frontrightmotor;
     DcMotor frontleftmotor;
     DcMotor armmotor;
@@ -53,11 +56,18 @@ public class battel_tank extends OpMode {
         time.reset();
         servo_time = new ElapsedTime();
         servo_time.reset();
-        servo_angles.backrightservo = 0.95f;
+        servo_angles.backrightservo = BUMPER_LOW_POSITION;
         servo_angles.servo3 = 0.50f;
         servo_angles.climers = 1.00f;
         servo_angles.servo5 = 0.50f;
         servo_angles.gateservo = 0.50f;
+
+        backmidservo.setPosition(servo_angles.backmidservo);
+        backrightservo.setPosition(servo_angles.backrightservo);
+        servo3.setPosition(servo_angles.servo3);
+        climers.setPosition(servo_angles.climers);
+        servo5.setPosition(servo_angles.servo5);
+        gateservo.setPosition(servo_angles.gateservo);
     }
 
     @Override
@@ -103,19 +113,19 @@ public class battel_tank extends OpMode {
         }
 
         if (gamepad2.a && (servo_time.time() > DELAY)){
-            servo_angles.backrightservo = 0.00f;
+            servo_angles.backrightservo = BUMPER_HIGH_POSITION;
             servo_time.reset();
         }
 
         if (gamepad2.b && (servo_time.time() > DELAY)){
-            servo_angles.backrightservo = 0.50f;
+            servo_angles.backrightservo = BUMPER_LOW_POSITION;
             servo_time.reset();
         }
 
-        if (gamepad2.y && (servo_time.time() > DELAY)){
+        /*if (gamepad2.y && (servo_time.time() > DELAY)){
             servo_angles.backrightservo = 0.95f;
             servo_time.reset();
-        }
+        }*/
 
         if (gamepad2.dpad_left && (servo_time.time() > DELAY)){
             servo_angles.gateservo = 0.00f;

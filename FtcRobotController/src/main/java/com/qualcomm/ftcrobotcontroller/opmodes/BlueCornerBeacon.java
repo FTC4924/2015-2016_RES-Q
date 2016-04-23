@@ -9,7 +9,7 @@ public class BlueCornerBeacon extends DeviBeaconBase {
 
     public BlueCornerBeacon() {
 
-        beaconPath = new DrivePathSegment[] {
+        objectivePath = new DrivePathSegment[] {
 
                 new DrivePathSegment(-10.0f, 0.7f),
                 new DrivePathSegment(26.0f, 27.0f, 0.9f),
@@ -19,5 +19,17 @@ public class BlueCornerBeacon extends DeviBeaconBase {
                 new DrivePathSegment(26.0f, 27.0f, 0.9f),
                 new DrivePathSegment(-50.0f, 0.7f)
         };
+    }
+
+    @Override
+    boolean isRobotOnRedAlliance() {
+
+        return false;
+    }
+
+    @Override
+    boolean isStartingOnWall() {
+
+        return false;
     }
 }

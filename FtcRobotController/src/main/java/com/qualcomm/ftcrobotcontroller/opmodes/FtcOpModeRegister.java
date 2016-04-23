@@ -56,8 +56,8 @@ public class FtcOpModeRegister implements OpModeRegister {
      */
 
         manager.register("battel_tank", battel_tank.class);
-        //manager.register("RedCornerBeacon", RedCornerBeacon.class);
-        //manager.register("BlueCornerBeacon", BlueCornerBeacon.class);
+        manager.register("RedCornerBeacon", RedCornerBeacon.class);
+        manager.register("BlueCornerBeacon", BlueCornerBeacon.class);
         manager.register("DriveToFloorGoal", DriveToFloorGoal.class);
         manager.register("RedPushAndClimb", RedPushAndClimb.class);
         manager.register("BluePushAndClimb", BluePushAndClimb.class);
@@ -65,12 +65,12 @@ public class FtcOpModeRegister implements OpModeRegister {
         manager.register("BlueMtnBaseOppositeClimb", BlueMtnBaseOppositeClimb.class);
         manager.register("RedCornerOppositeClimb", RedCornerOppositeClimb.class);
         manager.register("BlueCornerOppositeClimb", BlueCornerOppositeClimb.class);
-        //manager.register("RedWallBeacon", RedWallBeacon.class);
-        //manager.register("BlueWallBeacon", BlueWallBeacon.class);
-        manager.register("RedCornerBeaconDecisionTest", RedCornerBeaconDecisionTest.class);
-        manager.register("BlueCornerBeaconDecisionTest", BlueCornerBeaconDecisionTest.class);
-        manager.register("RedWallBeaconDecisionTest", RedWallBeaconDecisionTest.class);
-        manager.register("BlueWallBeaconDecisionTest", BlueWallBeaconDecisionTest.class);
-        manager.register("SharpIRTest", SharpIRTest.class);
+        manager.register("RedWallBeacon", RedWallBeacon.class);
+        manager.register("BlueWallBeacon", BlueWallBeacon.class);
+        //manager.register("RedCornerBeaconDecisionTest", RedCornerBeaconDecisionTest.class);
+        //manager.register("BlueCornerBeaconDecisionTest", BlueCornerBeaconDecisionTest.class);
+        //manager.register("RedWallBeaconDecisionTest", RedWallBeaconDecisionTest.class);
+        //manager.register("BlueWallBeaconDecisionTest", BlueWallBeaconDecisionTest.class);
+        //manager.register("SharpIRTest", SharpIRTest.class);
     }
 }

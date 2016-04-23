@@ -6,18 +6,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 /**
- * Created by 4924_Users on 2/7/2016.
+ * Created by William on 4/7/2016.
  */
-public class DeviBeaconBase extends AutonomousBase {
+public abstract class DeviBeaconBase extends AutonomousBase {
 
-    public DrivePathSegment[] beaconPath = {
+    public DrivePathSegment[] objectivePath = {
 
             new DrivePathSegment(105.0f, 105.0f, 0.9f),
             new DrivePathSegment(315.0f, 0.7f),
             new DrivePathSegment(8.0f, 8.0f, 0.9f)
     };
 
-    public boolean isRobotOnRedAlliance = false;
     private float COLOR_THRESHOLD = 2.0f;
     private boolean isCloseToBeacon = false;
     static final float CLIMBER_ARM_DEPLOYED_ANGLE = 0.0f;
@@ -37,7 +36,7 @@ public class DeviBeaconBase extends AutonomousBase {
 
                 if (!turningGyro.isCalibrating() && elapsedGameTime.time() >= 5.0f) {
 
-                    startPath(beaconPath);
+                    startPath(objectivePath);
                     transitionToNextState();
                     telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
                             getRightPosition()));
@@ -55,16 +54,27 @@ public class DeviBeaconBase extends AutonomousBase {
                     transitionToNextState();
                 }
 
-                if (elapsedGameTime.time() >= 22) {
+                float encoderPositionAverage = (frontRightMotor.getCurrentPosition() + frontLeftMotor.getCurrentPosition()) / 2;
 
-                    isCloseToBeacon = true;
+                if (isStartingOnWall()) {
+
+                    if (encoderPositionAverage >= 50.0f * countsPerInch) {
+
+                        isCloseToBeacon = true;
+                    }
+
+                } else {
+
+                    if (encoderPositionAverage >= 68.0f * countsPerInch) {
+
+                        isCloseToBeacon = true;
+                    }
                 }
 
                 if (pathIsBlocked() && !isCloseToBeacon) {
 
                     pausedStateIndex = stateIndex;
-                    stateIndex = stateList.size() - 2;
-                    transitionToNextState();
+                    SetCurrentState(State.STATE_WAIT);
                 }
 
                 break;
@@ -128,6 +138,111 @@ public class DeviBeaconBase extends AutonomousBase {
                     SetDriveMotorPowerLevels(powerLevels);
                 }
 
+                if (elapsedTimeForCurrentSegment.time() >= 5.0f && elapsedGameTime.time() >= 8.0f) {
+
+                    SetCurrentState(State.STATE_CHANGE_PATH);
+                }
+
+                break;
+
+            case STATE_CHANGE_PATH:
+
+                if (!newPathSet) {
+
+                    float distanceToNewTarget;
+
+                    if (isStartingOnWall()) {
+
+                        if (isRobotOnRedAlliance()) {
+
+                            distanceToNewTarget = (float) (15.0f - (frontRightMotor.getCurrentPosition() / countsPerInch));
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(47.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 25.0f, 1.0f),
+                                    new DrivePathSegment(47.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 25.0f, 1.0f),
+                                    new DrivePathSegment(47.0f, 0.7f)
+                            };
+
+                        } else {
+
+                            distanceToNewTarget = (float) (15.0f - (frontLeftMotor.getCurrentPosition() / countsPerInch));
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(317.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 35.0f, 1.0f),
+                                    new DrivePathSegment(317.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 35.0f, 1.0f),
+                                    new DrivePathSegment(317.0f, 0.7f)
+                            };
+                        }
+
+                    } else {
+
+                        distanceToNewTarget = (float) (40.0f - (frontLeftMotor.getCurrentPosition() / countsPerInch));
+
+                        if (isRobotOnRedAlliance()) {
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(0.0f, 0.7f),
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(92.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(92.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(92.0f, 0.7f)
+                            };
+
+                        } else {
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(0.0f, 0.7f),
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(272.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(272.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(272.0f, 0.7f)
+                            };
+                        }
+                    }
+
+                    newPathSet = true;
+                    startPath(objectivePath);
+                }
+
+                if (pathComplete()) {
+
+                    TurnOffAllDriveMotors();
+                    runWithoutEncoders();
+                    SetCurrentState(State.STATE_CLIMB_MOUNTAIN);
+                }
+
+                break;
+
+            case STATE_CLIMB_MOUNTAIN:
+
+                backBumperServo.setPosition(0.0d);
+
+                if (elapsedTimeForCurrentState.time() <= 5.0f) {
+
+                    frontLeftMotor.setPower(1.0d);
+                    frontRightMotor.setPower(1.0d);
+
+                } else {
+
+                    frontLeftMotor.setPower(0.0d);
+                    frontRightMotor.setPower(0.0d);
+                    SetCurrentState(State.STATE_STOP);
+                }
+
                 break;
         }
 
@@ -138,6 +253,7 @@ public class DeviBeaconBase extends AutonomousBase {
 
             TurnOffAllDriveMotors();
             runWithoutEncoders();
+            finalTime = elapsedGameTime.time();
             SetCurrentState(State.STATE_STOP);
         }
 
@@ -161,12 +277,17 @@ public class DeviBeaconBase extends AutonomousBase {
         stateList.add(State.STATE_DEPLOY_CLIMBERS);
         stateList.add(State.STATE_STOP);
         stateList.add(State.STATE_WAIT);
+        stateList.add(State.STATE_CHANGE_PATH);
+        stateList.add(State.STATE_CLIMB_MOUNTAIN);
     }
 
     @Override
     public void setReversedMotor() {
 
-        frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
         frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
+
+    abstract boolean isRobotOnRedAlliance();
+
+    abstract boolean isStartingOnWall();
 }

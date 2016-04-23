@@ -9,12 +9,24 @@ public class RedWallBeacon extends DeviBeaconBase {
 
     public RedWallBeacon() {
 
-        beaconPath = new DrivePathSegment[] {
+        objectivePath = new DrivePathSegment[] {
 
                 new DrivePathSegment(25.0f, 25.0f, 0.9f),
                 new DrivePathSegment(315.0f, 0.9f),
                 new DrivePathSegment(35.0f, 35.0f, 0.9f),
                 new DrivePathSegment(272.0f, 0.9f)
         };
+    }
+
+    @Override
+    boolean isRobotOnRedAlliance() {
+
+        return true;
+    }
+
+    @Override
+    boolean isStartingOnWall() {
+
+        return true;
     }
 }

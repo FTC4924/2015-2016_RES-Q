@@ -44,7 +44,7 @@ public class DeviClimbBase extends AutonomousBase {
 
                 if (pathComplete()) {
 
-                    TurnOffAllDriveMotors();
+                    backBumperServo.setPosition(0.0d);                    TurnOffAllDriveMotors();
                     runWithoutEncoders();
                     transitionToNextState();      // Next State:
                 }

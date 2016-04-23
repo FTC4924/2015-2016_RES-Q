@@ -5,7 +5,7 @@ import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
 /**
  * Created by 4924_Users on 3/26/2016.
  */
-public class BlueCornerOppositeClimb extends DeviClimbBaseTest {
+public class BlueCornerOppositeClimb extends DeviClimbBase {
 
     public BlueCornerOppositeClimb() {
 

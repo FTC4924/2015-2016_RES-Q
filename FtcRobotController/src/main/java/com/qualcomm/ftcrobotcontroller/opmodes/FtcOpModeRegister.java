@@ -71,5 +71,6 @@ public class FtcOpModeRegister implements OpModeRegister {
         manager.register("BlueCornerBeaconDecisionTest", BlueCornerBeaconDecisionTest.class);
         manager.register("RedWallBeaconDecisionTest", RedWallBeaconDecisionTest.class);
         manager.register("BlueWallBeaconDecisionTest", BlueWallBeaconDecisionTest.class);
+        manager.register("SharpIRTest", SharpIRTest.class);
     }
 }

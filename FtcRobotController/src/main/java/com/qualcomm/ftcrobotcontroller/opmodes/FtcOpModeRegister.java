@@ -54,7 +54,7 @@ public class FtcOpModeRegister implements OpModeRegister {
      *
      * If two or more op modes are registered with the same name, the app will display an error.
      */
-        manager.register("programmingpracticeThree",programmingpracticeThree.class);
+
         manager.register("battel_tank", battel_tank.class);
         //manager.register("RedCornerBeacon", RedCornerBeacon.class);
         //manager.register("BlueCornerBeacon", BlueCornerBeacon.class);

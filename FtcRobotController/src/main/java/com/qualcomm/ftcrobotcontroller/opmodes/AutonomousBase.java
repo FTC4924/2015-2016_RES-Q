@@ -25,7 +25,6 @@ public abstract class AutonomousBase extends OpMode {
         STATE_DRIVE_TO_BEACON,
         STATE_APPROACH_BEACON,
         STATE_DEPLOY_CLIMBERS,
-        STATE_READ_BEACON,
         STATE_DRIVE_TO_MOUNTAIN,
         STATE_CLIMB_MOUNTAIN,
         STATE_MOVE_TO_FLOOR_GOAL,
@@ -63,15 +62,14 @@ public abstract class AutonomousBase extends OpMode {
     DcMotor frontLeftMotor;
     DcMotor frontRightMotor;
     DcMotor collectMotor;
-    Servo rightsideservo; //rightsideservo is a
     Servo climberDeployer; //frontrightservo is a 180
     Servo ziplinerTripper;
     Servo deliveryBelt;
     Servo bumperServo;
     Servo gateServo;
+    Servo backBumperServo;
     GyroSensor turningGyro;
     TouchSensor bumper;
-    ColorSensor colorSensor;
     SharpIR10To150 sharpIRSensor;
 
     public State currentState;
@@ -93,21 +91,20 @@ public abstract class AutonomousBase extends OpMode {
         frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
         collectMotor = hardwareMap.dcMotor.get("collection");
         bumperServo = hardwareMap.servo.get("servo1");
-        rightsideservo = hardwareMap.servo.get("servo2");
+        backBumperServo = hardwareMap.servo.get("servo2");
         deliveryBelt = hardwareMap.servo.get("servo3");             //continuous
         climberDeployer = hardwareMap.servo.get("servo4");
         ziplinerTripper = hardwareMap.servo.get("servo5");          //continuous
         gateServo = hardwareMap.servo.get("servo6");                //continuous?
         turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
         bumper = hardwareMap.touchSensor.get("bumper");
-        colorSensor = hardwareMap.colorSensor.get("colorSensor");
         sharpIRSensor = new SharpIR10To150(hardwareMap.analogInput.get("sharpIR"));
 
         setReversedMotor();
 
         countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
 
-        rightsideservo.setPosition(1.0d);
+        backBumperServo.setPosition(0.5d);
         climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
@@ -135,6 +132,8 @@ public abstract class AutonomousBase extends OpMode {
 
         frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
         frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
+        TurnOffAllDriveMotors();
+        runWithoutEncoders();
     }
 
     public void addTelemetry() {
@@ -372,7 +371,6 @@ public abstract class AutonomousBase extends OpMode {
 
     public void initServos() {
 
-        rightsideservo.setPosition(1.0d);
         gateServo.setPosition(0.5d);
         ziplinerTripper.setPosition(0.5d);
         deliveryBelt.setPosition(0.5d);

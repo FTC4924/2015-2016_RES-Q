@@ -28,7 +28,6 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
     @Override
     public void loop() {
 
-        colorSensor.enableLed(false);
         initServos();
 
         switch (currentState) {
@@ -55,10 +54,22 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
                     transitionToNextState();
                 }
 
-                /*if (currentPathSegmentIndex == objectivePath.length - 1) {
+                float encoderPositionAverage = (frontRightMotor.getCurrentPosition() + frontLeftMotor.getCurrentPosition()) / 2;
 
-                    isCloseToBeacon = true;
-                }*/
+                if (isStartingOnWall()) {
+
+                    if (encoderPositionAverage >= 50.0f * countsPerInch) {
+
+                        isCloseToBeacon = true;
+                    }
+
+                } else {
+
+                    if (encoderPositionAverage >= 68.0f * countsPerInch) {
+
+                        isCloseToBeacon = true;
+                    }
+                }
 
                 if (pathIsBlocked() && !isCloseToBeacon) {
 
@@ -104,15 +115,6 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
 
                 break;
 
-            case STATE_READ_BEACON:
-
-                telemetry.addData("Red: ", isRed());
-                telemetry.addData("Blue: ", isBlue());
-                transitionToNextState();
-                finalTime = elapsedGameTime.time();
-
-                break;
-
             case STATE_STOP:
 
                 TurnOffAllDriveMotors();
@@ -136,7 +138,7 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
                     SetDriveMotorPowerLevels(powerLevels);
                 }
 
-                if (elapsedGameTime.time() >= 20.0f) {
+                if (elapsedTimeForCurrentSegment.time() >= 5.0f && elapsedGameTime.time() >= 8.0f) {
 
                     SetCurrentState(State.STATE_CHANGE_PATH);
                 }
@@ -227,6 +229,8 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
 
             case STATE_CLIMB_MOUNTAIN:
 
+                backBumperServo.setPosition(0.0d);
+
                 if (elapsedTimeForCurrentState.time() <= 5.0f) {
 
                     frontLeftMotor.setPower(1.0d);
@@ -249,6 +253,7 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
 
             TurnOffAllDriveMotors();
             runWithoutEncoders();
+            finalTime = elapsedGameTime.time();
             SetCurrentState(State.STATE_STOP);
         }
 
@@ -263,16 +268,6 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
         return sharpIRSensor.getDistance() <= 50.0f;
     }
 
-    public boolean isRed() {
-
-        return colorSensor.red() >= COLOR_THRESHOLD;
-    }
-
-    public boolean isBlue() {
-
-        return colorSensor.blue() >= COLOR_THRESHOLD;
-    }
-
     @Override
     public void addStates() {
 
@@ -280,7 +275,6 @@ public abstract class DeviBeaconBaseDecisionTest extends AutonomousBase {
         stateList.add(State.STATE_DRIVE_TO_BEACON);
         stateList.add(State.STATE_APPROACH_BEACON);
         stateList.add(State.STATE_DEPLOY_CLIMBERS);
-        stateList.add(State.STATE_READ_BEACON);
         stateList.add(State.STATE_STOP);
         stateList.add(State.STATE_WAIT);
         stateList.add(State.STATE_CHANGE_PATH);

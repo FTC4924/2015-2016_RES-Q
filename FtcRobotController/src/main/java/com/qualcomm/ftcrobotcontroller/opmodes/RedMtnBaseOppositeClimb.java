@@ -5,7 +5,7 @@ import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
 /**
  * Created by 4924_Users on 3/25/2016.
  */
-public class RedMtnBaseOppositeClimb extends DeviClimbBaseTest {
+public class RedMtnBaseOppositeClimb extends DeviClimbBase {
 
     public RedMtnBaseOppositeClimb() {
 

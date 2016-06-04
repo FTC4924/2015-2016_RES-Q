@@ -1,143 +1,46 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.ftcrobotcontroller.DrivePathSegment;
-import com.qualcomm.ftcrobotcontroller.EncoderTargets;
 import com.qualcomm.ftcrobotcontroller.FourWheelDrivePowerLevels;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.GyroSensor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 /**
- * Created by 4924_Users on 12/19/2015.
+ * Created by William on 4/7/2016.
  */
-public class DeviBeaconBase extends OpMode {
+public abstract class DeviBeaconBase extends AutonomousBase {
 
-    public enum State {
-        STATE_INITIAL,
-        STATE_DRIVE_TO_BEACON,
-        STATE_APPROACH_BEACON,
-        STATE_DEPLOY_CLIMBERS,
-        STATE_STOP
-    }
-
-    public ElapsedTime elapsedGameTime = new ElapsedTime();
-    private FourWheelDrivePowerLevels zeroPowerLevels = new FourWheelDrivePowerLevels(0.0f, 0.0f);
-    private ElapsedTime elapsedTimeForCurrentState = new ElapsedTime();
-    private ElapsedTime elapsedTimeForCurrentSegment = new ElapsedTime();
-    private EncoderTargets zeroEncoderTargets = new EncoderTargets(0, 0);
-    final int COUNTS_PER_REVOLUTION = 1120;
-    final double WHEEL_DIAMETER = 4.5f;
-    final double GEAR_RATIO = 24.0f/16.0f;
-    double countsPerInch;
-    double mustacheMotorAngle = 0.0d;
-    static final int ENCODER_TARGET_MARGIN = 10;
-    static final float TURNING_ANGLE_MARGIN = 2.0f;
-    static final float CALIBRATION_FACTOR = 1.414f;
-    static final float BUMPER_DEPLOYED_ANGLE = 0.0f;
-    static final float BUMPER_FOLDED_ANGLE = 0.6f;
-    static final float CLIMBER_ARM_DEPLOYED_ANGLE = 0.0f;
-    static final float CLIMBER_ARM_FOLDED_ANGLE = 1.0f;
-    int turnStartValueLeft;
-    int turnStartValueRight;
-    float climberArmAngle = 1.0f;
-    final float CLIMBER_ARM_WAIT_TIME = 4.0f;
-    final float CLIMBER_ARM_ANGLE_INCREMENTATION = 0.005f;
-
-    DcMotor frontLeftMotor;
-    DcMotor frontRightMotor;
-    Servo leftsideservo; //leftsideservo is a 180
-    Servo rightsideservo; //rightsideservo is a
-    Servo climberDeployer; //frontrightservo is a 180
-    Servo ziplinerTripper;
-    Servo deliveryBelt;
-    Servo bumperServo;
-    Servo gateServo;
-    GyroSensor turningGyro;
-    TouchSensor bumper;
-
-    public DrivePathSegment[] beaconPath = {
+    public DrivePathSegment[] objectivePath = {
 
             new DrivePathSegment(105.0f, 105.0f, 0.9f),
             new DrivePathSegment(315.0f, 0.7f),
             new DrivePathSegment(8.0f, 8.0f, 0.9f)
     };
 
-    public DrivePathSegment[] backingUpPath = {
-
-            new DrivePathSegment(-2.0f, -2.0f, 0.4f),
-    };
-
-    private State currentState;
-    private int currentPathSegmentIndex = 0;
-    private DrivePathSegment[] currentPath = beaconPath;
-    DrivePathSegment segment = currentPath[currentPathSegmentIndex];
-    EncoderTargets currentEncoderTargets = zeroEncoderTargets;
-
-    public void SetCurrentState(State newState) {
-
-        elapsedTimeForCurrentState.reset();
-        currentState = newState;
-    }
-
-    @Override
-    public void init() {
-
-        frontRightMotor = hardwareMap.dcMotor.get("frontrightMotor");
-        frontLeftMotor = hardwareMap.dcMotor.get("frontleftMotor");
-        bumperServo = hardwareMap.servo.get("servo1");
-        rightsideservo = hardwareMap.servo.get("servo2");
-        deliveryBelt = hardwareMap.servo.get("servo3");             //continuous
-        climberDeployer = hardwareMap.servo.get("servo4");
-        ziplinerTripper = hardwareMap.servo.get("servo5");          //continuous
-        gateServo = hardwareMap.servo.get("servo6");                //continuous?
-        turningGyro = hardwareMap.gyroSensor.get("gyroSensor");
-        bumper = hardwareMap.touchSensor.get("bumper");
-
-        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
-
-        countsPerInch = (COUNTS_PER_REVOLUTION / (Math.PI * WHEEL_DIAMETER)) * GEAR_RATIO * CALIBRATION_FACTOR;
-
-        turningGyro.calibrate();
-
-        rightsideservo.setPosition(1.0d);
-        climberDeployer.setPosition(CLIMBER_ARM_FOLDED_ANGLE);
-        gateServo.setPosition(0.5d);
-        ziplinerTripper.setPosition(0.5d);
-        deliveryBelt.setPosition(0.5d);
-        bumperServo.setPosition(BUMPER_FOLDED_ANGLE);
-    }
-
-    @Override
-    public void start() {
-
-        elapsedGameTime.reset();
-        SetCurrentState(State.STATE_INITIAL);
-    }
+    private float COLOR_THRESHOLD = 2.0f;
+    private boolean isCloseToBeacon = false;
+    static final float CLIMBER_ARM_DEPLOYED_ANGLE = 0.0f;
+    static final float CLIMBER_ARM_FOLDED_ANGLE = 1.0f;
+    final float CLIMBER_ARM_WAIT_TIME = 4.0f;
+    float climberArmAngle = 1.0f;
+    final float CLIMBER_ARM_ANGLE_INCREMENTATION = 0.005f;
 
     @Override
     public void loop() {
 
-        rightsideservo.setPosition(1.0d);
-        gateServo.setPosition(0.5d);
-        ziplinerTripper.setPosition(0.5d);
-        deliveryBelt.setPosition(0.5d);
-        bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
+        initServos();
 
         switch (currentState) {
 
             case STATE_INITIAL:
 
-                if (!turningGyro.isCalibrating()) {
+                if (!turningGyro.isCalibrating() && elapsedGameTime.time() >= 5.0f) {
 
-                    startPath(beaconPath);
-                    SetCurrentState(State.STATE_DRIVE_TO_BEACON);
+                    startPath(objectivePath);
+                    transitionToNextState();
                     telemetry.addData("1", String.format("L %5d - R %5d ", getLeftPosition(),
                             getRightPosition()));
+                    bumperServo.setPosition(BUMPER_DEPLOYED_ANGLE);
                 }
 
                 break;
@@ -148,7 +51,30 @@ public class DeviBeaconBase extends OpMode {
 
                     TurnOffAllDriveMotors();
                     runWithoutEncoders();
-                    SetCurrentState(State.STATE_APPROACH_BEACON);      // Next State:
+                    transitionToNextState();
+                }
+
+                float encoderPositionAverage = (frontRightMotor.getCurrentPosition() + frontLeftMotor.getCurrentPosition()) / 2;
+
+                if (isStartingOnWall()) {
+
+                    if (encoderPositionAverage >= 50.0f * countsPerInch) {
+
+                        isCloseToBeacon = true;
+                    }
+
+                } else {
+
+                    if (encoderPositionAverage >= 68.0f * countsPerInch) {
+
+                        isCloseToBeacon = true;
+                    }
+                }
+
+                if (pathIsBlocked() && !isCloseToBeacon) {
+
+                    pausedStateIndex = stateIndex;
+                    SetCurrentState(State.STATE_WAIT);
                 }
 
                 break;
@@ -158,7 +84,8 @@ public class DeviBeaconBase extends OpMode {
                 if (bumper.isPressed()) {
 
                     TurnOffAllDriveMotors();
-                    SetCurrentState(State.STATE_DEPLOY_CLIMBERS);
+                    runWithoutEncoders();
+                    transitionToNextState();
 
                 } else {
 
@@ -193,6 +120,128 @@ public class DeviBeaconBase extends OpMode {
                 TurnOffAllDriveMotors();
                 frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
                 frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+                telemetry.addData("Final Time: ", finalTime);
+
+                break;
+
+            case STATE_WAIT:
+
+                TurnOffAllDriveMotors();
+
+                if (!pathIsBlocked()) {
+
+                    stateIndex = pausedStateIndex - 1;
+                    transitionToNextState();
+
+                    FourWheelDrivePowerLevels powerLevels =
+                            new FourWheelDrivePowerLevels(segment.leftPower, segment.rightPower);
+                    SetDriveMotorPowerLevels(powerLevels);
+                }
+
+                if (elapsedTimeForCurrentSegment.time() >= 5.0f && elapsedGameTime.time() >= 8.0f) {
+
+                    SetCurrentState(State.STATE_CHANGE_PATH);
+                }
+
+                break;
+
+            case STATE_CHANGE_PATH:
+
+                if (!newPathSet) {
+
+                    float distanceToNewTarget;
+
+                    if (isStartingOnWall()) {
+
+                        if (isRobotOnRedAlliance()) {
+
+                            distanceToNewTarget = (float) (15.0f - (frontRightMotor.getCurrentPosition() / countsPerInch));
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(47.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 25.0f, 1.0f),
+                                    new DrivePathSegment(47.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 25.0f, 1.0f),
+                                    new DrivePathSegment(47.0f, 0.7f)
+                            };
+
+                        } else {
+
+                            distanceToNewTarget = (float) (15.0f - (frontLeftMotor.getCurrentPosition() / countsPerInch));
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(317.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 35.0f, 1.0f),
+                                    new DrivePathSegment(317.0f, 0.7f),
+                                    new DrivePathSegment(25.0f, 35.0f, 1.0f),
+                                    new DrivePathSegment(317.0f, 0.7f)
+                            };
+                        }
+
+                    } else {
+
+                        distanceToNewTarget = (float) (40.0f - (frontLeftMotor.getCurrentPosition() / countsPerInch));
+
+                        if (isRobotOnRedAlliance()) {
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(0.0f, 0.7f),
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(92.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(92.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(92.0f, 0.7f)
+                            };
+
+                        } else {
+
+                            objectivePath = new DrivePathSegment[] {
+
+                                    new DrivePathSegment(0.0f, 0.7f),
+                                    new DrivePathSegment(distanceToNewTarget, distanceToNewTarget, 1.0f),
+                                    new DrivePathSegment(272.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(272.0f, 0.7f),
+                                    new DrivePathSegment(20.0f, 20.0f, 1.0f),
+                                    new DrivePathSegment(272.0f, 0.7f)
+                            };
+                        }
+                    }
+
+                    newPathSet = true;
+                    startPath(objectivePath);
+                }
+
+                if (pathComplete()) {
+
+                    TurnOffAllDriveMotors();
+                    runWithoutEncoders();
+                    SetCurrentState(State.STATE_CLIMB_MOUNTAIN);
+                }
+
+                break;
+
+            case STATE_CLIMB_MOUNTAIN:
+
+                backBumperServo.setPosition(0.0d);
+
+                if (elapsedTimeForCurrentState.time() <= 5.0f) {
+
+                    frontLeftMotor.setPower(1.0d);
+                    frontRightMotor.setPower(1.0d);
+
+                } else {
+
+                    frontLeftMotor.setPower(0.0d);
+                    frontRightMotor.setPower(0.0d);
+                    SetCurrentState(State.STATE_STOP);
+                }
 
                 break;
         }
@@ -204,6 +253,7 @@ public class DeviBeaconBase extends OpMode {
 
             TurnOffAllDriveMotors();
             runWithoutEncoders();
+            finalTime = elapsedGameTime.time();
             SetCurrentState(State.STATE_STOP);
         }
 
@@ -213,233 +263,31 @@ public class DeviBeaconBase extends OpMode {
         }
     }
 
+    private boolean pathIsBlocked() {
+
+        return sharpIRSensor.getDistance() <= 50.0f;
+    }
+
     @Override
-    public void stop() {
+    public void addStates() {
 
-        frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
-        frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
+        stateList.add(State.STATE_INITIAL);
+        stateList.add(State.STATE_DRIVE_TO_BEACON);
+        stateList.add(State.STATE_APPROACH_BEACON);
+        stateList.add(State.STATE_DEPLOY_CLIMBERS);
+        stateList.add(State.STATE_STOP);
+        stateList.add(State.STATE_WAIT);
+        stateList.add(State.STATE_CHANGE_PATH);
+        stateList.add(State.STATE_CLIMB_MOUNTAIN);
     }
 
-    private void addTelemetry() {
+    @Override
+    public void setReversedMotor() {
 
-        telemetry.addData("L Target: ", currentEncoderTargets.LeftTarget);
-        telemetry.addData("L Pos: ", getLeftPosition());
-        telemetry.addData("R Target: ", currentEncoderTargets.RightTarget);
-        telemetry.addData("R Pos: ", getRightPosition());
-        telemetry.addData("State: ", currentState);
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
-    private int getRightPosition() {
+    abstract boolean isRobotOnRedAlliance();
 
-        return frontRightMotor.getCurrentPosition();
-    }
-
-    private int getLeftPosition() {
-
-        return frontLeftMotor.getCurrentPosition();
-    }
-
-    private void startPath(DrivePathSegment[] path) {
-
-        currentPath = path;
-        currentPathSegmentIndex = 0;
-        setEncoderTargetsToCurrentPosition();
-        useRunUsingEncoders();
-        startSeg();
-    }
-
-    private void setEncoderTargetsToCurrentPosition() {
-
-        currentEncoderTargets.LeftTarget = getLeftPosition();
-        currentEncoderTargets.RightTarget = getRightPosition();
-    }
-
-    public void UseRunToPosition() {
-
-        setDriveMode(DcMotorController.RunMode.RUN_TO_POSITION);
-    }
-
-    public void useRunUsingEncoders() {
-
-        setDriveMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-    }
-
-    public void runWithoutEncoders() {
-
-        setDriveMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
-    }
-
-    public void setDriveMode(DcMotorController.RunMode mode) {
-
-        if (frontLeftMotor.getChannelMode() != mode)
-            frontRightMotor.setChannelMode(mode);
-        if (frontRightMotor.getChannelMode() != mode)
-            frontLeftMotor.setChannelMode(mode);
-    }
-
-    private void startSeg() {
-
-        segment = currentPath[currentPathSegmentIndex];
-
-        int Left;
-        int Right;
-
-        elapsedTimeForCurrentSegment.reset();
-
-        if (currentPath != null) {
-
-            if (segment.isTurn) {
-
-                turnStartValueLeft = getLeftPosition();
-                turnStartValueRight = getRightPosition();
-
-                runWithoutEncoders();
-                double currentAngle = turningGyro.getHeading();
-
-                if (!counterclockwiseTurnNeeded(currentAngle)) {
-
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(segment.leftPower, 0.0f);
-                    SetDriveMotorPowerLevels(powerLevels);
-
-                } else {
-
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.0f, segment.leftPower);
-                    SetDriveMotorPowerLevels(powerLevels);
-                }
-
-            } else {
-
-                if (segment.isDelay) {
-
-                    runWithoutEncoders();
-
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(0.0f, 0.0f);
-                    SetDriveMotorPowerLevels(powerLevels);
-
-                } else {
-
-                    useRunUsingEncoders();
-
-                    Left  = (int)(segment.LeftSideDistance * countsPerInch);
-                    Right = (int)(segment.RightSideDistance * countsPerInch);
-                    addEncoderTarget(Left, Right);
-                    FourWheelDrivePowerLevels powerLevels =
-                            new FourWheelDrivePowerLevels(segment.leftPower, segment.leftPower);
-                    SetDriveMotorPowerLevels(powerLevels);
-                }
-            }
-
-            currentPathSegmentIndex++;
-        }
-    }
-
-    private boolean counterclockwiseTurnNeeded(double currentAngle) {
-
-        telemetry.addData("Angle: ", currentAngle);
-
-        if (currentAngle < Math.abs(segment.Angle)) {
-
-            return (Math.abs(segment.Angle) - currentAngle) >= 180.0f;
-        }
-
-        return (currentAngle - Math.abs(segment.Angle)) <= 180.0f;
-    }
-
-    void addEncoderTarget(int leftEncoderAdder, int rightEncoderAdder) {
-
-        currentEncoderTargets.LeftTarget += leftEncoderAdder;
-        currentEncoderTargets.RightTarget += rightEncoderAdder;
-    }
-
-    private void SetDriveMotorPowerLevels(FourWheelDrivePowerLevels levels) {
-
-        frontRightMotor.setPower(levels.frontLeft);
-        frontLeftMotor.setPower(levels.backRight);
-    }
-
-    private boolean pathComplete() {
-        // Wait for this Segement to end and then see what's next.
-        if (segmentComplete()) {
-            // Start next Segement if there is one.
-            if (currentPathSegmentIndex < currentPath.length) {
-
-                TurnOffAllDriveMotors();
-                startSeg();
-
-            } else {
-
-                currentPath = null;
-                currentPathSegmentIndex = 0;
-                TurnOffAllDriveMotors();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean linearMoveComplete() {
-
-        int leftPosition = getLeftPosition();
-        int leftTarget = currentEncoderTargets.LeftTarget;
-        int rightPosition = getRightPosition();
-        int rightTarget = currentEncoderTargets.RightTarget;
-
-        return (isPositionClose(leftPosition, leftTarget) &&
-                isPositionClose(rightPosition, rightTarget)) ||
-                (isPastTarget(leftPosition, leftTarget) &&
-                isPastTarget(rightPosition, rightTarget));
-    }
-
-    private boolean isPositionClose(int position, int target) {
-
-        return Math.abs(position - target) < ENCODER_TARGET_MARGIN;
-    }
-
-    private boolean isPastTarget(int position, int target) {
-
-        return position > target;
-    }
-
-    private void TurnOffAllDriveMotors() {
-        SetDriveMotorPowerLevels(zeroPowerLevels);
-    }
-
-    private void SetEncoderTargets() {
-        frontLeftMotor.setTargetPosition(currentEncoderTargets.LeftTarget);
-        frontRightMotor.setTargetPosition(currentEncoderTargets.RightTarget);
-    }
-
-    public boolean turnComplete() {
-
-        return Math.abs(segment.Angle) <= turningGyro.getHeading() + TURNING_ANGLE_MARGIN &&
-                Math.abs(segment.Angle) >= turningGyro.getHeading() - TURNING_ANGLE_MARGIN;
-    }
-
-    public boolean segmentComplete() {
-
-        if (segment.isTurn) {
-
-            return turnComplete();
-
-        } else {
-
-            if (segment.isDelay) {
-
-                return delayComplete();
-
-            } else {
-
-                return linearMoveComplete();
-            }
-        }
-    }
-
-    private boolean delayComplete() {
-
-        return elapsedTimeForCurrentSegment.time() >= segment.delayTime;
-    }
+    abstract boolean isStartingOnWall();
 }

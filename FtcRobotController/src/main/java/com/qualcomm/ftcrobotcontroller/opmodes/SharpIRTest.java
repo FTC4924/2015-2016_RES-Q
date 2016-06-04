@@ -13,7 +13,7 @@ public class SharpIRTest extends OpMode {
     @Override
     public void init() {
 
-        irSensor = new SharpIR10To150(hardwareMap.analogInput.get("irSensor"));
+        irSensor = new SharpIR10To150(hardwareMap.analogInput.get("sharpIR"));
     }
 
     @Override
@@ -21,5 +21,11 @@ public class SharpIRTest extends OpMode {
 
         telemetry.addData("Sharp IR Distance: ", irSensor.getDistance());
         telemetry.addData("Sharp IR Value: ", irSensor.getRawDistance());
+        telemetry.addData("Is Path Blocked", pathIsBlocked());
+    }
+
+    private boolean pathIsBlocked() {
+
+        return irSensor.getDistance() <= 50.0f;
     }
 }

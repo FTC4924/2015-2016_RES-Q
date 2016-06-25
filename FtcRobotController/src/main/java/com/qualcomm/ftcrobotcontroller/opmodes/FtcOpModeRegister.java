@@ -58,6 +58,7 @@ public class FtcOpModeRegister implements OpModeRegister {
         manager.register("battel_tank", battel_tank.class);
         //manager.register("RedCornerBeacon", RedCornerBeacon.class);
         //manager.register("BlueCornerBeacon", BlueCornerBeacon.class);
+        manager.register("PracticeRobotTeleOp", PracticeRobotTeleOp.class);
         manager.register("DriveToFloorGoal", DriveToFloorGoal.class);
         manager.register("RedPushAndClimb", RedPushAndClimb.class);
         manager.register("BluePushAndClimb", BluePushAndClimb.class);

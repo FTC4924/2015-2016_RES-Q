@@ -16,13 +16,19 @@ public class PracticeRobotTeleOp extends OpMode {
     GyroSensor Gyro;
     PracticeRobotPowerLevels PowerLevels = new PracticeRobotPowerLevels();
 
-    final float CURVE_POWER_ADJUSTMENT = 0.2f;
-    final float GYRO_ANGLE_MARGINE = 1.0f;
+    final float GYRO_ANGLE_MARGIN = 1.0f;
     final float BASE_HOLONOMIC_DRIVE_POWER = 0.5f;
+    final int LOOP_SAMPLE_RATE = 5;
 
+    float angleSample = 0.0f;
+    float curvePowerAdjustment = 0.1f;
+    float previousCurvePowerAdjustment = 0.1f;
     float steadyAngle = 0.0f;
     boolean isStrafingLeft = false;
     boolean isStrafingRight = false;
+    boolean haveSamplesInitialized = false;
+    int loopCount = 0;
+    float powerAdjustmentPerDegree = 0;
 
     @Override
     public void init() {
@@ -43,20 +49,36 @@ public class PracticeRobotTeleOp extends OpMode {
     @Override
     public void loop() {
 
-        isStrafingLeft = gamepad1.left_bumper;
-        isStrafingRight = gamepad1.right_bumper;
+        //if (!Gyro.isCalibrating()) {
 
-        if (isStrafingLeft || isStrafingRight) {
+            isStrafingLeft = gamepad1.left_bumper;
+            isStrafingRight = gamepad1.right_bumper;
 
-            setPowerForMecanumStrafe();
+            if (isStrafingLeft || isStrafingRight) {
 
-        } else {
+                setPowerForMecanumStrafe();
 
-            setPowerForTankDrive();
-            steadyAngle = Gyro.getHeading();
-        }
+                if (haveSamplesInitialized) {
 
-        setMotorPowerLevels(PowerLevels);
+                    float angleDifference = Gyro.getHeading() - angleSample;
+                    powerAdjustmentPerDegree = (curvePowerAdjustment - previousCurvePowerAdjustment) / angleDifference;
+                    curvePowerAdjustment = powerAdjustmentPerDegree * (Gyro.getHeading() - steadyAngle);
+                }
+
+                haveSamplesInitialized = true;
+
+                angleSample = Gyro.getHeading();
+                previousCurvePowerAdjustment = curvePowerAdjustment;
+                loopCount = 0;
+
+            } else {
+
+                setPowerForTankDrive();
+                steadyAngle = Gyro.getHeading();
+            }
+
+            setMotorPowerLevels(PowerLevels);
+        //}
     }
 
     public void setMotorPowerLevels(PracticeRobotPowerLevels PowerLevels) {
@@ -102,27 +124,27 @@ public class PracticeRobotTeleOp extends OpMode {
 
         if (isStrafingLeft) {
 
-            if (Gyro.getHeading() < steadyAngle - GYRO_ANGLE_MARGINE) {
+            if (Gyro.getHeading() < steadyAngle - GYRO_ANGLE_MARGIN) {
 
-                PowerLevels.backLeftPower -= CURVE_POWER_ADJUSTMENT;
+                PowerLevels.backLeftPower -= curvePowerAdjustment;
             }
 
-            if (Gyro.getHeading() > steadyAngle + GYRO_ANGLE_MARGINE) {
+            if (Gyro.getHeading() > steadyAngle + GYRO_ANGLE_MARGIN) {
 
-                PowerLevels.frontLeftPower += CURVE_POWER_ADJUSTMENT;
+                PowerLevels.frontLeftPower += curvePowerAdjustment;
             }
         }
 
         if (isStrafingRight) {
 
-            if (Gyro.getHeading() < steadyAngle - GYRO_ANGLE_MARGINE) {
+            if (Gyro.getHeading() < steadyAngle - GYRO_ANGLE_MARGIN) {
 
-                PowerLevels.frontRightPower += CURVE_POWER_ADJUSTMENT;
+                PowerLevels.frontRightPower += curvePowerAdjustment;
             }
 
-            if (Gyro.getHeading() > steadyAngle + GYRO_ANGLE_MARGINE) {
+            if (Gyro.getHeading() > steadyAngle + GYRO_ANGLE_MARGIN) {
 
-                PowerLevels.backRightPower -= CURVE_POWER_ADJUSTMENT;
+                PowerLevels.backRightPower -= curvePowerAdjustment;
             }
         }
     }

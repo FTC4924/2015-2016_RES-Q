@@ -3,6 +3,7 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * Created by 4924_Users on 6/3/2016.
@@ -20,15 +21,12 @@ public class PracticeRobotTeleOp extends OpMode {
     final float BASE_HOLONOMIC_DRIVE_POWER = 0.5f;
     final int LOOP_SAMPLE_RATE = 5;
 
+    int loopCount = 0;
     float angleSample = 0.0f;
-    float curvePowerAdjustment = 0.1f;
-    float previousCurvePowerAdjustment = 0.1f;
+    float curvePowerAdjustment = 1.0f;
     float steadyAngle = 0.0f;
     boolean isStrafingLeft = false;
     boolean isStrafingRight = false;
-    boolean haveSamplesInitialized = false;
-    int loopCount = 0;
-    float powerAdjustmentPerDegree = 0;
 
     @Override
     public void init() {
@@ -49,7 +47,7 @@ public class PracticeRobotTeleOp extends OpMode {
     @Override
     public void loop() {
 
-        //if (!Gyro.isCalibrating()) {
+        if (!Gyro.isCalibrating()) {
 
             isStrafingLeft = gamepad1.left_bumper;
             isStrafingRight = gamepad1.right_bumper;
@@ -58,27 +56,27 @@ public class PracticeRobotTeleOp extends OpMode {
 
                 setPowerForMecanumStrafe();
 
-                if (haveSamplesInitialized) {
+                if (loopCount >= LOOP_SAMPLE_RATE) {
 
-                    float angleDifference = Gyro.getHeading() - angleSample;
-                    powerAdjustmentPerDegree = (curvePowerAdjustment - previousCurvePowerAdjustment) / angleDifference;
-                    curvePowerAdjustment = powerAdjustmentPerDegree * (Gyro.getHeading() - steadyAngle);
+                    curvePowerAdjustment = Math.abs(Gyro.getHeading() - steadyAngle) / 25.0f;
+                    loopCount = 0;
                 }
 
-                haveSamplesInitialized = true;
-
-                angleSample = Gyro.getHeading();
-                previousCurvePowerAdjustment = curvePowerAdjustment;
-                loopCount = 0;
+                loopCount++;
 
             } else {
 
                 setPowerForTankDrive();
                 steadyAngle = Gyro.getHeading();
+                angleSample = Gyro.getHeading();
             }
 
+            clipPowerLevels();
             setMotorPowerLevels(PowerLevels);
-        //}
+
+            telemetry.addData("Power Adjustment: ", curvePowerAdjustment);
+            telemetry.addData("Heading: ", Gyro.getHeading());
+        }
     }
 
     public void setMotorPowerLevels(PracticeRobotPowerLevels PowerLevels) {
@@ -147,5 +145,13 @@ public class PracticeRobotTeleOp extends OpMode {
                 PowerLevels.backRightPower -= curvePowerAdjustment;
             }
         }
+    }
+
+    public void clipPowerLevels() {
+
+        PowerLevels.backRightPower = Range.clip(PowerLevels.backRightPower, -1.0f, 1.0f);
+        PowerLevels.backLeftPower = Range.clip(PowerLevels.backLeftPower, -1.0f, 1.0f);
+        PowerLevels.frontRightPower = Range.clip(PowerLevels.frontRightPower, -1.0f, 1.0f);
+        PowerLevels.frontLeftPower = Range.clip(PowerLevels.frontLeftPower, -1.0f, 1.0f);
     }
 }

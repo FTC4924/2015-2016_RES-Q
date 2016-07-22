@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 /**
  * Created by Bob on 1/23/2016.
  */
-public class LeftReverseTest extends OpMode {
+public class  LeftReverseTest extends OpMode {
 
     DcMotor leftMotor;
     DcMotor rightMotor;

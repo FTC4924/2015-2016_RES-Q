@@ -5,8 +5,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.wifi.p2p.WifiP2pManager;
-import android.util.EventLog;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -24,13 +22,16 @@ public class PracticeRobotTeleOp extends OpMode implements SensorEventListener {
     DcMotor frontRightMotor;
     GyroSensor Gyro;
     PracticeRobotPowerLevels PowerLevels = new PracticeRobotPowerLevels();
-    SensorManager sensorManager;
-    Sensor accelerometer;
-
+    private SensorManager mSensorManager;
+    private Sensor accelerometer;
+    private Sensor magnetometer;
+    private float pitch = 0.0f;
+    private float[] mGravity;
+    private float[] mGeomagnetic;
 
     final float GYRO_ANGLE_MARGIN = 1.0f;
     final float BASE_HOLONOMIC_DRIVE_POWER = 0.5f;
-    final int LOOP_SAMPLING_RATE = 10;
+    final int LOOP_SAMPLING_RATE = 20;
 
     float angleSample = 0.0f;
     float curvePowerAdjustment = 1.0f;
@@ -38,9 +39,6 @@ public class PracticeRobotTeleOp extends OpMode implements SensorEventListener {
     boolean isStrafingLeft = false;
     boolean isStrafingRight = false;
     int loopCount = 0;
-    float orientationZero = 0.0f;
-    float orientationOne = 0.0f;
-    float orientationTwo = 0.0f;
 
     @Override
     public void init() {
@@ -56,12 +54,21 @@ public class PracticeRobotTeleOp extends OpMode implements SensorEventListener {
         frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
         backRightMotor.setDirection(DcMotor.Direction.FORWARD);
 
-        sensorManager = (SensorManager) hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager = (SensorManager) hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        pitch = 0.0f;
 
         Gyro.calibrate();
     }
+
+    @Override
+    public void start() {
+
+        mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI);
+    }
+
 
     @Override
     public void loop() {
@@ -103,9 +110,13 @@ public class PracticeRobotTeleOp extends OpMode implements SensorEventListener {
             setMotorPowerLevels(PowerLevels);
         }
 
-        telemetry.addData("Orient 0: ", orientationZero);
-        telemetry.addData("Orient 1: ", orientationOne);
-        telemetry.addData("Orient 2: ", orientationTwo);
+        //telemetry.addData("pitch", Math.round(Math.toDegrees(pitch)));
+    }
+
+    @Override
+    public void stop() {
+
+        mSensorManager.unregisterListener(this);
     }
 
     public void setMotorPowerLevels(PracticeRobotPowerLevels PowerLevels) {
@@ -133,7 +144,7 @@ public class PracticeRobotTeleOp extends OpMode implements SensorEventListener {
             PowerLevels.backRightPower = BASE_HOLONOMIC_DRIVE_POWER;
             PowerLevels.frontRightPower = -BASE_HOLONOMIC_DRIVE_POWER;
 
-            adjustPowerForHolonomicCurve();
+            adjustHolonomicPower();
         }
 
         if (isStrafingRight) {
@@ -143,11 +154,11 @@ public class PracticeRobotTeleOp extends OpMode implements SensorEventListener {
             PowerLevels.backRightPower = -BASE_HOLONOMIC_DRIVE_POWER;
             PowerLevels.frontRightPower = BASE_HOLONOMIC_DRIVE_POWER;
 
-            adjustPowerForHolonomicCurve();
+            adjustHolonomicPower();
         }
     }
 
-    public void adjustPowerForHolonomicCurve() {
+    public void adjustHolonomicPower() {
 
         if (isStrafingLeft) {
 
@@ -184,19 +195,30 @@ public class PracticeRobotTeleOp extends OpMode implements SensorEventListener {
         PowerLevels.frontLeftPower = Range.clip(PowerLevels.frontLeftPower, -1.0f, 1.0f);
     }
 
-    @Override
     public void onSensorChanged(SensorEvent event) {
 
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
-            float[] orientation = new float[3];
-            float[] R = new float[9];
+            mGravity = event.values;
+        }
 
-            SensorManager.getOrientation(R, orientation);
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
 
-            orientationZero = orientation[0];
-            orientationOne = orientation[1];
-            orientationTwo = orientation[2];
+            mGeomagnetic = event.values;
+        }
+
+        if (mGravity != null && mGeomagnetic != null) {
+
+            float R[] = new float[9];
+            float I[] = new float[9];
+            boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+
+            if (success) {
+
+                float orientation[] = new float[3];
+                SensorManager.getOrientation(R, orientation);
+                pitch = orientation[1];
+            }
         }
     }
 
